@@ -1,10 +1,10 @@
 :- module(mathml, [
     mathml/2,
     op(300, xfx, apply_function),
-    op(180, xf, !)]).
+    op(180, xf, !),
+    op(200, xfy, '_')]).
 
 :- use_module(library(http/html_write)).
-
 :- discontiguous mathml/2.
 :- discontiguous example/0, example/1.
 :- discontiguous paren/2.
@@ -216,23 +216,23 @@ mathml(no_paren(Name, Arg), X) :-
     number(Arg), Arg >= 0,
     !, mathml(Name apply_function Arg, X).
 
-ml(no_paren(Name, Arg), X) :-
-    ml(fun(Name, Arg), X).
+mathml(no_paren(Name, Arg), X) :-
+    mathml(fun(Name, Arg), X).
 
-ml(dbinom(K, N, P), X) :-
-    ml(fun('P' '_' "Bi", 'X' = K ; [N, P]), X).
+mathml(dbinom(K, N, P), X) :-
+    mathml(fun('P' '_' "Bi", 'X' = K ; [N, P]), X).
 
-ml(pbinom(K, N, P), X) :-
-    ml(fun('P' '_' "Bi", 'X' =< K ; [N, P]), X).
+mathml(pbinom(K, N, P), X) :-
+    mathml(fun('P' '_' "Bi", 'X' =< K ; [N, P]), X).
 
-ml(ubinom(K, N, P), X) :-
-    ml(fun('P' '_' "Bi", 'X' >= K ; [N, P]), X).
+mathml(ubinom(K, N, P), X) :-
+    mathml(fun('P' '_' "Bi", 'X' >= K ; [N, P]), X).
 
-ml(qbinom(Alpha, N, P), X) :-
-    ml(fun('Q' '_' "Bi", Alpha ; [N, P]), X).
+mathml(qbinom(Alpha, N, P), X) :-
+    mathml(fun('Q' '_' "Bi", Alpha ; [N, P]), X).
 
-ml(uqbinom(Alpha, N, P), X) :-
-    ml(fun('Q' '_' "Bi", 1-Alpha ; [N, P]), X).
+mathml(uqbinom(Alpha, N, P), X) :-
+    mathml(fun('Q' '_' "Bi", 1-Alpha ; [N, P]), X).
 
 % Bit unusual terminology
 mathml(bernoulli(Succ, N, Pi), X) :-
