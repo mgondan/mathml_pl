@@ -9,7 +9,7 @@ Simple usage example from the SWI-Prolog console:
 ```
 pack_install(mathml).
 use_module(library(mathml)).
-use_module(library(html_write)).
+use_module(library(http/html_write)).
 
 mathml(sin(x), M), html(html(math(M)), Tokens, []), print_html(Tokens).
 ```
