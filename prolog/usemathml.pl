@@ -2,7 +2,6 @@
 :- use_module(library(html_write)).
 
 example :-
-    mathml(sin(x), M),
-    writeln('<HTML>'),
-    print_html(M),
-    writeln('</HTML>').
+    mathml(sin(x), M), 
+    html(html(math(M)), Tokens, []),
+    print_html(Tokens).
