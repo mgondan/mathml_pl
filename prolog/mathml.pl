@@ -1,6 +1,8 @@
 :- module(mathml, [
+    mathml//1,
     mathml/2,
     op(300, xfx, apply_function),
+    op(400, yfx, invisible_times),
     op(180, xf, !),
     op(200, xfy, '_')]).
 
@@ -11,8 +13,21 @@
 :- discontiguous prec/3.
 :- discontiguous inner/2.
 
-:- current_op(Prec, yfx, *), op(Prec, yfx, invisible_times).
-:- current_op(Prec, xfy, ^), op(Prec, xfy, '_').
+%
+% DCG interface
+%
+% e.g., invoke with something like
+%
+% mathml(dbinom(k, 'N', pi) =
+%     with(choose('N', k) = dfrac('N'!, k!*('N'-k)!), "the binomial coefficient")
+%     * pi^k * (1-pi)^('N' - k), M, []), print_html(M).
+%
+mathml(A) -->
+    {
+       mathml(A, M),
+       denoting(A, D)
+    },
+    html(p(math([M | D]))).
 
 %
 % Variables ('identifiers')
@@ -26,6 +41,7 @@ mi(alpha, \['&alpha;']).
 mi(mu, \['&mu;']).
 mi(pi, \['&pi;']).
 mi(sigma, \['&sigma;']).
+mi(ldots, \['&hellip;']).
 
 % Operator precedence
 prec(A, P, Op) :-
@@ -403,16 +419,20 @@ example(col) :-
 % Operators
 %
 % check if multiplication sign can be omitted
-invisible_times(A) :-
+%
+% Todo: include compounds such as A^B, red(A), with(A, _, _)
+invisible_times_first(A) :-
     atom(A).
 
-invisible_times(A) :-
-    number(A),
-    A > 0.
+invisible_times_first(A) :-
+    number(A).
+
+invisible_times_rest(B) :-
+    atom(B).
 
 invisible_times(A*B) :-
-    invisible_times(A),
-    invisible_times(B).
+    invisible_times_first(A),
+    invisible_times_rest(B).
 
 % No parentheses around base in subscript and powers
 mathml(A '_' B ^ C, msubsup([X, Y, Z])) :-
@@ -602,18 +622,23 @@ example(num) :-
 %
 % Abbreviations
 %
-mathml(with(X, _Term, _Desc), Y) :-
+mathml(with(X, _, _), Y) :-
     mathml(X, Y).
 
 paren(with(A, _, _), P) :-
     !, paren(A, P).
 
-% Collect abbreviations
-with(with(Exp, Term, Desc), [with(Exp = Term, Desc) | T]) :-
-    !, with(Exp, T).
+prec(with(A, _, _), P, Op) :-
+    !, prec(A, P, Op).
 
-with(X, []) :-
-    atomic(X).
+% Collect abbreviations
+with(with(Abbrev, Exp, Desc), X) :-
+    !, with(Exp, T),
+    X = [with(Abbrev, Exp, Desc) | T].
+
+with(X, W) :-
+    atomic(X),
+    !, W = [].
 
 with(X, W) :-
     compound(X),
@@ -621,50 +646,36 @@ with(X, W) :-
     maplist(with, Args, List),
     append(List, W).
 
-% Render in HTML
-denoting([]) -->
-    html("").
+% Render abbreviations
+denoting(A, []) :-
+    with(A, []),
+    !.
 
-denoting([with(ExpTerm, Desc) | T]) -->
-    {mathml(list([", with", &(nbsp), ExpTerm, &(nbsp), "denoting", &(nbsp), Desc]), M)},
-    html(math(M)),
-    denoting_and(T).
+denoting(A, [M | MT]) :-
+    with(A, [with(Abbrev, Exp, Desc) | T]),
+    mathml(list([
+        ", with", &(nbsp), Abbrev = Exp, &(nbsp), "denoting", &(nbsp), Desc]), M),
+    denoting_and(T, MT).
 
-denoting_and([]) -->
-    html(".").
+denoting_and([], [X]) :-
+    mathml(".", X).
 
-denoting_and([with(ExpTerm, Desc) | T]) -->
-    {mathml(list([', and&(nbsp)', ExpTerm, '&(nbsp)denoting&(nbsp)', Desc], ''), M)},
-    html(math(M)),
-    denoting_and(T).
-
-%
-% Convert the whole thing
-%
-mathml(A) -->
-    {
-       term_string(A, S),
-       mathml(A, M),
-       with(A, W)
-    },
-    html(S),
-    html(p('')),
-    html(math(M)),
-    denoting(W),
-    html(p('')).
-
-example(ml) :-
-    mathml(((a + b)^2 = a^2 + 2*a*b + b^2), M, []),
-    print_html(M).
+denoting_and([with(Abbrev, Exp, Desc) | T], [M | MT]) :-
+    mathml(list([
+        ", and", &(nbsp), Abbrev = Exp, &(nbsp), "denoting", &(nbsp), Desc]), M),
+    denoting_and(T, MT).
 
 example(ml) :-
     mathml(dbinom(k, 'N', pi) =
-        with(choose('N', k), dfrac('N'!, k!*('N'-k)!), "the binomial coefficient")
-           * pi^k * (1-pi)^('N' - k), M, []),
+        with(choose('N', k),
+            dfrac(
+                with('N'!, 1*2*3*ldots*'N', "the factorial"),
+                k!*('N'-k)!),
+            "the binomial coefficient")
+        * pi^k * (1-pi)^('N' - k), M, []),
     print_html(M).
 
 example :-
     writeln('<HTML>'),
     findall(true, example(_), _),
     writeln('</HTML>').
-
