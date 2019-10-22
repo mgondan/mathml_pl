@@ -1,38 +1,39 @@
 :- module(mathml, [
-    mathml//1,
     mathml/2,
     op(300, xfx, apply_function),
     op(400, yfx, invisible_times),
     op(180, xf, !),
     op(200, xfy, '_')]).
 
+:- op(300, xfx, apply_function).
+:- op(400, yfx, invisible_times).
+:- op(180, xf, !).
+:- op(200, xfy, '_').
+
 :- use_module(library(http/html_write)).
-:- discontiguous mathml/2.
-:- discontiguous example/0, example/1.
+:- discontiguous mml/2.
+:- discontiguous example/1.
 :- discontiguous paren/2.
 :- discontiguous prec/3.
 :- discontiguous inner/2.
 
 %
-% DCG interface
+% Interface
 %
-% e.g., invoke with something like
+% invoke with something like
 %
 % mathml(dbinom(k, 'N', pi) =
 %     with(choose('N', k) = dfrac('N'!, k!*('N'-k)!), "the binomial coefficient")
-%     * pi^k * (1-pi)^('N' - k), M, []), print_html(M).
+%     * pi^k * (1-pi)^('N' - k), M), html(M).
 %
-mathml(A) -->
-    {
-       mathml(A, M),
-       denoting(A, D)
-    },
-    html(p(math([M | D]))).
+mathml(A, math([M | D])) :-
+    mml(A, M),
+    denoting(A, D).
 
 %
 % Variables ('identifiers')
 %
-mathml(A, X) :-
+mml(A, X) :-
     atom(A),
     mi(A, M),
     !, X = mi(M).
@@ -41,6 +42,7 @@ mi(alpha, \['&alpha;']).
 mi(mu, \['&mu;']).
 mi(pi, \['&pi;']).
 mi(sigma, \['&sigma;']).
+
 mi(ldots, \['&hellip;']).
 
 % Operator precedence
@@ -57,7 +59,7 @@ paren(A, 0) :-
 %
 % Operators
 %
-mathml(A, X) :-
+mml(A, X) :-
     atom(A),
     mo(A, M),
     !, X = mo(M).
@@ -81,7 +83,7 @@ mo('|', \['|']).
 mo(invisible_times, \['&#x2062']).
 mo(apply_function, \['&ApplyFunction;']).
 
-mathml(A, X) :-
+mml(A, X) :-
     atom(A),
     current_op(_, _, A),
     !, X = mo(A).
@@ -89,7 +91,7 @@ mathml(A, X) :-
 %
 % Other atoms
 %
-mathml(A, X) :-
+mml(A, X) :-
     atom(A),
     !, X = mi(A).
 
@@ -101,17 +103,17 @@ prec(A, P, Op) :-
 
 % Some tests
 example(var) :-
-    mathml(a + alpha, M, []),
-    print_html(M).
+    mathml(a + alpha, M),
+    html(M).
 
 %
 % Symbols (non-italicized)
 %
-mathml(&(A), mtext(&(X))) :-
+mml(&(A), mtext(&(X))) :-
     atom(A),
     !, atom_string(X, A).
 
-mathml(A, mtext(X)) :-
+mml(A, mtext(X)) :-
     (   string(A); atom(X)
     ), !,
     atom_string(X, A).
@@ -120,22 +122,22 @@ paren(A, 0) :-
     string(A).
 
 example(sym) :-
-    mathml("a" + alpha, M, []),
-    print_html(M).
+    mathml("a" + alpha, M),
+    html(M).
 
 %
 % Parentheses
 %
-mathml(paren(A), X) :-
+mml(paren(A), X) :-
     paren(A, 0),
-    !, mathml(parenthesis(A), X).
+    !, mml(parenthesis(A), X).
 
-mathml(paren(A), X) :-
+mml(paren(A), X) :-
     paren(A, 1),
-    !, mathml(bracket(A), X).
+    !, mml(bracket(A), X).
 
-mathml(paren(A), X) :-
-    !, mathml(curly(A), X).
+mml(paren(A), X) :-
+    !, mml(curly(A), X).
 
 % Determine level
 paren(paren(A), P) :-
@@ -151,24 +153,24 @@ paren(bracket(_), P) :-
 paren(curly(_), P) :-
     !, P = 3.
 
-mathml(parenthesis(A), mfenced(X)) :-
-    mathml(A, X).
+mml(parenthesis(A), mfenced(X)) :-
+    mml(A, X).
 
-mathml(bracket(A), mfenced([open('['), close(']')], X)) :-
-    mathml(A, X).
+mml(bracket(A), mfenced([open('['), close(']')], X)) :-
+    mml(A, X).
 
-mathml(curly(A), mfenced([open('{'), close('}')], X)) :-
-    mathml(A, X).
+mml(curly(A), mfenced([open('{'), close('}')], X)) :-
+    mml(A, X).
 
 example(par) :-
-    mathml(paren(1), M, []),
-    print_html(M).
+    mathml(paren(1), M),
+    html(M).
 
 %
 % Lists (e.g., function arguments)
 %
-mathml([H | T], X) :-
-    !, mathml(list([H | T], ', '), X).
+mml([H | T], X) :-
+    !, mml(list([H | T], ', '), X).
 
 paren([H | T], P) :-
     !, paren(list([H | T], sep), P).
@@ -177,25 +179,25 @@ paren(list([H | T], _Sep), P) :-
     !, maplist(paren, [H | T], Pi),
     sort(0, @>, Pi, [P | _]).
 
-mathml(list([H | T]), X) :-
-    !, mathml(list([H | T], ''), X).
+mml(list([H | T]), X) :-
+    !, mml(list([H | T], ''), X).
 
-mathml(list([H | T], Sep), mfenced([open(''), close(''), separators(Sep)], X)) :-
-    !, maplist(mathml, [H | T], X).
+mml(list([H | T], Sep), mfenced([open(''), close(''), separators(Sep)], X)) :-
+    !, maplist(mml, [H | T], X).
 
 example(list) :-
-    mathml([1, 2, 3], M, []),
-    print_html(M).
+    mathml([1, 2, 3], M),
+    html(M).
 
 %
 % Fractions
 %
-mathml(frac(A, B), mfrac([X, Y])) :-
-    !, mathml(A, X),
-    mathml(B, Y).
+mml(frac(A, B), mfrac([X, Y])) :-
+    !, mml(A, X),
+    mml(B, Y).
 
-mathml(dfrac(A, B), mstyle(displaystyle(true), X)) :-
-    !, mathml(frac(A, B), X).
+mml(dfrac(A, B), mstyle(displaystyle(true), X)) :-
+    !, mml(frac(A, B), X).
 
 paren(frac(_, _), 0) :-
     !.
@@ -211,72 +213,72 @@ prec(dfrac(A, B), P, Op) :-
     !, prec(frac(A, B), P, Op).
 
 example(frac) :-
-    mathml(frac(1.5, 2)^2, M, []),
-    print_html(M).
+    mathml(frac(1.5, 2)^2, M),
+    html(M).
 
 example(frac) :-
-    mathml(frac(small, small) = dfrac(large, large), M, []),
-    print_html(M).
+    mathml(frac(small, small) = dfrac(large, large), M),
+    html(M).
 
 %
 % Functions
 %
-mathml(fun(Name, Args_Params), X) :-
-    mathml(Name apply_function paren(Args_Params), X).
+mml(fun(Name, Args_Params), X) :-
+    mml(Name apply_function paren(Args_Params), X).
 
-mathml(no_paren(Name, Arg), X) :-
+mml(no_paren(Name, Arg), X) :-
     atom(Arg),
-    !, mathml(Name apply_function Arg, X).
+    !, mml(Name apply_function Arg, X).
 
-mathml(no_paren(Name, Arg), X) :-
+mml(no_paren(Name, Arg), X) :-
     number(Arg), Arg >= 0,
-    !, mathml(Name apply_function Arg, X).
+    !, mml(Name apply_function Arg, X).
 
-mathml(no_paren(Name, Arg), X) :-
-    mathml(fun(Name, Arg), X).
+mml(no_paren(Name, Arg), X) :-
+    mml(fun(Name, Arg), X).
 
-mathml(dbinom(K, N, P), X) :-
-    mathml(fun('P' '_' "Bi", 'X' = K ; [N, P]), X).
+mml(dbinom(K, N, P), X) :-
+    mml(fun('P' '_' "Bi", 'X' = K ; [N, P]), X).
 
-mathml(pbinom(K, N, P), X) :-
-    mathml(fun('P' '_' "Bi", 'X' =< K ; [N, P]), X).
+mml(pbinom(K, N, P), X) :-
+    mml(fun('P' '_' "Bi", 'X' =< K ; [N, P]), X).
 
-mathml(ubinom(K, N, P), X) :-
-    mathml(fun('P' '_' "Bi", 'X' >= K ; [N, P]), X).
+mml(ubinom(K, N, P), X) :-
+    mml(fun('P' '_' "Bi", 'X' >= K ; [N, P]), X).
 
-mathml(qbinom(Alpha, N, P), X) :-
-    mathml(fun('Q' '_' "Bi", Alpha ; [N, P]), X).
+mml(qbinom(Alpha, N, P), X) :-
+    mml(fun('Q' '_' "Bi", Alpha ; [N, P]), X).
 
-mathml(uqbinom(Alpha, N, P), X) :-
-    mathml(fun('Q' '_' "Bi", 1-Alpha ; [N, P]), X).
+mml(uqbinom(Alpha, N, P), X) :-
+    mml(fun('Q' '_' "Bi", 1-Alpha ; [N, P]), X).
 
 % Bit unusual terminology
-mathml(bernoulli(Succ, N, Pi), X) :-
-    mathml(successes(Succ, Pi) * failures(N-Succ, Pi), X).
+mml(bernoulli(Succ, N, Pi), X) :-
+    mml(successes(Succ, Pi) * failures(N-Succ, Pi), X).
 
-mathml(successes(Succ, Pi), X) :-
-    mathml(Succ^Pi, X).
+mml(successes(Succ, Pi), X) :-
+    mml(Succ^Pi, X).
 
-mathml(failures(Fail, Pi), X) :-
-    mathml(Fail^(1-Pi), X).
+mml(failures(Fail, Pi), X) :-
+    mml(Fail^(1-Pi), X).
 
-mathml(sqrt(A), msqrt(X)) :-
-    mathml(A, X).
+mml(sqrt(A), msqrt(X)) :-
+    mml(A, X).
 
 paren(sqrt(_), 0) :-
     !.
 
-mathml(choose(N, K), mfenced(mfrac([linethickness(0)], [X, Y]))) :-
-    mathml(N, X),
-    mathml(K, Y).
+mml(choose(N, K), mfenced(mfrac([linethickness(0)], [X, Y]))) :-
+    mml(N, X),
+    mml(K, Y).
 
 paren(choose(_, _), 1) :-
     !.
 
-mathml('Sum'(I, From, To, A), mrow([munderover([\['&sum;'], XIFrom, XTo]), X])) :-
-    mathml(I = From, XIFrom),
-    mathml(To, XTo),
-    mathml(A, X).
+mml('Sum'(I, From, To, A), mrow([munderover([\['&sum;'], XIFrom, XTo]), X])) :-
+    mml(I = From, XIFrom),
+    mml(To, XTo),
+    mml(A, X).
 
 paren('Sum'(_, _, _, A), P) :-
     !, paren(A, P).
@@ -289,97 +291,97 @@ inner('Sum'(A, B, C, D), P) :-
     prec('Sum'(A, B, C, D), Prec, +),
     !, P is Prec + 1.
 
-mathml(argmin(A, _, _, B), X) :-
-    mathml(under("argmin", A) apply_function B, X).
+mml(argmin(A, _, _, B), X) :-
+    mml(under("argmin", A) apply_function B, X).
 
-mathml(argmax(A, _, _, B), X) :-
-    mathml(fun(under("argmax", A), B), X).
+mml(argmax(A, _, _, B), X) :-
+    mml(fun(under("argmax", A), B), X).
 
-mathml(under(A, B), munder([X, Y])) :-
-    mathml(A, X),
-    mathml(B, Y).
+mml(under(A, B), munder([X, Y])) :-
+    mml(A, X),
+    mml(B, Y).
 
 % Trigonometric functions
-mathml(sin(A), X) :-
-    mathml(no_paren(sin, A), X).
+mml(sin(A), X) :-
+    mml(no_paren(sin, A), X).
 
-mathml(cos(A), X) :-
-    mathml(no_paren(cos, A), X).
+mml(cos(A), X) :-
+    mml(no_paren(cos, A), X).
 
-mathml(tan(A), X) :-
-    mathml(no_paren(tan, A), X).
+mml(tan(A), X) :-
+    mml(no_paren(tan, A), X).
 
 example(fun) :-
-    mathml(sin(alpha), M, []),
-    print_html(M).
+    mathml(sin(alpha), M),
+    html(M).
 
 example(fun) :-
     mathml(qbinom(alpha, 'N', pi) =
-        argmax(k, 1, 10, pbinom(k, 'N', pi) =< alpha), M, []),
-    print_html(M).
+        argmax(k, 1, 10, pbinom(k, 'N', pi) =< alpha), M),
+    html(M).
 
 example(fun) :-
-    mathml(choose('N', k) = frac('N'!, k! * ('N' - k)!), M, []),
-    print_html(M).
+    mathml(choose('N', k) = frac('N'!, k! * ('N' - k)!), M),
+    html(M).
 
 example(fun) :-
-    mathml(choose('N', k) = frac('N'!, k! * ('N' - k)!), M, []),
-    print_html(M).
+    mathml(choose('N', k) = frac('N'!, k! * ('N' - k)!), M),
+    html(M).
 
 example(fun) :-
-    mathml(dbinom(k, 'N', 'pi'), M, []),
-    print_html(M).
+    mathml(dbinom(k, 'N', 'pi'), M),
+    html(M).
 
 example(fun) :-
-    mathml(pbinom(k, 'N', 'pi'), M, []),
-    print_html(M).
+    mathml(pbinom(k, 'N', 'pi'), M),
+    html(M).
 
 example(fun) :-
-    mathml(ubinom(k, 'N', 'pi'), M, []),
-    print_html(M).
+    mathml(ubinom(k, 'N', 'pi'), M),
+    html(M).
 
 example(fun) :-
-    mathml(qbinom(alpha, 'N', 'pi'), M, []),
-    print_html(M).
+    mathml(qbinom(alpha, 'N', 'pi'), M),
+    html(M).
 
 example(fun) :-
-    mathml(uqbinom(alpha, 'N', 'pi'), M, []),
-    print_html(M).
+    mathml(uqbinom(alpha, 'N', 'pi'), M),
+    html(M).
 
 example(fun) :-
-    mathml(bernoulli(k, 'N', 'pi'), M, []),
-    print_html(M).
+    mathml(bernoulli(k, 'N', 'pi'), M),
+    html(M).
 
 example(fun) :-
-    mathml(a * (1 + sqrt(paren(paren(k)))), M, []),
-    print_html(M).
+    mathml(a * (1 + sqrt(paren(paren(k)))), M),
+    html(M).
 
 example(fun) :-
     mathml(pbinom(k, 'N', pi) = 'Sum'(i, k, 'N', choose('N', k) *
-        fun('P' '_' "Bi", 'X' = k; ['N', pi])), M, []),
-    print_html(M).
+        fun('P' '_' "Bi", 'X' = k; ['N', pi])), M),
+    html(M).
 
 example(fun) :-
-    mathml('Sum'(i, k, 'N', i) + 'Sum'(i, k, 'N', i), M, []),
-    print_html(M).
+    mathml('Sum'(i, k, 'N', i) + 'Sum'(i, k, 'N', i), M),
+    html(M).
 
 %
 % Decorations
 %
-mathml(red(X), Y) :-
-    !, mathml(color(red, X), Y).
+mml(red(X), Y) :-
+    !, mml(color(red, X), Y).
 
-mathml(green(X), Y) :-
-    !, mathml(color(green, X), Y).
+mml(green(X), Y) :-
+    !, mml(color(green, X), Y).
 
-mathml(blue(X), Y) :-
-    !, mathml(color(blue, X), Y).
+mml(blue(X), Y) :-
+    !, mml(color(blue, X), Y).
 
-mathml(black(X), Y) :-
-    !, mathml(color(black, X), Y).
+mml(black(X), Y) :-
+    !, mml(color(black, X), Y).
 
-mathml(color(Col, X), mstyle(color(Col), Y)) :-
-    !, mathml(X, Y).
+mml(color(Col, X), mstyle(color(Col), Y)) :-
+    !, mml(X, Y).
 
 paren(red(X), P) :-
     !, paren(X, P).
@@ -412,88 +414,97 @@ prec(color(_, X), P, Op) :-
     !, prec(X, P, Op).
 
 example(col) :-
-    mathml(a * red(b + c), M, []),
-    print_html(M).
+    mathml(a * red(b + c), M),
+    html(M).
 
 %
 % Operators
 %
 % check if multiplication sign can be omitted
 %
-% Todo: include compounds such as A^B, red(A), with(A, _, _)
+% Todo: clean up and include compounds such as A^B, red(A), with(A, _, _)
 invisible_times_first(A) :-
     atom(A).
 
 invisible_times_first(A) :-
     number(A).
 
+invisible_times_rest(ldots) :-
+    !, fail.
+
 invisible_times_rest(B) :-
     atom(B).
+
+invisible_times_rest(B*C) :-
+    atom(C),
+    invisible_times_rest(B).
 
 invisible_times(A*B) :-
     invisible_times_first(A),
     invisible_times_rest(B).
 
 % No parentheses around base in subscript and powers
-mathml(A '_' B ^ C, msubsup([X, Y, Z])) :-
+mml(A '_' B ^ C, msubsup([X, Y, Z])) :-
     !, current_op(Sub, xfy, '_'),
-    mathml_paren(Sub, A, X),
-    mathml(B, Y),
-    mathml(C, Z).
+    mml_paren(Sub, A, X),
+    mml(B, Y),
+    mml(C, Z).
 
 % No parentheses around exponent
-mathml(A^B, msup([X, Y])) :-
+mml(A^B, msup([X, Y])) :-
     !, current_op(Power, xfy, ^),
-    mathml_paren(Power, A, X),
-    mathml(B, Y).
+    mml_paren(Power, A, X),
+    mml(B, Y).
 
 % No parentheses around subscript
-mathml(A '_' B, msub([X, Y])) :-
+mml(A '_' B, msub([X, Y])) :-
     !, current_op(Power, xfy, '_'),
-    mathml_paren(Power, A, X),
-    mathml(B, Y).
+    mml_paren(Power, A, X),
+    mml(B, Y).
 
 % Omit dot for multiplication
-mathml(A * B, X) :-
+mml(A * B, X) :-
     invisible_times(A * B),
-    !, mathml(A invisible_times B, X).
+    !, mml(A invisible_times B, X).
 
 % Postfix operators (e.g., factorial)
-mathml(Prod, mrow([X, Sign])) :-
+mml(Prod, mrow([X, Sign])) :-
     compound(Prod),
     compound_name_arguments(Prod, Op, [A]),
     current_op(Prec, Fix, Op),
     member(Fix, [xf, yf]),
-    !, mathml_paren(Prec, A, X),
-    mathml(Op, Sign).
+    !, mml_paren(Prec, A, X),
+    mml(Op, Sign).
 
 % Prefix operators (e.g., factorial)
-mathml(Prod, mrow([Sign, X])) :-
+mml(Prod, mrow([Sign, X])) :-
     compound(Prod),
     compound_name_arguments(Prod, Op, [A]),
     current_op(Prec, Fix, Op),
     member(Fix, [fx, fy]),
-    !, mathml(Op, Sign),
-    mathml_paren(Prec, A, X).
+    !, mml(Op, Sign),
+    mml_paren(Prec, A, X).
 
 % Binary operators
-mathml(Prod, mrow([X, Sign, Y])) :-
+mml(Prod, mrow([X, Sign, Y])) :-
     compound(Prod),
     compound_name_arguments(Prod, Op, [A, B]),
     current_op(Prec, Fix, Op),
     member(Fix, [yfx, xfx, xfy]),
-    !, mathml_paren(Prec, A, X),
-    mathml(Op, Sign),
-    mathml_paren(Prec, B, Y).
+    !, mml_paren(Prec, A, X),
+    mml(Op, Sign),
+    mml_paren(Prec, B, Y).
 
+%
 % Parenthesis in (a - b) * ...
-mathml_paren(Prod, A, X) :-
+%
+mml_paren(Prod, A, X) :-
     inner(A, Minus),
     Prod < Minus,
-    !, mathml(paren(A), X).
+    !, mml(paren(A), X).
 
-mathml_paren(_, A, X) :-
-    mathml(A, X).
+mml_paren(_, A, X) :-
+    mml(A, X).
 
 paren(A '_' _ ^ _, P) :-
     !, paren(A, P).
@@ -556,49 +567,49 @@ inner(X, P) :-
     prec(X, P, _).
 
 example(op) :-
-    mathml(1 + 1, M, []),
-    print_html(M).
+    mathml(1 + 1, M),
+    html(M).
 
 example(op) :-
-    mathml(-1 + -1, M, []),
-    print_html(M).
+    mathml(-1 + -1, M),
+    html(M).
 
 example(op) :-
-    mathml(a - b - (c - d), M, []),
-    print_html(M).
+    mathml(a - b - (c - d), M),
+    html(M).
 
 example(op) :-
-    mathml((a - b)^(c - d), M, []),
-    print_html(M).
+    mathml((a - b)^(c - d), M),
+    html(M).
 
 example(op) :-
-    mathml(a^b^c, M, []),
-    print_html(M).
+    mathml(a^b^c, M),
+    html(M).
 
 example(op) :-
-    mathml((a+b) '_' (c+d), M, []),
-    print_html(M).
+    mathml((a+b) '_' (c+d), M),
+    html(M).
 
 example(op) :-
-    mathml((a+b) '_' c ^ d, M, []),
-    print_html(M).
+    mathml((a+b) '_' c ^ d, M),
+    html(M).
 
 example(op) :-
-    mathml(paren(2*a*b*(a+b)), M, []),
-    print_html(M).
+    mathml(paren(2*a*b*(a+b)), M),
+    html(M).
 
 %
 % Numbers
 %
-mathml(A, mn(A)) :-
+mml(A, mn(A)) :-
     number(A),
     A >= 0.
 
-mathml(A, X) :-
+mml(A, X) :-
     number(A),
     A < 0,
     Abs is abs(A),
-    mathml(-Abs, X).
+    mml(-Abs, X).
 
 paren(A, 0) :-
     number(A), !.
@@ -616,14 +627,14 @@ prec(A, P, O) :-
     O = (-).
 
 example(num) :-
-    mathml(1.5 + (-1.5), M, []),
-    print_html(M).
+    mathml(1.5 + (-1.5), M),
+    html(M).
 
 %
 % Abbreviations
 %
-mathml(with(X, _, _), Y) :-
-    mathml(X, Y).
+mml(with(X, _, _), Y) :-
+    mml(X, Y).
 
 paren(with(A, _, _), P) :-
     !, paren(A, P).
@@ -653,15 +664,15 @@ denoting(A, []) :-
 
 denoting(A, [M | MT]) :-
     with(A, [with(Abbrev, Exp, Desc) | T]),
-    mathml(list([
+    mml(list([
         ", with", &(nbsp), Abbrev = Exp, &(nbsp), "denoting", &(nbsp), Desc]), M),
     denoting_and(T, MT).
 
 denoting_and([], [X]) :-
-    mathml(".", X).
+    mml(".", X).
 
 denoting_and([with(Abbrev, Exp, Desc) | T], [M | MT]) :-
-    mathml(list([
+    mml(list([
         ", and", &(nbsp), Abbrev = Exp, &(nbsp), "denoting", &(nbsp), Desc]), M),
     denoting_and(T, MT).
 
@@ -672,10 +683,8 @@ example(ml) :-
                 with('N'!, 1*2*3*ldots*'N', "the factorial"),
                 k!*('N'-k)!),
             "the binomial coefficient")
-        * pi^k * (1-pi)^('N' - k), M, []),
-    print_html(M).
+        * pi^k * (1-pi)^('N' - k), M),
+    html(M).
 
 example :-
-    writeln('<HTML>'),
-    findall(true, example(_), _),
-    writeln('</HTML>').
+    findall(true, example(_), _).
