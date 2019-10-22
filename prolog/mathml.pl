@@ -30,6 +30,8 @@ mathml(A, math([M | D])) :-
     mml(A, M),
     denoting(A, D).
 
+html(X) :- html(X, Tokens, []), print_html(Tokens).
+    
 %
 % Variables ('identifiers')
 %
