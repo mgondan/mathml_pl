@@ -36,6 +36,10 @@ mathml(A, math([mrow([M, ',']), mspace(width(thickmathspace), '') | D])) :-
     mml(A, M),
     denoting(A, D).
 
+% non swish
+html(X) :-
+    html(X, Tokens, []), print_html(Tokens).
+
 %
 % Check types
 %
