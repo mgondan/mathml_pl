@@ -14,6 +14,7 @@
 :- discontiguous mml/2.
 :- discontiguous example/1.
 :- discontiguous paren/2.
+:- discontiguous type/2.
 :- discontiguous prec/3.
 :- discontiguous inner/2.
 
@@ -26,15 +27,49 @@
 %     with(choose('N', k) = dfrac('N'!, k!*('N'-k)!), "the binomial coefficient")
 %     * pi^k * (1-pi)^('N' - k), M), html(M).
 %
-mathml(A, math([M | D])) :-
+mathml(A, X) :-
+    denoting(A, []),
+    !, mml(A, M),
+    X = math(M).
+
+mathml(A, math([mrow([M, ',']), mspace(width(thickmathspace), '') | D])) :-
     mml(A, M),
     denoting(A, D).
 
-html(X) :- html(X, Tokens, []), print_html(Tokens).
-    
+%
+% Check types
+%
+% Accepts compounds like red(2) as numbers
+type(number, X) :-
+    number(X).
+
+type(positive, X) :-
+    number(X), 
+    X >= 0.
+
+type(negative, X) :-
+    number(X), 
+    X < 0.
+
+type(atomic, X) :-
+    type(positive, X).
+
+type(atomic, X) :-
+    type(identifier, X).
+
+type(atomic, X) :-
+    type(punct, X).
+
+type(atomic, X) :-
+    type(operator, X).
+
 %
 % Variables ('identifiers')
 %
+type(identifier, X) :-
+    atom(X),
+    mi(X, _).
+
 mml(A, X) :-
     atom(A),
     mi(A, M),
@@ -45,22 +80,42 @@ mi(mu, \['&mu;']).
 mi(pi, \['&pi;']).
 mi(sigma, \['&sigma;']).
 
-mi(ldots, \['&hellip;']).
+%
+% Punctuation
+%
+type(punct, X) :-
+    atom(X),
+    punct(X, _).
+
+mml(A, X) :-
+    atom(A),
+    punct(A, M),
+    !, X = mi(M).
+
+punct(ldots, \['&hellip;']).
 
 % Operator precedence
 prec(A, P, Op) :-
-    atom(A),
+    type(atomic, A),
     mi(A, _),
     !, P = 0,
     Op = mi.
 
 % Depth of parentheses
 paren(A, 0) :-
-    atom(A).
+    type(atomic, A).
 
 %
 % Operators
 %
+type(operator, X) :-
+    atom(X),
+    mo(X, _).
+
+type(operator, X) :-
+    atom(X),
+    current_op(_, _, X).
+
 mml(A, X) :-
     atom(A),
     mo(A, M),
@@ -79,7 +134,7 @@ mo(>=, \['&ge;']).
 mo(\=, \['&ne;']).
 mo(!, !).
 mo(cdots, \['&ctdot;']).
-mo(',', \[',']).
+mo(',', [separator(true), \[',']]).
 mo(';', \['&#59;']).
 mo('|', \['|']).
 mo(invisible_times, \['&#x2062']).
@@ -93,15 +148,14 @@ mml(A, X) :-
 %
 % Other atoms
 %
+type(identifier, X) :-
+    atom(X),
+    \+ type(punct, X),
+    \+ type(operator, X).
+
 mml(A, X) :-
     atom(A),
     !, X = mi(A).
-
-prec(A, P, Op) :-
-    atom(A),
-    mi(A, _),
-    !, P = 0,
-    Op = mi.
 
 % Some tests
 example(var) :-
@@ -111,6 +165,12 @@ example(var) :-
 %
 % Symbols (non-italicized)
 %
+mml(&(badbreak), mspace([width("0ex"), linebreak(badbreak)], '')) :-
+    !.
+
+mml(&(sp), mspace([width("0.5ex"), linebreak(goodbreak)], '')) :-
+    !.
+
 mml(&(A), mtext(&(X))) :-
     atom(A),
     !, atom_string(X, A).
@@ -122,10 +182,6 @@ mml(A, mtext(X)) :-
 
 paren(A, 0) :-
     string(A).
-
-example(sym) :-
-    mathml("a" + alpha, M),
-    html(M).
 
 %
 % Parentheses
@@ -229,11 +285,11 @@ mml(fun(Name, Args_Params), X) :-
     mml(Name apply_function paren(Args_Params), X).
 
 mml(no_paren(Name, Arg), X) :-
-    atom(Arg),
+    type(atomic, Arg),
     !, mml(Name apply_function Arg, X).
 
 mml(no_paren(Name, Arg), X) :-
-    number(Arg), Arg >= 0,
+    type(positive, Arg), 
     !, mml(Name apply_function Arg, X).
 
 mml(no_paren(Name, Arg), X) :-
@@ -315,6 +371,10 @@ mml(tan(A), X) :-
 
 example(fun) :-
     mathml(sin(alpha), M),
+    html(M).
+
+example(fun) :-
+    mathml(sin(30), M),
     html(M).
 
 example(fun) :-
@@ -415,6 +475,21 @@ prec(black(X), P, Op) :-
 prec(color(_, X), P, Op) :-
     !, prec(X, P, Op).
 
+type(T, red(X)) :-
+    type(T, X).
+
+type(T, green(X)) :-
+    type(T, X).
+
+type(T, blue(X)) :-
+    type(T, X).
+
+type(T, black(X)) :-
+    type(T, X).
+
+type(T, color(_, X)) :-
+    type(T, X).
+
 example(col) :-
     mathml(a * red(b + c), M),
     html(M).
@@ -425,25 +500,23 @@ example(col) :-
 % check if multiplication sign can be omitted
 %
 % Todo: clean up and include compounds such as A^B, red(A), with(A, _, _)
-invisible_times_first(A) :-
-    atom(A).
+invisible_times(A) :-
+    type(identifier, A).
 
-invisible_times_first(A) :-
-    number(A).
-
-invisible_times_rest(ldots) :-
-    !, fail.
-
-invisible_times_rest(B) :-
-    atom(B).
-
-invisible_times_rest(B*C) :-
-    atom(C),
-    invisible_times_rest(B).
+invisible_times(A) :-
+    \+ type(number, A),
+    \+ type(punct, A),
+    type(atomic, A).
 
 invisible_times(A*B) :-
-    invisible_times_first(A),
-    invisible_times_rest(B).
+    invisible_times_left(A),
+    invisible_times(B).
+
+invisible_times_left(A) :-
+    type(number, A).
+
+invisible_times_left(A) :-
+    invisible_times(A).
 
 % No parentheses around base in subscript and powers
 mml(A '_' B ^ C, msubsup([X, Y, Z])) :-
@@ -451,6 +524,9 @@ mml(A '_' B ^ C, msubsup([X, Y, Z])) :-
     mml_paren(Sub, A, X),
     mml(B, Y),
     mml(C, Z).
+
+type(atomic, _^B) :-
+    type(atomic, B).
 
 % No parentheses around exponent
 mml(A^B, msup([X, Y])) :-
@@ -477,6 +553,9 @@ mml(Prod, mrow([X, Sign])) :-
     member(Fix, [xf, yf]),
     !, mml_paren(Prec, A, X),
     mml(Op, Sign).
+
+type(atomic, N!) :-
+    type(atomic, N).
 
 % Prefix operators (e.g., factorial)
 mml(Prod, mrow([Sign, X])) :-
@@ -614,16 +693,16 @@ mml(A, X) :-
     mml(-Abs, X).
 
 paren(A, 0) :-
-    number(A), !.
+    type(number, A), !.
 
 % Operator precedence
-prec(A, P, number) :-
-    number(A),
-    A >= 0,
-    !, P=0.
+prec(A, P, O) :-
+    type(positive, A),
+    !, P=0,
+    O = number.
 
 prec(A, P, O) :-
-    number(A),
+    type(negative, A),
     A < 0,
     !, current_op(P, yfx, -), % use binary operator
     O = (-).
@@ -664,18 +743,20 @@ denoting(A, []) :-
     with(A, []),
     !.
 
+denoting(A, M) :-
+    with(A, with(Abbrev, Exp, Desc)),
+    !, mml(list([&(sp), "with", &(sp), Abbrev = Exp, &(sp), "denoting", &(sp), Desc, "."]), M).
+
 denoting(A, [M | MT]) :-
     with(A, [with(Abbrev, Exp, Desc) | T]),
-    mml(list([
-        ", with", &(nbsp), Abbrev = Exp, &(nbsp), "denoting", &(nbsp), Desc]), M),
+    mml(list(["with", &(sp), Abbrev = Exp, &(sp), "denoting", &(sp), Desc, ",", &(sp)]), M),
     denoting_and(T, MT).
 
 denoting_and([], [X]) :-
     mml(".", X).
 
 denoting_and([with(Abbrev, Exp, Desc) | T], [M | MT]) :-
-    mml(list([
-        ", and", &(nbsp), Abbrev = Exp, &(nbsp), "denoting", &(nbsp), Desc]), M),
+    mml(list(["and", &(sp), Abbrev = Exp, &(sp), "denoting", &(sp), Desc]), M),
     denoting_and(T, MT).
 
 example(ml) :-
