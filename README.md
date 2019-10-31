@@ -2,7 +2,7 @@
 
 Prolog package to convert mathematical expressions to MathML that can be rendered by some browsers. Actually, it's mostly Firefox, all the other browsers I tried did not yield satisfactory results.
 
-You can find a SWISH demo here, https://swish.swi-prolog.org/p/mathml-0.0.4.swinb
+You can find a SWISH demo here, https://swish.swi-prolog.org/p/mathml-0.0.6.swinb
 
 # Installation and usage
 
