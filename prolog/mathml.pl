@@ -1,5 +1,6 @@
 :- module(mathml, [
     mathml/2,
+    mathml/3,
     op(300, xfx, apply_function),
     op(400, yfx, invisible_times),
     op(180, xf, !),
@@ -744,6 +745,10 @@ mml(Flags, instead_of(A, B), X) :-
     member(error-highlight, Flags),
     !, mml(Flags, underbrace(A, list(["instead of", ' ', B])), X).
 
+example(err) :-
+    mathml([error-highlight], 'T' = dfrac('X' - mu, instead_of(sigma, s)/sqrt('N')), M),
+    html(M).
+    
 %
 % Abbreviations
 %
