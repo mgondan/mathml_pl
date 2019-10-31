@@ -42,7 +42,7 @@ mathml(Flags, A, math([mrow([M, ',']), mspace(width(thickmathspace), '') | D])) 
 % non swish
 html(X) :-
     html(X, Tokens, []), print_html(Tokens).
-    
+
 %
 % Check types
 %
@@ -99,6 +99,7 @@ mml(_Flags, A, X) :-
     punct(A, M),
     !, X = mi(M).
 
+punct(' ', \['&nbsp;']).
 punct(ldots, \['&hellip;']).
 
 % Operator precedence
@@ -131,7 +132,6 @@ mml(_Flags, A, X) :-
 mo(*, \['&sdot;']).
 mo('.', \['&sdot;']).
 mo(/, /).
-mo(' ', \['&nbsp;']).
 mo(=\=, \['&#8203;']).
 mo(=, =).
 mo(<, \['&lt;']).
@@ -452,6 +452,11 @@ mml(Flags, black(X), Y) :-
 mml(Flags, color(Col, X), mstyle(color(Col), Y)) :-
     !, mml(Flags, X, Y).
 
+mml(Flags, underbrace(X, Under), munder([munder([accentunder(true)],
+        [Y, mo([stretchy(true)], \['&UnderBrace;'])]), New])) :-
+    mml(Flags, X, Y),
+    mml(Flags, Under, New).
+
 paren(red(X), P) :-
     !, paren(X, P).
 
@@ -465,6 +470,9 @@ paren(black(X), P) :-
     !, paren(X, P).
 
 paren(color(_, X), P) :-
+    !, paren(X, P).
+
+paren(underbrace(X, _), P) :-
     !, paren(X, P).
 
 prec(red(X), P, Op) :-
@@ -481,6 +489,9 @@ prec(black(X), P, Op) :-
 
 prec(color(_, X), P, Op) :-
     !, prec(X, P, Op).
+
+prec(underbrace(X, _), P) :-
+    !, prec(X, P).
 
 type(T, red(X)) :-
     type(T, X).
@@ -717,6 +728,21 @@ prec(A, P, O) :-
 example(num) :-
     mathml(1.5 + (-1.5), M),
     html(M).
+
+%
+% Mistakes
+% 
+mml(Flags, instead_of(A, _B), X) :-
+    member(error-show, Flags),
+    !, mml(Flags, red(A), X).
+
+mml(Flags, instead_of(_A, B), X) :-
+    member(error-fix, Flags),
+    !, mml(Flags, green(B), X).
+
+mml(Flags, instead_of(A, B), X) :-
+    member(error-highlight, Flags),
+    !, mml(Flags, underbrace(A, list(["instead of", ' ', B])), X).
 
 %
 % Abbreviations
