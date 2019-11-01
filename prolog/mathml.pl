@@ -762,31 +762,45 @@ prec(with(A, _, _), P, Op) :-
     !, prec(A, P, Op).
 
 % Collect abbreviations
-with(with(Abbrev, Exp, Desc), X) :-
-    !, with(Exp, T),
+with(Flags, with(Abbrev, Exp, Desc), X) :-
+    !, with(Flags, Exp, T),
     X = [with(Abbrev, Exp, Desc) | T].
 
-with(X, W) :-
+with(_Flags, X, W) :-
     atomic(X),
     !, W = [].
 
-with(X, W) :-
+with(Flags, instead_of(X, Y, _Desc), W) :-
+    member(error-highlight, Flags),
+    !, with(Flags, X, WX),
+    with(Flags, Y, WY),
+    append(WX, WY, W).
+
+with(Flags, instead_of(X, _Y), W) :-
+    member(error-show, Flags),
+    !, with(Flags, X, W).
+
+with(Flags, instead_of(_X, Y), W) :-
+    member(error-fix, Flags),
+    !, with(Flags, Y, W).
+
+with(Flags, X, W) :-
     compound(X),
     compound_name_arguments(X, _, Args),
-    maplist(with, Args, List),
+    maplist({Flags}/[A, L] >> with(Flags, A, L), Args, List),
     append(List, W).
 
 % Render abbreviations
-denoting(_Flags, A, []) :-
-    with(A, []),
+denoting(Flags, A, []) :-
+    with(Flags, A, []),
     !.
 
 denoting(Flags, A, M) :-
-    with(A, with(Abbrev, Exp, Desc)),
+    with(Flags, A, with(Abbrev, Exp, Desc)),
     !, mml(Flags, list([&(sp), "with", &(sp), Abbrev = Exp, &(sp), "denoting", &(sp), Desc, "."]), M).
 
-denoting(_Flags, A, [M | MT]) :-
-    with(A, [with(Abbrev, Exp, Desc) | T]),
+denoting(Flags, A, [M | MT]) :-
+    with(Flags, A, [with(Abbrev, Exp, Desc) | T]),
     mml(Flags, list(["with", &(sp), Abbrev = Exp, &(sp), "denoting", &(sp), Desc, ",", &(sp)]), M),
     denoting_and(Flags, T, MT).
 
