@@ -490,7 +490,7 @@ prec(black(X), P, Op) :-
 prec(color(_, X), P, Op) :-
     !, prec(X, P, Op).
 
-prec(underbrace(X, _), P) :-
+prec(underbrace(X, _), P, Op) :-
     !, prec(X, P).
 
 type(T, red(X)) :-
@@ -538,6 +538,9 @@ paren(Flags, instead_of(_A, B), P) :-
 paren(Flags, instead_of(A, _B), P) :-
     member(error-highlight, Flags),
     !, paren(Flags, A, P).
+
+prec(instead_of(A, _B), P, Op) :-
+    !, prec(A, P, Op).
 
 %
 % Abbreviations
