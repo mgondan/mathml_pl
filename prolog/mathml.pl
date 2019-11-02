@@ -15,8 +15,8 @@
 :- discontiguous example/1.
 :- discontiguous paren/3.
 :- discontiguous type/2.
-:- discontiguous prec/3.
-:- discontiguous inner/2.
+:- discontiguous prec/4.
+:- discontiguous inner/3.
 
 %
 % Interface
@@ -103,7 +103,7 @@ punct(' ', \['&nbsp;']).
 punct(ldots, \['&hellip;']).
 
 % Operator precedence
-prec(A, P, Op) :-
+prec(_Flags, A, P, Op) :-
     type(atomic, A),
     mi(A, _),
     !, P = 0,
@@ -270,12 +270,12 @@ paren(_Flags, frac(_, _), 0) :-
 paren(Flags, dfrac(A, B), P) :-
     !, paren(Flags, frac(A, B), P).
 
-prec(frac(_, _), P, Op) :-
+prec(_Flags, frac(_, _), P, Op) :-
     !, current_op(P, yfx, /),
     Op = (/).
 
-prec(dfrac(A, B), P, Op) :-
-    !, prec(frac(A, B), P, Op).
+prec(Flags, dfrac(A, B), P, Op) :-
+    !, prec(Flags, frac(A, B), P, Op).
 
 example(frac) :-
     mathml(frac(1.5, 2)^2, M),
@@ -348,12 +348,12 @@ mml(Flags, 'Sum'(I, From, To, A), mrow([munderover([\['&sum;'], XIFrom, XTo]), X
 paren(Flags, 'Sum'(_, _, _, A), P) :-
     !, paren(Flags, A, P).
 
-prec('Sum'(_, _, _, _), P, Op) :-
+prec(_Flags, 'Sum'(_, _, _, _), P, Op) :-
     !, current_op(P, yfx, +),
     Op = (+).
 
-inner('Sum'(A, B, C, D), P) :-
-    prec('Sum'(A, B, C, D), Prec, +),
+inner(Flags, 'Sum'(A, B, C, D), P) :-
+    prec(Flags, 'Sum'(A, B, C, D), Prec, +),
     !, P is Prec + 1.
 
 mml(Flags, argmin(A, _, _, B), X) :-
@@ -475,23 +475,23 @@ paren(Flags, color(_, X), P) :-
 paren(Flags, underbrace(X, _), P) :-
     !, paren(Flags, X, P).
 
-prec(red(X), P, Op) :-
-    !, prec(X, P, Op).
+prec(Flags, red(X), P, Op) :-
+    !, prec(Flags, X, P, Op).
 
-prec(green(X), P, Op) :-
-    !, prec(X, P, Op).
+prec(Flags, green(X), P, Op) :-
+    !, prec(Flags, X, P, Op).
 
-prec(blue(X), P, Op) :-
-    !, prec(X, P, Op).
+prec(Flags, blue(X), P, Op) :-
+    !, prec(Flags, X, P, Op).
 
-prec(black(X), P, Op) :-
-    !, prec(X, P, Op).
+prec(Flags, black(X), P, Op) :-
+    !, prec(Flags, X, P, Op).
 
-prec(color(_, X), P, Op) :-
-    !, prec(X, P, Op).
+prec(Flags, color(_, X), P, Op) :-
+    !, prec(Flags, X, P, Op).
 
-prec(underbrace(X, _), P, Op) :-
-    !, prec(X, P).
+prec(Flags, underbrace(X, _), P, Op) :-
+    !, prec(Flags, X, P, Op).
 
 type(T, red(X)) :-
     type(T, X).
@@ -539,8 +539,17 @@ paren(Flags, instead_of(A, _B), P) :-
     member(error-highlight, Flags),
     !, paren(Flags, A, P).
 
-prec(instead_of(A, _B), P, Op) :-
-    !, prec(A, P, Op).
+prec(Flags, instead_of(A, _B), P, Op) :-
+    member(error-show, Flags),
+    !, prec(Flags, A, P, Op).
+
+prec(Flags, instead_of(_A, B), P, Op) :-
+    member(error-fix, Flags),
+    !, prec(Flags, B, P, Op).
+
+prec(Flags, instead_of(A, _B), P, Op) :-
+    member(error-highlight, Flags),
+    !, prec(Flags, A, P, Op).
 
 %
 % Abbreviations
@@ -551,8 +560,8 @@ mml(Flags, with(X, _, _), Y) :-
 paren(Flags, with(A, _, _), P) :-
     !, paren(Flags, A, P).
 
-prec(with(A, _, _), P, Op) :-
-    !, prec(A, P, Op).
+prec(Flags, with(A, _, _), P, Op) :-
+    !, prec(Flags, A, P, Op).
 
 %
 % Operators
@@ -640,7 +649,7 @@ mml(Flags, Prod, mrow([X, Sign, Y])) :-
 % Parenthesis in (a - b) * ...
 %
 mml_paren(Flags, Prod, A, X) :-
-    inner(A, Minus),
+    inner(Flags, A, Minus),
     Prod < Minus,
     !, mml(Flags, paren(A), X).
 
@@ -662,7 +671,7 @@ paren(Flags, A, P) :-
     current_op(Prec, Fix, Op),
     member(Fix, [xf, yf, fx, fy]),
     !, paren(Flags, Arg, P0),
-    (   inner(Arg, Plus), Prec < Plus -> P is P0 + 1 ; P is P0   ).
+    (   inner(Flags, Arg, Plus), Prec < Plus -> P is P0 + 1 ; P is P0   ).
 
 paren(Flags, A, P) :-
     compound(A),
@@ -671,8 +680,8 @@ paren(Flags, A, P) :-
     member(Fix, [xfx, xfy, yfx]),
     !, paren(Flags, Arg1, P1),
     paren(Flags, Arg2, P2),
-    (   inner(Arg1, Plus1), Prec < Plus1 -> P11 is P1 + 1 ; P11 is P1   ),
-    (   inner(Arg1, Plus2), Prec < Plus2 -> P22 is P2 + 1 ; P22 is P2   ),
+    (   inner(Flags, Arg1, Plus1), Prec < Plus1 -> P11 is P1 + 1 ; P11 is P1   ),
+    (   inner(Flags, Arg1, Plus2), Prec < Plus2 -> P22 is P2 + 1 ; P22 is P2   ),
     P is max(P11, P22).
 
 paren(Flags, X, P) :-
@@ -685,10 +694,10 @@ paren(Flags, X, P) :-
 % Operator precedence
 %
 % use binary operator instead of "sign"
-prec(-_, Prec, -) :-
+prec(_Flags, -_, Prec, -) :-
     !, current_op(Prec, yfx, -).
 
-prec(X, P, O) :-
+prec(_Flags, X, P, O) :-
     compound(X),
     compound_name_arity(X, Op, Arity),
     current_op(Prec, Fix, Op),
@@ -697,15 +706,15 @@ prec(X, P, O) :-
     O = Op.
 
 % Parentheses in ... - (1 - 1)
-inner(X, P) :-
-    prec(X, Prec, Op),
+inner(Flags, X, P) :-
+    prec(Flags, X, Prec, Op),
     member(Fix-Op, [yfx-(-), yfx-(/), yf-(factorial)]),
     current_op(Prec, Fix, Op),
     !, P is Prec + 1.
 
 % General case
-inner(X, P) :-
-    prec(X, P, _).
+inner(Flags, X, P) :-
+    prec(Flags, X, P, _).
 
 example(op) :-
     mathml(1 + 1, M),
@@ -757,12 +766,12 @@ paren(_Flags, A, P) :-
     !, P = 0.
 
 % Operator precedence
-prec(A, P, O) :-
+prec(_Flags, A, P, O) :-
     type(positive, A),
-    !, P=0,
+    !, P = 0,
     O = number.
 
-prec(A, P, O) :-
+prec(_Flags, A, P, O) :-
     type(negative, A),
     A < 0,
     !, current_op(P, yfx, -), % use binary operator
