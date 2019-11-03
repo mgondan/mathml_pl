@@ -449,6 +449,9 @@ mml(Flags, blue(X), Y) :-
 mml(Flags, black(X), Y) :-
     !, mml(Flags, color(black, X), Y).
 
+mml(Flags, overline(X), mover(accent(true), [Y, mo(stretchy(true), &('OverBar'))])) :-
+    !, mml(Flags, X, Y).
+
 mml(Flags, color(Col, X), mstyle(color(Col), Y)) :-
     !, mml(Flags, X, Y).
 
@@ -469,6 +472,9 @@ paren(Flags, blue(X), P) :-
 paren(Flags, black(X), P) :-
     !, paren(Flags, X, P).
 
+paren(Flags, overline(X), P) :-
+    !, paren(Flags, X, P).
+
 paren(Flags, color(_, X), P) :-
     !, paren(Flags, X, P).
 
@@ -485,6 +491,9 @@ prec(Flags, blue(X), P, Op) :-
     !, prec(Flags, X, P, Op).
 
 prec(Flags, black(X), P, Op) :-
+    !, prec(Flags, X, P, Op).
+
+prec(Flags, overline(X), P, Op) :-
     !, prec(Flags, X, P, Op).
 
 prec(Flags, color(_, X), P, Op) :-
