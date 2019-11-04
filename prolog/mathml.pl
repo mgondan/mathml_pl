@@ -3,11 +3,13 @@
     op(300, xfx, apply_function),
     op(400, yfx, invisible_times),
     op(180, xf, !),
+    op(170, xf, '%'),
     op(200, xfy, '_')]).
 
 :- op(300, xfx, apply_function).
 :- op(400, yfx, invisible_times).
 :- op(180, xf, !).
+:- op(180, xf, '%').
 :- op(200, xfy, '_').
 
 :- use_module(library(http/html_write)).
@@ -140,6 +142,7 @@ mo(=<, \['&le;']).
 mo(>=, \['&ge;']).
 mo(\=, \['&ne;']).
 mo(!, !).
+mo('%', '%').
 mo(cdots, \['&ctdot;']).
 mo(',', [separator(true), \[',']]).
 mo(';', \['&#59;']).
@@ -789,6 +792,19 @@ prec(_Flags, A, P, O) :-
 example(num) :-
     mathml(1.5 + (-1.5), M),
     html(M).
+
+%
+% Percentage
+%
+mml(Flags, '%'(A), mrow([X, P])) :-
+    mml(Flags, A, X),
+    mml(Flags, '%', P).
+
+paren(Flags, '%'(A), P) :-
+    !, paren(Flags, A, P).
+
+prec(Flags, '%'(A), P, O) :-
+    !, prec(Flags, A, P, O).
 
 % Collect abbreviations
 with(Flags, with(Abbrev, Exp, Desc), X) :-
