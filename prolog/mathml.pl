@@ -464,7 +464,7 @@ prec(sup(_, _), Prec) -->
 
 % Omit multiplication sign in "simple" products
 math(A * B, M) -->
-    paren(A, 0),
+    paren(A / x, 0),
     !, {M = A invisible_times B}.
 
 % Negative sign has same precedence as binary minus
@@ -498,8 +498,17 @@ mathml(operator(Prec, yf, Op, A), mrow([Y, F])) -->
     prec(A, Inner),
     (   {Prec < Inner} -> mathml(paren(A), Y) ; mathml(A, Y) ).
 
-paren(operator(_, _, _, A), Paren) -->
-    paren(A, Paren).
+paren(operator(Prec, Fix, _, A), Paren) -->
+    {member(Fix, [xf, fx])},
+    paren(A, P),
+    prec(A, Inner),
+    (   {Prec =< Inner -> Paren is P + 1 ; Paren = P}).
+
+paren(operator(Prec, Fix, _, A), Paren) -->
+    {member(Fix, [yf, fy])},
+    paren(A, P),
+    prec(A, Inner),
+    (   {Prec < Inner -> Paren is P + 1 ; Paren = P}).
 
 prec(operator(Prec, _, _, _), Prec) --> [].
 
@@ -530,10 +539,32 @@ mathml(operator(Prec, yfx, Op, A, B), mrow([Y, F, X])) -->
     prec(B, PrecB),
     (   {Prec =< PrecB} -> mathml(paren(B), X) ; mathml(B, X) ).
 
-paren(operator(_, _, _, A, B), Paren) -->
+paren(operator(Prec, xfx, _, A, B), Paren) -->
     paren(A, PA),
+    prec(A, PrecA),
+    (   {Prec =< PrecA -> ParenA is PA + 1 ; ParenA = PA} ),
     paren(B, PB),
-    {Paren is max(PA, PB)}.
+    prec(B, PrecB),
+    (   {Prec =< PrecB -> ParenB is PB + 1 ; ParenB = PB} ),
+    {Paren is max(ParenA, ParenB)}.
+
+paren(operator(Prec, yfx, _, A, B), Paren) -->
+    paren(A, PA),
+    prec(A, PrecA),
+    (   {Prec < PrecA -> ParenA is PA + 1 ; ParenA = PA} ),
+    paren(B, PB),
+    prec(B, PrecB),
+    (   {Prec =< PrecB -> ParenB is PB + 1 ; ParenB = PB} ),
+    {Paren is max(ParenA, ParenB)}.
+
+paren(operator(Prec, xfy, _, A, B), Paren) -->
+    paren(A, PA),
+    prec(A, PrecA),
+    (   {Prec =< PrecA -> ParenA is PA + 1 ; ParenA = PA} ),
+    paren(B, PB),
+    prec(B, PrecB),
+    (   {Prec < PrecB -> ParenB is PB + 1 ; ParenB = PB} ),
+    {Paren is max(ParenA, ParenB)}.
 
 prec(operator(Prec, _, _, _, _), Prec) --> [].
 
