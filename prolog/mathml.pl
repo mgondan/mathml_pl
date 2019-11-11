@@ -44,7 +44,7 @@ example(Flags, A) :-
 % For SWISH
 %
 example(Flags, A) :-
-    mathml(Flags, A, M) -> html(html(math(M))) ;  html(html(failed)).
+    mathml(Flags, A, M) -> catch(call(html(html(math(M))), _, writeln('html//1 only works in SWISH') ; writeln(failed).
 
 %
 % Helper predicate for flags
