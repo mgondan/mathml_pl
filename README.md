@@ -1,8 +1,10 @@
 # mathml
 
-Prolog package to convert mathematical expressions to MathML that can be rendered by some browsers. Actually, it's mostly Firefox, all the other browsers I tried did not yield satisfactory results.
+Prolog package to convert mathematical expressions to MathML that can be rendered by some 
+browsers. Actually, it's mostly Firefox, all the other browsers I tried did not yield 
+satisfactory results.
 
-You can find a SWISH demo here, https://swish.swi-prolog.org/p/mathml-0.0.6.swinb
+You can find a SWISH demo here, https://swish.swi-prolog.org/p/mathml-0.0.8.swinb
 
 # Installation and usage
 
@@ -22,5 +24,5 @@ More fancy things are given as an example:
 mathml:example.
 ```
 
-At the moment, the library is quite limited, but is is easily extended. So if you need more stuff, just write me a little email and 
-I will see if I can implement it.
+At the moment, the library is quite limited, but is is easily extended. So if you need more 
+stuff, just write me a little email and I will see if I can implement it.
