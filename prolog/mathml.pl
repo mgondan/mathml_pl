@@ -8,8 +8,6 @@
 :- op(170, xf, '%').
 :- op(200, xfy, '_').
 
-% Uses seqmap from pack dcgutils
-:- use_module(library(dcg_core)).
 :- use_module(library(http/html_write)).
 
 :- discontiguous mathml//2.
@@ -37,7 +35,7 @@ mathml(Flags, A, math([mrow([M, ',']),
 % Show example
 %
 example(A) :-
-    example([], A, M).
+    example([], A).
 
 example(Flags, A) :-
     mathml(Flags, A, M) -> writeln(math:A = ml:M) ;  writeln(math:A = failed).
@@ -46,7 +44,7 @@ example(Flags, A) :-
 % For SWISH
 %
 example(Flags, A) :-
-    mathml(Flags, A, M) -> html(html(M)) ;  html(html(failed)).
+    mathml(Flags, A, M) -> html(html(math(M))) ;  html(html(failed)).
 
 %
 % Helper predicate for flags
@@ -73,12 +71,12 @@ prec(A, Prec) -->
 % Punctuation
 %
 is_punct(A) --> punct(A, _).
-punct(A, mo(M)) --> {punct(A, M)}.
+punct(A, M) --> {punct(A, M)}.
 
 punct('_', &(nbsp)).
-punct(' ', &(sp)).
-punct(ldots, &(hellip)).
-punct(cdots, &(ctdot)).
+punct(' ', mspace(width(thickmathspace), '')).
+punct(ldots, mi(&(hellip))).
+punct(cdots, mi(&(ctdot))).
 
 mathml(A, M) -->
     is_punct(A),
@@ -227,15 +225,20 @@ math((H; T), list(';', [H, T])).
 
 math((H | T), list('|', [H, T])).
 
-mathml(list(Sep, List), mfenced([open(''), close(''), separators(Sep)], X)) -->
-        seqmap(mathml, List, X).
+seqmap(_,[])             --> [].
+seqmap(P,[A|AX])         --> call(P,A), seqmap(P,AX).
+
+mathml(list(Sep, List), mfenced([open(''), close(''), separators(Sep)], L)) -->
+    state(S, New),
+    {maplist({S, New}/[A, X] >> mathml(A, X, [S], [New]), List, L)}.
 
 paren(list(_, List), Paren) -->
-        seqmap(paren, List, P),
-        {sort(0, @>, P, [Paren | _])}.
+    state(S, New),
+    {maplist({S, New}/[A, X] >> paren(A, X, [S], [New]), List, P),
+     sort(0, @>, P, [Paren | _])}.
 
 prec(list(Sep, _), Prec) -->
-        {current_op(P, _, Sep), Prec = P -> true ; Prec = 999}.
+    {current_op(P, _, Sep), Prec = P -> true ; Prec = 999}.
 
 example :- example([x, y, z]).
 example :- example((x, y, z)).
@@ -260,8 +263,9 @@ paren(color(_, A), Paren) -->
 prec(color(_, A), Prec) -->
         prec(A, Prec).
 
-mathml(underbrace(A, Under), munder(munder(accentunder(true),
-        [Y, mo(stretchy(true), &('UnderBrace'))], X))) -->
+mathml(underbrace(A, Under), 
+       munder([munder([accentunder(true)],
+        [Y, mo([stretchy(true)], \['&UnderBrace;'])]), X])) -->
         mathml(A, X),
         mathml(Under, Y).
 
@@ -371,11 +375,12 @@ with0(instead_of(_, B), W) -->
         {member(error-fix, S)},
         !, with0(B, W).
 
-with0(A, W) -->
-        {compound(A),
-         compound_name_arguments(A, _, Args)},
-        seqmap(with0, Args, List),
-        {append(List, W)}.
+with0(Comp, With) -->
+    state(S, New),
+    {compound(Comp),
+     compound_name_arguments(Comp, _, Args)},
+    {maplist({S, New}/[A, W] >> with0(A, W, [S], [New]), Args, Withs),
+     append(Withs, With)}.
 
 % Render abbreviations
 denoting(A, []) -->
@@ -430,16 +435,16 @@ paren(sub(A, _), Paren) -->
 prec(sub(_, _), Prec) -->
         prec(x^y, Prec).
 
+math(A^B, sup(A, B)).
+
 % experimental: sin^2 x for "simple" x
-mathml(Sin^B, M) -->
+mathml(sup(Sin, X), M) -->
         prec(Sin, Prec),
         prec(sin(x), Prec),
-        paren(B, 0),
-        prec(B, 0),
-        !, state(S, [replace(Sin^2, Sin) | S]),
+        paren(X, 0),
+        prec(X, 0),
+        !, state(S, [replace(Sin^X, Sin) | S]),
         mathml(Sin, M).
-
-math(A^B, sup(A, B)).
 
 mathml(sup(A, B), msup([X, Y])) -->
         prec(sup(A, B), Prec),
