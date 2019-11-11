@@ -1,5 +1,6 @@
 :- module(mathml, [
     mathml/2,
+    op(400, yfx, invisible_times),
     op(180, xf, !),
     op(170, xf, '%'),
     op(200, xfy, '_')]).
@@ -7,6 +8,7 @@
 :- op(180, xf, !).
 :- op(170, xf, '%').
 :- op(200, xfy, '_').
+:- op(400, yfx, invisible_times).
 
 :- use_module(library(http/html_write)).
 
@@ -14,7 +16,7 @@
 :- discontiguous example/0.
 :- discontiguous paren//2.
 :- discontiguous prec//2.
-:- discontiguous math/2.
+:- discontiguous math//2.
 
 %
 % Interface
@@ -56,15 +58,15 @@ state(S0, S), [S] --> [S0].
 % Macros (e.g., red(X) for color(red, X)
 %
 mathml(A, M) -->
-    {math(A, X)},
+    math(A, X),
     !, mathml(X, M).
 
 paren(A, Paren) -->
-    {math(A, X)},
+    math(A, X),
     !, paren(X, Paren).
 
 prec(A, Prec) -->
-    {math(A, X)},
+    math(A, X),
     !, prec(X, Prec).
 
 %
@@ -113,6 +115,7 @@ op('%', '%').
 op(',', &(comma)).
 op(';', &('#59')).
 op('|', '|').
+op(invisible_times, &('#x2062')).
 
 mathml(A, M) -->
     is_op(A),
@@ -146,7 +149,11 @@ example :- example(alpha).
 %
 % General atoms
 %
-is_atom(A) --> atom(A, _), \+ is_id(A).
+is_atom(A) -->
+    atom(A, _),
+    \+ is_id(A),
+    \+ is_op(A).
+
 atom(A, mi(A)) --> {atom(A)}.
 
 mathml(A, M) -->
@@ -217,16 +224,13 @@ example :- example(paren(paren(x))).
 %
 % Lists (e.g., function arguments)
 %
-math([H | T], list('', [H | T])).
+math([H | T], list('', [H | T])) --> [].
 
-math((H, T), list(',', [H, T])).
+math((H, T), list(',', [H, T])) --> [].
 
-math((H; T), list(';', [H, T])).
+math((H; T), list(';', [H, T])) --> [].
 
-math((H | T), list('|', [H, T])).
-
-seqmap(_,[])             --> [].
-seqmap(P,[A|AX])         --> call(P,A), seqmap(P,AX).
+math((H | T), list('|', [H, T])) --> [].
 
 mathml(list(Sep, List), mfenced([open(''), close(''), separators(Sep)], L)) -->
     state(S, New),
@@ -249,10 +253,10 @@ example :- example(paren([paren(x), paren(y)])).
 %
 % Decorations
 %
-math(red(A), color(red, A)).
-math(green(A), color(green, A)).
-math(blue(A), color(blue, A)).
-math(black(A), color(black, A)).
+math(red(A), color(red, A)) --> [].
+math(green(A), color(green, A)) --> [].
+math(blue(A), color(blue, A)) --> [].
+math(black(A), color(black, A)) --> [].
 
 mathml(color(Col, A), mstyle(color(Col), X)) -->
         mathml(A, X).
@@ -263,7 +267,7 @@ paren(color(_, A), Paren) -->
 prec(color(_, A), Prec) -->
         prec(A, Prec).
 
-mathml(underbrace(A, Under), 
+mathml(underbrace(A, Under),
        munder([munder([accentunder(true)],
         [Y, mo([stretchy(true)], \['&UnderBrace;'])]), X])) -->
         mathml(A, X),
@@ -406,120 +410,125 @@ denoting_and([with(X, Exp, Des) | T], [M | MT]) -->
 %
 % Operators
 %
-math(A '_' B ^ C, subsup(A, B, C)).
+math(A '_' B ^ C, subsup(A, B, C)) --> [].
 
 mathml(subsup(A, B, C), msubsup([X, Y, Z])) -->
-        prec(subsup(A, B, C), Prec),
-        prec(A, Inner),
-        (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ),
-        mathml(B, Y),
-        mathml(C, Z).
+    prec(subsup(A, B, C), Prec),
+    prec(A, Inner),
+    (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ),
+    mathml(B, Y),
+    mathml(C, Z).
 
 paren(subsup(A, _, _), Paren) -->
-        paren(A, Paren).
+    paren(A, Paren).
 
 prec(subsup(_, _, _), Prec) -->
-        prec(x^y, Prec).
+    prec(x^y, Prec).
 
-math(A '_' B, sub(A, B)).
+math(A '_' B, sub(A, B)) --> [].
 
 mathml(sub(A, B), msub([X, Y])) -->
-        prec(sub(A, B), Prec),
-        prec(A, Inner),
-        (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ),
-        mathml(B, Y).
+    prec(sub(A, B), Prec),
+    prec(A, Inner),
+    (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ),
+    mathml(B, Y).
 
 paren(sub(A, _), Paren) -->
-        paren(A, Paren).
+    paren(A, Paren).
 
 prec(sub(_, _), Prec) -->
-        prec(x^y, Prec).
+    prec(x^y, Prec).
 
-math(A^B, sup(A, B)).
+math(A^B, sup(A, B)) --> [].
 
 % experimental: sin^2 x for "simple" x
 mathml(sup(Sin, X), M) -->
-        prec(Sin, Prec),
-        prec(sin(x), Prec),
-        paren(X, 0),
-        prec(X, 0),
-        !, state(S, [replace(Sin^X, Sin) | S]),
-        mathml(Sin, M).
+    prec(Sin, Prec),
+    prec(sin(x), Prec),
+    paren(X, 0),
+    prec(X, 0),
+    !, state(S, [replace(Sin^X, Sin) | S]),
+    mathml(Sin, M).
 
 mathml(sup(A, B), msup([X, Y])) -->
-        prec(sup(A, B), Prec),
-        prec(A, Inner),
-        (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ),
-        mathml(B, Y).
+    prec(sup(A, B), Prec),
+    prec(A, Inner),
+    (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ),
+    mathml(B, Y).
 
 paren(sup(A, _), Paren) -->
-        paren(A, Paren).
+    paren(A, Paren).
 
 prec(sup(_, _), Prec) -->
-        {current_op(P, xfy, ^), Prec = P}.
+    {current_op(P, xfy, ^), Prec = P}.
+
+% Omit multiplication sign in "simple" products
+math(A * B, M) -->
+    paren(A, 0),
+    !, {M = A invisible_times B}.
 
 % Negative sign has same precedence as binary minus
-math(-A, operator(Prec, fx, -, A)) :-
-    current_op(P, yfx, -), Prec = P.
+math(-A, operator(Prec, fx, -, A)) -->
+    prec(a-b, Prec).
 
 % Prefix and postfix operators (e.g., factorial)
-math(Comp, operator(Prec, Fix, Op, A)) :-
-    compound(Comp),
-    compound_name_arguments(Comp, Op, [A]),
-    current_op(P, Fix, Op), Prec = P,
-    member(Fix, [xf, yf, fx, fy]).
+math(Comp, operator(Prec, Fix, Op, A)) -->
+    {compound(Comp),
+     compound_name_arguments(Comp, Op, [A]),
+     current_op(P, Fix, Op), Prec = P,
+     member(Fix, [xf, yf, fx, fy])}.
 
 mathml(operator(Prec, fx, Op, A), mrow([F, X])) -->
-        mathml(Op, F),
-        prec(A, Inner),
-        ( {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ).
+    mathml(Op, F),
+    prec(A, Inner),
+    (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ).
 
 mathml(operator(Prec, fy, Op, A), mrow([F, Y])) -->
-        mathml(Op, F),
-        prec(A, Inner),
-        ( {Prec < Inner} -> mathml(paren(A), Y) ; mathml(A, Y) ).
+    mathml(Op, F),
+    prec(A, Inner),
+    (   {Prec < Inner} -> mathml(paren(A), Y) ; mathml(A, Y) ).
 
 mathml(operator(Prec, xf, Op, A), mrow([X, F])) -->
-        mathml(Op, F),
-        prec(A, Inner),
-        ( {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ).
+    mathml(Op, F),
+    prec(A, Inner),
+    (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ).
 
 mathml(operator(Prec, yf, Op, A), mrow([Y, F])) -->
-        !, mathml(Op, F),
-        prec(A, Inner),
-        ( {Prec < Inner} -> mathml(paren(A), Y) ; mathml(A, Y) ).
+    mathml(Op, F),
+    prec(A, Inner),
+    (   {Prec < Inner} -> mathml(paren(A), Y) ; mathml(A, Y) ).
 
 paren(operator(_, _, _, A), Paren) -->
-        paren(A, Paren).
+    paren(A, Paren).
 
 prec(operator(Prec, _, _, _), Prec) --> [].
 
-math(Comp, operator(Prec, Fix, Op, A, B)) :-
-    compound(Comp),
-    compound_name_arguments(Comp, Op, [A, B]),
-    current_op(P, Fix, Op), Prec = P,
-    member(Fix, [xfx, yfx, xfy]).
+math(Comp, operator(Prec, Fix, Op, A, B)) -->
+    {compound(Comp),
+     compound_name_arguments(Comp, Op, [A, B]),
+     current_op(P, Fix, Op), Prec = P,
+     member(Fix, [xfx, yfx, xfy])}.
 
 mathml(operator(Prec, xfx, Op, A, B), mrow([X, F, Y])) -->
-        mathml(Op, F),
-        prec(A, PrecA),
-        ( {Prec =< PrecA} -> mathml(paren(A), X) ; mathml(A, X) ),
-        prec(B, PrecB),
-        ( {Prec =< PrecB} -> mathml(paren(B), Y) ; mathml(B, Y) ).
+    mathml(Op, F),
+    prec(A, PrecA),
+    (   {Prec =< PrecA} -> mathml(paren(A), X) ; mathml(A, X) ),
+    prec(B, PrecB),
+    (   {Prec =< PrecB} -> mathml(paren(B), Y) ; mathml(B, Y) ).
 
 mathml(operator(Prec, xfy, Op, A, B), mrow([X, F, Y])) -->
-        mathml(Op, F),
-        prec(A, PrecA),
-        ( {Prec =< PrecA} -> mathml(paren(A), X) ; mathml(A, X) ),
-        prec(B, PrecB),
-        ( {Prec < PrecB} -> mathml(paren(B), Y) ; mathml(B, Y) ).
+    mathml(Op, F),
+    prec(A, PrecA),
+    (   {Prec =< PrecA} -> mathml(paren(A), X) ; mathml(A, X) ),
+    prec(B, PrecB),
+    (   {Prec < PrecB} -> mathml(paren(B), Y) ; mathml(B, Y) ).
 
 mathml(operator(Prec, yfx, Op, A, B), mrow([Y, F, X])) -->
-        mathml(Op, F),
-        prec(A, PrecA),
-        ( {Prec < PrecA} -> mathml(paren(A), Y) ; mathml(A, Y) ),
-        prec(B, PrecB),
-        ( {Prec =< PrecB} -> mathml(paren(B), X) ; mathml(B, X) ).
+    mathml(Op, F),
+    prec(A, PrecA),
+    (   {Prec < PrecA} -> mathml(paren(A), Y) ; mathml(A, Y) ),
+    prec(B, PrecB),
+    (   {Prec =< PrecB} -> mathml(paren(B), X) ; mathml(B, X) ).
 
 paren(operator(_, _, _, A, B), Paren) -->
     paren(A, PA),
@@ -528,6 +537,7 @@ paren(operator(_, _, _, A, B), Paren) -->
 
 prec(operator(Prec, _, _, _, _), Prec) --> [].
 
+example :- example(a^3 + 3*a^2*b + 3*a*b^2 + b^3).
 example :- example(a^b).
 example :- example((s!)!).
 example :- example(a + b + c).
@@ -542,6 +552,8 @@ example :- example((a + b) * (a - b) = a^two - b^two).
 is_positive(A) --> positive(A, _).
 positive(A, mn(A)) --> {number(A), A >= 0}.
 
+is_negative(A) --> {number(A), A < 0}.
+
 mathml(A, M) -->
     is_positive(A),
     positive(A, M).
@@ -552,10 +564,9 @@ paren(A, 0) -->
 prec(A, 0) -->
     is_positive(A).
 
-math(A, -X) :-
-    number(A),
-    A < 0,
-    X is abs(A).
+math(A, -X) -->
+    is_negative(A),
+    {X is abs(A)}.
 
 example :- example(5^2).
 example :- example((-5)^(-2)).
@@ -613,9 +624,9 @@ example :- example(frac(small, small) = dfrac(large, large)).
 %
 % Trigonometric functions
 %
-math(sin(A), trig(sin, A)).
-math(cos(A), trig(cos, A)).
-math(tan(A), trig(tan, A)).
+math(sin(A), trig(sin, A)) --> [].
+math(cos(A), trig(cos, A)) --> [].
+math(tan(A), trig(tan, A)) --> [].
 
 mathml(trig(Fun, Arg), M) -->
     paren(Arg, 0),
@@ -699,16 +710,16 @@ paren(sqrt(_), 0) --> [].
 prec(sqrt(_), Prec) -->
     prec(x^y, Prec).
 
-math(dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])).
-math(pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])).
-math(ubinom(K, N, P), fun('P' '_' "Bi", ['X' >= K ; (N, P)])).
-math(qbinom(Alpha, N, P), fun('Q' '_' "Bi", [Alpha ; (N, P)])).
-math(uqbinom(Alpha, N, P), fun('Q' '_' "Bi", [1 - Alpha ; (N, P)])).
+math(dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])) --> [].
+math(pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])) --> [].
+math(ubinom(K, N, P), fun('P' '_' "Bi", ['X' >= K ; (N, P)])) --> [].
+math(qbinom(Alpha, N, P), fun('Q' '_' "Bi", [Alpha ; (N, P)])) --> [].
+math(uqbinom(Alpha, N, P), fun('Q' '_' "Bi", [1 - Alpha ; (N, P)])) --> [].
 
 % Bit unusual terminology
-math(bernoulli(Succ, N, Pi), successes(Succ, Pi) * failures(N-Succ, Pi)).
-math(successes(Succ, Pi), Succ^Pi).
-math(failures(Fail, Pi), Fail^(1-Pi)).
+math(bernoulli(Succ, N, Pi), successes(Succ, Pi) * failures(N-Succ, Pi)) --> [].
+math(successes(Succ, Pi), Succ^Pi) --> [].
+math(failures(Fail, Pi), Fail^(1-Pi)) --> [].
 
 % General functions
 mathml(fun(Name, Args), mrow([N, &(af), A])) -->
