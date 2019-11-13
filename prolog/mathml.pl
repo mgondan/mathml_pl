@@ -267,6 +267,15 @@ paren(color(_, A), Paren) -->
 prec(color(_, A), Prec) -->
         prec(A, Prec).
 
+mathml(overline(A), mover(accent(true), [X, mo(&(macr))])) -->
+        mathml(A, X).
+
+paren(overline(_, A), Paren) -->
+        paren(A, Paren).
+
+prec(overline(_, A), Prec) -->
+        prec(A, Prec).
+
 mathml(underbrace(A, Under),
        munder([munder([accentunder(true)],
         [Y, mo([stretchy(true)], \['&UnderBrace;'])]), X])) -->
