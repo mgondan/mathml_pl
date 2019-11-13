@@ -771,7 +771,7 @@ example :- example(ubinom(k, n, pi)).
 example :- example(qbinom(alpha, n, pi)).
 example :- example(uqbinom(alpha, n, pi)).
 example :- example(dbinom(k, n, pi) =
-                   choose(n, k) * successes(n, pi) * failures(n-k, 1-pi)).
+                   choose(n, k) * successes(n, pi) * failures(n-k, pi)).
 example :- example(pbinom(k, 'N', pi) =
                    sum(i, k, 'N', choose('N', k) * dbinom(i, 'N', k))).
 example :- example(sum(i, k, 'N', i) + sum(i, k, 'N', i)).
