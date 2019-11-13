@@ -609,6 +609,24 @@ example :- example(1 - ((-2) - 3)).
 example :- example((a + b) * (a - b) = a^2 - b^2).
 
 %
+% Units
+%
+is_unit(A) --> unit(A, _).
+unit(A, M) --> {unit(A, M)}.
+
+unit('%', "%").
+unit('kg', "kg").
+
+mathml(A, [Num, ' ', Unit]) -->
+    {compound(A),
+     compound_name_arguments(A, U, [Num])},
+    is_unit(U),
+    unit(U, Unit).
+
+example :- example(10 '%').
+example :- example(kg(5)).
+
+%
 % Fractions
 %
 mathml(frac(A, B), mfrac([X, Y])) -->
