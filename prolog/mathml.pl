@@ -289,6 +289,7 @@ prec(underbrace(A, _), Prec) -->
         prec(A, Prec).
 
 example :- example(paren([paren(red(x)), green(paren(y))])).
+example :- example(overline('X')).
 example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 
 %
