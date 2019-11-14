@@ -288,6 +288,18 @@ paren(underbrace(A, _), Paren) -->
 prec(underbrace(A, _), Prec) -->
         prec(A, Prec).
 
+math(cancel(A), red(strike(black(A)))) --> [].
+
+mathml(strike(A), menclose(notation(updiagonalstrike), X)) -->
+    mathml(A, X).
+
+paren(strike(A), Paren) -->
+        paren(A, Paren).
+
+prec(strike(A), Prec) -->
+        prec(A, Prec).
+
+example :- example(cancel('X')).
 example :- example(paren([paren(red(x)), green(paren(y))])).
 example :- example(overline('X')).
 example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
