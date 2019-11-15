@@ -278,7 +278,7 @@ prec(overline(A), Prec) -->
 
 mathml(underbrace(A, Under),
        munder([munder([accentunder(true)],
-        [Y, mo([stretchy(true)], \['&UnderBrace;'])]), X])) -->
+        [X, mo([stretchy(true)], \['&UnderBrace;'])]), Y])) -->
         mathml(A, X),
         mathml(Under, Y).
 
