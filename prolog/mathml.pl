@@ -3,12 +3,14 @@
     op(400, yfx, invisible_times),
     op(180, xf, !),
     op(170, xf, '%'),
-    op(200, xfy, '_')]).
+    op(200, xfy, '_'),
+    op(1050, xfy, '~>')]).
 
 :- op(180, xf, !).
 :- op(170, xf, '%').
 :- op(200, xfy, '_').
 :- op(400, yfx, invisible_times).
+:- op(1050, xfy, '~>').
 
 :- use_module(library(http/html_write)).
 
@@ -45,8 +47,8 @@ example(Flags, A) :-
 %
 % For SWISH
 %
-% example(Flags, A) :-
-%    mathml(Flags, A, M) -> html(html(math(M))) ; writeln(failed).
+ example(Flags, A) :-
+    mathml(Flags, A, M) -> html(html(math(M))) ; writeln(failed).
 
 %
 % Helper predicate for flags
@@ -116,6 +118,8 @@ op(',', &(comma)).
 op(';', &('#59')).
 op('|', '|').
 op(invisible_times, &('#x2062')).
+op(->, &(rArr)).
+op(~>, &(zigrarr)).
 
 mathml(A, M) -->
     is_op(A),
@@ -125,6 +129,8 @@ paren(A, 0) --> is_op(A).
 prec(A, 0) --> is_op(A).
 
 example :- example(/).
+example :- example(->).
+example :- example(~>).
 
 %
 % Identifiers
@@ -352,9 +358,13 @@ prec(instead_of(_, B), Prec) -->
         {member(error-fix, S)},
         prec(B, Prec).
 
+math(expert(A = B), A -> B) --> [].
+math(buggy(A \= B, _Bug), A ~> B) --> [].
+
 example :- example([error-highlight], instead_of(sigma, s)).
 example :- example([error-fix], instead_of(sigma, s)).
 example :- example([error-show], instead_of(sigma, s)).
+example :- example(expert(1 = 2)).
 
 %
 % Abbreviations
@@ -688,6 +698,12 @@ paren(dchoose(A, B), Paren) -->
 
 prec(dchoose(A, B), Prec) -->
     prec(choose(A, B), Prec).
+
+math(tratio(X, Mu, S, N), 
+    fun("paired t-test", (X, S; Mu, N))) --> [].
+
+math('TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
+     fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))) --> [].
 
 example :- example(frac(1.5, 2)^2).
 example :- example(frac(small, small) = dfrac(large, large)).
