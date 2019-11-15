@@ -270,10 +270,10 @@ prec(color(_, A), Prec) -->
 mathml(overline(A), mover(accent(true), [X, mo(&(macr))])) -->
         mathml(A, X).
 
-paren(overline(_, A), Paren) -->
+paren(overline(A), Paren) -->
         paren(A, Paren).
 
-prec(overline(_, A), Prec) -->
+prec(overline(A), Prec) -->
         prec(A, Prec).
 
 mathml(underbrace(A, Under),
