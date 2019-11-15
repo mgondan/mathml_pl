@@ -157,6 +157,7 @@ example :- example(alpha).
 %
 is_atom(A) -->
     atom(A, _),
+    \+ is_punct(A),
     \+ is_id(A),
     \+ is_op(A).
 
