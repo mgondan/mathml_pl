@@ -129,8 +129,6 @@ paren(A, 0) --> is_op(A).
 prec(A, 0) --> is_op(A).
 
 example :- example(/).
-example :- example(->).
-example :- example(~>).
 
 %
 % Identifiers
@@ -157,8 +155,8 @@ example :- example(alpha).
 %
 is_atom(A) -->
     atom(A, _),
-    \+ is_punct(A),
     \+ is_id(A),
+    \+ is_punct(A),
     \+ is_op(A).
 
 atom(A, mi(A)) --> {atom(A)}.
@@ -274,6 +272,7 @@ paren(color(_, A), Paren) -->
 prec(color(_, A), Prec) -->
         prec(A, Prec).
 
+% Only decoration
 mathml(overline(A), mover(accent(true), [X, mo(&(macr))])) -->
         mathml(A, X).
 
@@ -283,11 +282,12 @@ paren(overline(A), Paren) -->
 prec(overline(A), Prec) -->
         prec(A, Prec).
 
-mathml(underbrace(A, Under),
-       munder([munder([accentunder(true)],
-        [X, mo([stretchy(true)], \['&UnderBrace;'])]), Y])) -->
-        mathml(A, X),
-        mathml(Under, Y).
+% Proper average
+math(mean(A), overline(A)) --> [].
+
+mathml(underbrace(A, Under), munder([munder(accentunder(true), [X, mo(stretchy(true), &('UnderBrace'))]), Y])) -->
+    mathml(A, X),
+    mathml(Under, Y).
 
 paren(underbrace(A, _), Paren) -->
         paren(A, Paren).
@@ -308,7 +308,6 @@ prec(strike(A), Prec) -->
 
 example :- example(cancel('X')).
 example :- example(paren([paren(red(x)), green(paren(y))])).
-example :- example(overline('X')).
 example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 
 %
@@ -365,58 +364,56 @@ math(buggy(A \= B, _Bug), A ~> B) --> [].
 example :- example([error-highlight], instead_of(sigma, s)).
 example :- example([error-fix], instead_of(sigma, s)).
 example :- example([error-show], instead_of(sigma, s)).
-example :- example(expert(1 = 2)).
 
 %
 % Abbreviations
 %
-mathml(with(A, _, _), M) -->
+mathml(denoting(A, _, _), M) -->
         mathml(A, M).
 
-paren(with(A, _, _), Paren) -->
+paren(denoting(A, _, _), Paren) -->
         paren(A, Paren).
 
-prec(with(A, _, _), Paren) -->
+prec(denoting(A, _, _), Paren) -->
         prec(A, Paren).
 
-example :- example(with(s, t + u, "something")).
-example :- example(a + with(s, t + u, "something")).
-example :- example([render-main], with(s, with(t, t, tt) + with(t, t, tt), ss)).
+example :- example(denoting(s, t + u, "something")).
+example :- example(a + denoting(s, t + u, "something")).
 
 % Collect abbreviations
 abbrev(A, W) -->
-        with0(A, X),
+        denoting0(A, X),
         {list_to_set(X, W)}.
 
-with0(A, []) -->
+denoting0(A, []) -->
         {atomic(A)}.
 
-with0(with(Abbrev, Exp, Desc), W) -->
-        !, with0(Exp, T),
-        {W = [with(Abbrev, Exp, Desc) | T]}.
+denoting0(denoting(Abbrev, Exp, Desc), W) -->
+        !, denoting0(Exp, T),
+        {W = [denoting(Abbrev, Exp, Desc) | T]}.
 
-with0(instead_of(A, B, _), W) -->
+denoting0(instead_of(A, B, _), W) -->
         state(S),
         {member(error-highlight, S)},
-        !, with0(A, X),
-        with0(B, Y),
+        !, denoting0(A, X),
+        denoting0(B, Y),
         {append(X, Y, W)}.
 
-with0(instead_of(A, _), W) -->
+denoting0(instead_of(A, _), W) -->
         state(S),
         {member(error-show, S)},
-        !, with0(A, W).
+        !, denoting0(A, W).
 
-with0(instead_of(_, B), W) -->
+denoting0(instead_of(_, B), W) -->
         state(S),
         {member(error-fix, S)},
-        !, with0(B, W).
+        !, denoting0(B, W).
 
-with0(Comp, With) -->
+denoting0(Comp, With) -->
     state(S, New),
     {compound(Comp),
      compound_name_arguments(Comp, _, Args)},
-    {maplist({S, New}/[A, W] >> with0(A, W, [S], [New]), Args, Withs),
+    {maplist({S, New}/[A, W] >> denoting0(A, W, [S], [New]), Args, Withs),
      append(Withs, With)}.
 
 % Render abbreviations
@@ -425,18 +422,18 @@ denoting(A, []) -->
         !.
 
 denoting(A, [M]) -->
-        abbrev(A, [with(X, Exp, Des)]),
+        abbrev(A, [denoting(X, Exp, Des)]),
         !, mathml([' ', "with", ' ', X = Exp, ' ', "denoting", ' ', Des, "."], M).
 
 denoting(A, [M | MT]) -->
-        abbrev(A, [with(X, Exp, Des) | T]),
+        abbrev(A, [denoting(X, Exp, Des) | T]),
         mathml(["with", ' ', X = Exp, ' ', "denoting", ' ', Des, ",", ' '], M),
         denoting_and(T, MT).
 
 denoting_and([], [X]) -->
         mathml(".", X).
 
-denoting_and([with(X, Exp, Des) | T], [M | MT]) -->
+denoting_and([denoting(X, Exp, Des) | T], [M | MT]) -->
         mathml(["and", ' ', X = Exp, ' ', "denoting", ' ', Des], M),
         denoting_and(T, MT).
 
@@ -671,6 +668,7 @@ paren(frac(_, _), 0) --> [].
 prec(frac(_, _), Prec) -->
     prec(x/y, Prec).
 
+% Large fraction
 mathml(dfrac(A, B), mstyle(displaystyle(true), X)) -->
     mathml(frac(A, B), X).
 
@@ -700,11 +698,11 @@ paren(dchoose(A, B), Paren) -->
 prec(dchoose(A, B), Prec) -->
     prec(choose(A, B), Prec).
 
-math(tratio(X, Mu, S, N), 
-    fun("paired t-test", (X, S; Mu, N))) --> [].
-
 math('TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
      fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))) --> [].
+
+math(tratio(X, Mu, S, N), 
+    fun("paired t-test", (X, S; Mu, N))) --> [].
 
 example :- example(frac(1.5, 2)^2).
 example :- example(frac(small, small) = dfrac(large, large)).
