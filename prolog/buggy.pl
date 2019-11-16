@@ -2,7 +2,7 @@
 :- use_module(library(mathml)).
 :- use_module(library(http/html_write)).
 
-:- include('real.pl').
+:- include('real-0.0.8.pl').
 % :- include('mathml-0.0.8.pl').
 % :- include('rserve-0.0.8.pl').
 :- discontiguous buggy/2.
