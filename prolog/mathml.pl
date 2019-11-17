@@ -614,9 +614,12 @@ example :- example((a + b) * (a - b) = a^two - b^two).
 % Numbers
 %
 is_positive(A) --> positive(A, _).
-positive(A, mn(A)) --> {number(A), A >= 0}.
+positive(A, mn(A)) --> 
+    {number(A), A >= 0}.
 
-is_negative(A) --> {number(A), A < 0}.
+positive(A, X) -->
+    {string(A), number_string(N, A)},
+    positive(N, X).
 
 mathml(A, M) -->
     is_positive(A),
@@ -628,9 +631,62 @@ paren(A, 0) -->
 prec(A, 0) -->
     is_positive(A).
 
-math(A, -X) -->
+is_negative(A) --> negative(A, _).
+negative(A, X) --> 
+    {number(A), A < 0, P is abs(A)},
+    mathml(-P, X).
+
+negative(A, X) --> 
+    {string(A), number_string(N, A)},
+    negative(N, X).
+
+mathml(A, M) -->
     is_negative(A),
-    {X is abs(A)}.
+    negative(A, M).
+
+paren(A, 0) -->
+    is_negative(A).
+
+prec(A, Prec) -->
+    is_negative(A),
+    prec(-a, Prec).
+
+% SWISH sandbox restrictions do not allow
+% a general "round", but it is not needed
+% anyway.
+math(round0(A), X) -->
+    {X is round(A)}.
+
+mathml(round1(A), mn(S)) -->
+    {number(A),
+     format(atom(S), '~1f', A)}.
+
+paren(round1(A), X) -->
+    paren(A, X).
+
+prec(round1(A), X) -->
+    prec(A, X).
+
+mathml(round2(A), mn(S)) -->
+    {number(A),
+     format(atom(S), '~2f', A)}.
+    
+paren(round2(A), X) -->
+    paren(A, X).
+
+prec(round2(A), X) -->
+    prec(A, X).
+
+mathml(round3(A), mn(S)) -->
+    {number(A),
+     format(atom(S), '~3f', A)}.
+    
+paren(round3(A), X) -->
+    paren(A, X).
+
+prec(round3(A), X) -->
+    prec(A, X).
+
 
 example :- example(5^2).
 example :- example((-5)^(-2)).
