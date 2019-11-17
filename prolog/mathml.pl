@@ -306,8 +306,11 @@ paren(strike(A), Paren) -->
 prec(strike(A), Prec) -->
         prec(A, Prec).
 
-% Only relevant for R output, not here
-math(format_tratio(A), A) --> [].
+math(format_tratio(A), round2(A)) --> 
+    {number(A)}.
+
+math(format_tratio(A), A) --> 
+    {\+ number(A)}.
 
 example :- example(cancel('X')).
 example :- example(paren([paren(red(x)), green(paren(y))])).
