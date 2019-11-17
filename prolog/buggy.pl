@@ -100,11 +100,6 @@ item('TTEST'('T0' - 'EOT', 'T0', 'EOT', mu, s,
     'EOT' <- 19.7,
     s_EOT <- 5.2.
 
-%:- <- {|r||
-%       T0 = 25.6 ; EOT = 19.7 ; mu = 4 ; s = 4.0 ;
-%       S_T0 = 4.9 ; S_EOT = 5.2 ; N = 24
-%       |}.
-
 intermediate('TTEST'(_, _, _, _, _, _, _, _)).
 intermediate(tratio(_, _, _, _)).
 
@@ -112,7 +107,7 @@ expert('TTEST'(X, _T0, _EOT, Mu, S, _S_T0, _S_EOT, N) =
        tratio(X, Mu, S, N)).
 
 expert(tratio(X, Mu, S, N) = 
-       dfrac(X - Mu, S / sqrt(N))).
+       format_tratio(dfrac(X - Mu, S / sqrt(N)))).
 
 % Wrong X
 buggy(TTEST \= TRATIO, BUG) :-
