@@ -19,3 +19,8 @@
 :- <- {|r||
        dfrac = `/`
        |}.
+
+:- <- {|r||
+       format_tratio = function(x)
+           sprintf(ifelse(abs(x) > 10, '%.1f', '%.2f'), x)
+       |}.
