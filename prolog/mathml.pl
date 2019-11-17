@@ -306,6 +306,9 @@ paren(strike(A), Paren) -->
 prec(strike(A), Prec) -->
         prec(A, Prec).
 
+% Only relevant for R output, not here
+math(format_tratio(A), A) --> [].
+
 example :- example(cancel('X')).
 example :- example(paren([paren(red(x)), green(paren(y))])).
 example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
