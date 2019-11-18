@@ -12,8 +12,6 @@
 :- op(400, yfx, invisible_times).
 :- op(1050, xfy, '~>').
 
-:- use_module(library(http/html_write)).
-
 :- discontiguous mathml//2.
 :- discontiguous example/0.
 :- discontiguous paren//2.
@@ -23,6 +21,10 @@
 %
 % Interface
 %
+mml(A) -->
+    {phrase(mathml(A, M), [error-highlight], _)},
+    html(math(M)).
+
 mathml(A, M) :-
     mathml([error-highlight], A, M).
 
@@ -39,7 +41,7 @@ mathml(Flags, A, math([mrow([M, ',']),
 % Show example
 %
 example(A) :-
-    example([], A).
+    example([error-highlight], A).
 
 example(Flags, A) :-
     mathml(Flags, A, M) -> writeln(math:A = ml:M) ;  writeln(math:A = failed).
@@ -47,8 +49,8 @@ example(Flags, A) :-
 %
 % For SWISH
 %
-% example(Flags, A) :-
-%    mathml(Flags, A, M) -> html(html(math(M))) ; writeln(failed).
+example(Flags, A) :-
+    mathml(Flags, A, M) -> html(html(math(M))) ; writeln(failed).
 
 %
 % Helper predicate for flags
@@ -156,7 +158,6 @@ example :- example(alpha).
 is_atom(A) -->
     atom(A, _),
     \+ is_id(A),
-    \+ is_punct(A),
     \+ is_op(A).
 
 atom(A, mi(A)) --> {atom(A)}.
@@ -247,7 +248,7 @@ paren(list(_, List), Paren) -->
      sort(0, @>, P, [Paren | _])}.
 
 prec(list(Sep, _), Prec) -->
-    {current_op(P, _, Sep), Prec = P -> true ; Prec = 999}.
+    {current_op(P, _, Sep), Prec = P -> true ; Prec = 1}.
 
 example :- example([x, y, z]).
 example :- example((x, y, z)).
@@ -617,6 +618,26 @@ example :- example((a + b) * (a - b) = a^two - b^two).
 % Numbers
 %
 is_positive(A) --> positive(A, _).
+positive(A, mn(N)) --> 
+    {number(A), A >= 0}, 
+    state(S), {member(round3, S)},
+    !, {format(atom(N), '~3f', A)}.
+
+positive(A, mn(N)) --> 
+    {number(A), A >= 0}, 
+    state(S), {member(round2, S)},
+    !, {format(atom(N), '~2f', A)}.
+
+positive(A, mn(N)) --> 
+    {number(A), A >= 0}, 
+    state(S), {member(round1, S)},
+    !, {format(atom(N), '~1f', A)}.
+
+positive(A, mn(N)) --> 
+    {number(A), A >= 0}, 
+    state(S), {member(round0, S)},
+    !, {format(atom(N), '~0f', A)}.
+
 positive(A, mn(A)) --> 
     {number(A), A >= 0}.
 
@@ -657,39 +678,49 @@ prec(A, Prec) -->
 % SWISH sandbox restrictions do not allow
 % a general "round", but it is not needed
 % anyway.
-math(round0(A), X) -->
-    {X is round(A)}.
+mathml(round0(A), X) -->
+    state(S, [round0 | S]),
+    mathml(A, X),
+    state([round0 | S], S).
 
-mathml(round1(A), mn(S)) -->
-    {number(A),
-     format(atom(S), '~1f', A)}.
+paren(round0(A), Paren) -->
+    paren(A, Paren).
 
-paren(round1(A), X) -->
-    paren(A, X).
+prec(round0(A), Prec) -->
+    prec(A, Prec).
 
-prec(round1(A), X) -->
-    prec(A, X).
+mathml(round1(A), X) -->
+    state(S, [round1 | S]),
+    mathml(A, X),
+    state([round1 | S], S).
 
-mathml(round2(A), mn(S)) -->
-    {number(A),
-     format(atom(S), '~2f', A)}.
-    
-paren(round2(A), X) -->
-    paren(A, X).
+paren(round1(A), Paren) -->
+    paren(A, Paren).
 
-prec(round2(A), X) -->
-    prec(A, X).
+prec(round1(A), Prec) -->
+    prec(A, Prec).
 
-mathml(round3(A), mn(S)) -->
-    {number(A),
-     format(atom(S), '~3f', A)}.
-    
-paren(round3(A), X) -->
-    paren(A, X).
+mathml(round2(A), X) -->
+    state(S, [round2 | S]),
+    mathml(A, X),
+    state([round2 | S], S).
 
-prec(round3(A), X) -->
-    prec(A, X).
+paren(round2(A), Paren) -->
+    paren(A, Paren).
 
+prec(round2(A), Prec) -->
+    prec(A, Prec).
+
+mathml(round3(A), X) -->
+    state(S, [round3 | S]),
+    mathml(A, X),
+    state([round3 | S], S).
+
+paren(round3(A), Paren) -->
+    paren(A, Paren).
+
+prec(round3(A), Prec) -->
+    prec(A, Prec).
 
 example :- example(5^2).
 example :- example((-5)^(-2)).
