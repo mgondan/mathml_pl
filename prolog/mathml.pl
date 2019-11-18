@@ -1,5 +1,6 @@
 :- module(mathml, [
     mathml/2,
+    mml//1,
     op(400, yfx, invisible_times),
     op(180, xf, !),
     op(170, xf, '%'),
