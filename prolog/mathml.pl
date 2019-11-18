@@ -159,6 +159,7 @@ example :- example(alpha).
 is_atom(A) -->
     atom(A, _),
     \+ is_id(A),
+    \+ is_punct(A),
     \+ is_op(A).
 
 atom(A, mi(A)) --> {atom(A)}.
