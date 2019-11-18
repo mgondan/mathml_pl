@@ -5,6 +5,7 @@
 :- include('real-0.0.8.pl').
 % :- include('mathml-0.0.8.pl').
 % :- include('rserve-0.0.8.pl').
+
 :- discontiguous buggy/2.
 :- discontiguous intermediate/1.
     
@@ -14,6 +15,7 @@ route(A, B, Path) :-
 
 ex :-
     item(TTEST),
+    html(\item(TTEST)),
     route(TTEST, Sol, Path),
     Res <- Sol,
     mathml(Sol = Res, S), html(html(S)), 
@@ -89,16 +91,47 @@ intermediate(A) :-
     include(intermediate, Args, [_ | _]).
 
 % Example: Paired t-test
-item('TTEST'('T0' - 'EOT', 'T0', 'EOT', mu, s, 
-             'S_T0', 'S_EOT', 'N')) :-
-    'T0_EOT' <- 5.9,
-    mu <- 4,
-    s <- 4.0,
-    'N' <- as.integer(24),
-    'T0' <- 25.6,
-    s_T0 <- 4.9,
-    'EOT' <- 19.7,
-    s_EOT <- 5.2.
+item('TTEST'('T0'-'EOT', 'T0', 'EOT', mu, s, 'S_T0', 'S_EOT', 'N')) :-
+    <- 'T0' = 25.6,
+    <- 'EOT' = 19.7,
+    <- mu = 4,
+    <- s = 4.0,
+    <- 'S_T0' = 4.9,
+    <- 'S_EOT' = 5.2,
+    <- 'N' = 24.
+
+item('TTEST'(T0-EOT, T0, EOT, Mu, s, _S_T0, _S_EOT, N)) -->
+    { X_T0_EOT <- 'T0'-'EOT', 
+      X_mu <- mu,
+      X_s <- s,
+      X_N <- 'N',
+      X_T0 <- 'T0',
+      X_s_T0 <- 'S_T0',
+      X_EOT <- 'EOT',
+      X_s_EOT <- 'S_EOT' },
+    html([h1(["Paired ", \mml(t), "-test"]),
+        p(["Consider a clinical study on rumination-focused Cognitive ",
+           "Behavioral Therapy (rfCBT) with ", \mml(N = X_N), " ",
+	       "patients."]),
+    table(class("table"),
+          [thead(tr([th(\mml(N = X_N)), th(\mml(T0)),
+	          th(\mml(EOT)), th(\mml(T0-EOT))])),
+           tbody([tr([th("Mean"), td(\mml(X_T0)), td(\mml(X_EOT)),
+                      td(\mml(round1(X_T0_EOT)))]),
+  		          tr([th("SD"), td(\mml(X_s_T0)), td(\mml(X_s_EOT)),
+                      td(\mml(X_s))])])]),
+    p(["Does rfCBT lead to a relevant reduction (i.e., more than ",
+       \mml(Mu = X_mu), " HDRS units) in mean HDRS scores between ",
+       "Baseline (", \mml(T0), ") and End of Treatment ",
+       "(", \mml(EOT), ")? Please determine the ", \mml(t), "-ratio."]),
+    div(class("panel panel-default"), 
+    div(class("panel-body"),
+    div(class("form-group"), 
+     [label("Response"),
+      div(class("input-group"), 
+          [input([class("form-control"), id(response), name(response)]),
+            div(class("input-group-btn"),
+                button([type(submit), id(submit), class("btn btn-default")], "Submit"))])])))]).
 
 intermediate('TTEST'(_, _, _, _, _, _, _, _)).
 intermediate(tratio(_, _, _, _)).
