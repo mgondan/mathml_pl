@@ -5,7 +5,7 @@
 %
 % 1.5 cm
 %
-string_number(Number, String, Options) :-
+string_number(String, Number, Options) :-
     string_codes(String, Codes), 
     number(Number, Options, Codes, []).
 
@@ -89,50 +89,50 @@ si(m) --> "m".
 
 ex :-
     S = ".5 kg", writeln(S),
-    string_number(N, S, Options),
+    string_number(S, N, Options),
     writeln(N), writeln(Options).
 
 ex :-
     S = "1.5 kg", writeln(S),
-    string_number(N, S, Options),
+    string_number(S, N, Options),
     writeln(N), writeln(Options).
 
 ex :-
     S = "15 kg", writeln(S),
-    string_number(N, S, Options),
+    string_number(S, N, Options),
     writeln(N), writeln(Options).
 
 ex :-
     S = "15 g", writeln(S),
-    string_number(N, S, Options),
+    string_number(S, N, Options),
     writeln(N), writeln(Options).
 
 ex :-
     S = "-15 g", writeln(S),
-    string_number(N, S, Options),
+    string_number(S, N, Options),
     writeln(N), writeln(Options).
 
 ex :-
     S = "-15E10 g", writeln(S),
-    string_number(N, S, Options),
+    string_number(S, N, Options),
     writeln(N), writeln(Options).
 
 ex :-
     S = "-1.5E-10 g", writeln(S),
-    string_number(N, S, Options),
+    string_number(S, N, Options),
     writeln(N), writeln(Options).
 
 ex :-
     S = "0.09", writeln(S),
-    string_number(N, S, Options),
+    string_number(S, N, Options),
     writeln(N), writeln(Options).
 
 ex :-
     S = "9%", writeln(S),
-    string_number(N, S, Options),
+    string_number(S, N, Options),
     writeln(N), writeln(Options).
 
 ex :-
     S = "9.1 %", writeln(S),
-    string_number(N, S, Options),
+    string_number(S, N, Options),
     writeln(N), writeln(Options).
