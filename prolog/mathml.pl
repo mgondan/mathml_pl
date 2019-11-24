@@ -899,8 +899,8 @@ math(uqbinom(Alpha, N, P), fun('Q' '_' "Bi", [1 - Alpha ; (N, P)])) --> [].
 
 % Bit unusual terminology
 math(bernoulli(Succ, N, Pi), successes(Succ, Pi) * failures(N-Succ, Pi)) --> [].
-math(successes(Succ, Pi), Succ^Pi) --> [].
-math(failures(Fail, Pi), Fail^(1-Pi)) --> [].
+math(successes(Succ, Pi), Pi^Succ) --> [].
+math(failures(Fail, Pi), (1-Pi)^Fail) --> [].
 
 % General functions
 mathml(fun(Name, Args), mrow([N, &(af), A])) -->
