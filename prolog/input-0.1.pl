@@ -9,6 +9,18 @@ string_number(String, Number, Options) :-
     string_codes(String, Codes), 
     number(Number, Options, Codes, []).
 
+tratio(String, Number, []) :-
+    string_number(String, Number, Options),
+    option(dec(2), Options).
+
+tratio(String, Number, [dec(2)]) :-
+    string_number(String, Number, Options),
+    option(dec(D), Options, ''),
+    D \= 2.
+
+number(Number, Options) --> 
+    numb(Number, Options).
+
 number(Number, Options) --> 
     numb(N, NumOpt),
     blanks,
@@ -23,17 +35,12 @@ number(Number, Options) -->
 % Real number
 numb(Number, Options) -->
     sgn(S, SgnOpt),
-    int(I, IntOpt),
-    dotfrac(F, DotOpt),
-    { \+ option(int(empty), IntOpt); 
-      \+ option(dec(0), DotOpt),
-      merge_options(IntOpt, DotOpt, IntDotOpt)
-    },
+    intdotfrac(I, IntOpt),
     power(E),
-    { Number is S * (I + F) * 10^E, 
-      option(dec(D), DotOpt, 0),
+    { Number is S * I * 10^E, 
+      option(dec(D), IntOpt, 0),
       Dec is D - E,
-      merge_options([dec(Dec) | SgnOpt], IntDotOpt, Options) 
+      merge_options([dec(Dec) | SgnOpt], IntOpt, Options) 
     }.
 
 % Sign
@@ -41,25 +48,38 @@ sgn(+1, [sgn(+)]) --> "+".
 sgn(-1, [sgn(-)]) --> "-"; [226, 136, 146].
 sgn( 1, []) --> "".
 
-int(I, []) --> 
+int(I) --> 
     digits([H | T]),
     {number_codes(N, [H | T]), I is N + 0.0}.
-
-int(0, [int(empty)]) --> "".
-
-dotfrac(F, Options) --> dot, frac(F, Options).
-dotfrac(0, [dot(''), dec(0)]) --> [].
 
 dot --> ".".
 dot --> ",".
 
-frac(F, [dec(Dec)]) --> digits([H | T]),
-    {number_codes(N, [H | T]), length([H | T], Dec), F is N/10.0^Dec}.
+frac(F, [dec(Dec)]) --> 
+    digits([H | T]),
+    { number_codes(N, [H | T]), 
+      length([H | T], Dec), 
+      F is N/10.0^Dec}.
 
+intdotfrac(N, [dec(0)]) -->
+    int(N).
+    
+intdotfrac(N, Dec) -->
+    int(I),
+    dot,
+    frac(F, Dec),
+    { N is I + F }.
+    
+intdotfrac(N, [ int(empty) | Dec]) -->
+    dot,
+    frac(N, Dec).
+    
 % times 10^E
-power(E) --> exp_e, sgn(S, _), int(C, IntOpt),
-    {\+ option(int(empty), IntOpt),
-      E is S * C}.
+power(E) --> 
+    exp_e, 
+    sgn(S, _), 
+    int(C),
+    { E is S * C }.
 power(0) --> [].
 
 exp_e --> "E".
@@ -69,13 +89,12 @@ exp_e --> blanks, "*", blanks, "10", blanks, "**", blanks.
 exp_e --> blanks, [195, 151], blanks, "10", blanks, "^", blanks.
 exp_e --> blanks, [195, 151], blanks, "10", blanks, "**", blanks.
 
-unit('', []) --> "".
 unit('%', [fac(0.01), si('%')]) --> "%".
 
 unit(U, [si(SI) | Options]) --> 
     modifier(M, Options), 
     si(SI),
-    { string_concat(M, SI, U)}.
+    { string_concat(M, SI, U) }.
 
 % Modifier
 modifier(k, [fac(1000)]) --> "k".
