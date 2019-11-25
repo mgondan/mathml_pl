@@ -13,7 +13,7 @@ tratio(String, Number, []) :-
     string_number(String, Number, Options),
     option(dec(2), Options).
 
-tratio(String, Number, [buggy(dec([t, "-ratio")]) \= 2]) :-
+tratio(String, Number, [buggy(dec([t, "-ratio"]) \= 2)]) :-
     string_number(String, Number, Options),
     option(dec(D), Options, ''),
     D \= 2.
