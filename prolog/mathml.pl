@@ -23,7 +23,7 @@
 % Interface
 %
 mml(A) -->
-    {phrase(mathml(A, M), [error-highlight], _)},
+    {phrase(mathml(A, M), [[error-highlight]], _)},
     html(math(M)).
 
 mathml(A, M) :-
