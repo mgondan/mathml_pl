@@ -394,6 +394,33 @@ paren(omit_left(Exp), Paren) -->
 prec(omit_left(Exp), Prec) -->
     paren(Exp, Prec).
 
+mathml(omit_right(Exp), M) -->
+        state(S),
+        { member(error-highlight, S),
+          compound(Exp),
+          compound_name_arguments(Exp, Op, [A, B]) 
+        }, mathml([A, underbrace([Op, B], "omitted")], M).
+
+mathml(omit_right(Exp), M) -->
+        state(S),
+        { member(error-show, S),
+          compound(Exp),
+          compound_name_arguments(Exp, Op, [A, B])
+        }, mathml([A, cancel([Op, B])], M).
+
+mathml(omit_right(Exp), M) -->
+        state(S),
+        { member(error-fix, S),
+          compound(Exp),
+          compound_name_arguments(Exp, Op, [A, B])
+        }, mathml([A, green([Op, B])], M).
+
+paren(omit_right(Exp), Paren) -->
+    paren(Exp, Paren).
+
+prec(omit_right(Exp), Prec) -->
+    paren(Exp, Prec).
+
 math(expert(A = B), A -> B) --> [].
 math(buggy(A \= B, _Bug), A ~> B) --> [].
 
