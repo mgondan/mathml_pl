@@ -367,12 +367,43 @@ prec(instead_of(_, B), Prec) -->
         {member(error-fix, S)},
         prec(B, Prec).
 
+mathml(omit_left(Exp), M) -->
+        state(S),
+        { member(error-highlight, S),
+          compound(Exp),
+          compound_name_arguments(Exp, Op, [A, B]) 
+        }, mathml([underbrace([A, Op], "omitted"), B], M).
+
+mathml(omit_left(Exp), M) -->
+        state(S),
+        { member(error-show, S),
+          compound(Exp),
+          compound_name_arguments(Exp, Op, [A, B])
+        }, mathml([cancel([A, Op]), B], M).
+
+mathml(omit_left(Exp), M) -->
+        state(S),
+        { member(error-fix, S),
+          compound(Exp),
+          compound_name_arguments(Exp, Op, [A, B])
+        }, mathml([green([A, Op]), B], M).
+
+paren(omit_left(Exp), Paren) -->
+    paren(Exp, Paren).
+
+prec(omit_left(Exp), Prec) -->
+    paren(Exp, Prec).
+
 math(expert(A = B), A -> B) --> [].
 math(buggy(A \= B, _Bug), A ~> B) --> [].
 
 example :- example([error-highlight], instead_of(sigma, s)).
 example :- example([error-fix], instead_of(sigma, s)).
 example :- example([error-show], instead_of(sigma, s)).
+
+example :- example([error-highlight], omit_left(1 + 1)).
+example :- example([error-fix], omit_left(1 + 1)).
+example :- example([error-show], omit_left(1 + 1)).
 
 %
 % Abbreviations
