@@ -6,12 +6,12 @@
            return(instead)).
 
 :- omit_right <- (
-    function(l, o, r) :-
-        return(l)).
+    function(Expr) :-
+        as.list(Expr)[[2]]).
 
 :- omit_left <- (
-    function(l, o, r) :-
-        return(r)).
+    function(Expr) :-
+        as.list(Expr)[[3]]).
 
 :- frac <- '`/`'.
 
