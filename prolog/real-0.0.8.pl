@@ -5,13 +5,13 @@
        function(instead, of) :-
            return(instead)).
 
-:- omit_right <- (
+:- omit0 <- (
     function(expr) :-
-        as.list(expr)[[2]]).
+        return(0)).
 
-:- omit_left <- (
+:- omit1 <- (
     function(expr) :-
-        as.list(expr)[[3]]).
+        return(1)).
 
 :- frac <- '`/`'.
 
