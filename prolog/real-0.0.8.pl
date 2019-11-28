@@ -5,6 +5,14 @@
        function(instead, of) :-
            return(instead)).
 
+:- omit_right <- (
+    function(l, o, r) :-
+        return(l)).
+
+:- omit_left <- (
+    function(l, o, r) :-
+        return(r)).
+
 :- frac <- '`/`'.
 
 :- dfrac <- '`/`'.
@@ -19,3 +27,9 @@
        function(x) :-
            s = sprintf(ifelse(abs(x) > 10, "%.1f", "%.2f"), x)
            return(s)).
+
+:- sub <- (
+    function(x, s) :-
+        return(x)).
+
+ 
