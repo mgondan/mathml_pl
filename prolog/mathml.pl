@@ -389,6 +389,26 @@ paren(omit0(Expr), Paren) -->
 prec(omit0(Expr), Prec) -->
     paren(Expr, Prec).
 
+mathml(omit1(Expr), M) -->
+        { member(error-highlight, S) }, 
+        mathml(underbrace(Expr, "omitted"), M).
+
+mathml(omit1(Expr), M) -->
+        state(S),
+        { member(error-show, S) }, 
+        mathml(cancel(Expr), M).
+
+mathml(omit1(Expr), M) -->
+        state(S),
+        { member(error-fix, S) }, 
+        mathml(green(Expr), M).
+
+paren(omit1(Expr), Paren) -->
+    paren(Expr, Paren).
+
+prec(omit1(Expr), Prec) -->
+    paren(Expr, Prec).
+
 math(expert(A = B), A -> B) --> [].
 math(buggy(A \= B, _Bug), A ~> B) --> [].
 
