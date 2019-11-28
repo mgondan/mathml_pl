@@ -369,51 +369,59 @@ prec(instead_of(_, B), Prec) -->
         {member(error-fix, S)},
         prec(B, Prec).
 
-mathml(omit_left(A, Op, B), M) -->
+mathml(omit_left(quote(Expr)), M) -->
         state(S),
-        { member(error-highlight, S) }, 
-        mathml([underbrace([A, Op], "omitted"), B], M).
+        { member(error-highlight, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [A, B])
+        }, mathml([underbrace([A, Op], "omitted"), B], M).
 
-mathml(omit_left(A, Op, B), M) -->
+mathml(omit_left(quote(Expr)), M) -->
         state(S),
-        { member(error-show, S) }, 
-        mathml([cancel([A, Op]), B], M).
+        { member(error-show, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [A, B])
+        }, mathml([cancel([A, Op]), B], M).
 
-mathml(omit_left(A, Op, B), M) -->
+mathml(omit_left(quote(Expr)), M) -->
         state(S),
-        { member(error-fix, S) },
-        mathml([green([A, Op]), B], M).
+        { member(error-fix, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [A, B])
+        }, mathml([green([A, Op]), B], M).
 
-paren(omit_left(A, Op, B), Paren) -->
-    { compound_name_arguments(Exp, Op, [A, B]) },
-    paren(Exp, Paren).
+paren(omit_left(quote(Expr)), Paren) -->
+    paren(Expr, Paren).
 
-prec(omit_left(A, Op, B), Prec) -->
-    { compound_name_arguments(Exp, Op, [A, B]) },
-    paren(Exp, Prec).
+prec(omit_left(quote(Expr)), Prec) -->
+    paren(Expr, Prec).
 
-mathml(omit_right(A, Op, B), M) -->
+mathml(omit_right(quote(Expr)), M) -->
         state(S),
-        { member(error-highlight, S) }, 
-        mathml([A, underbrace([Op, B], "omitted")], M).
+        { member(error-highlight, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [A, B])
+        }, mathml([A, underbrace([Op, B], "omitted")], M).
 
-mathml(omit_right(A, Op, B), M) -->
+mathml(omit_right(quote(Expr)), M) -->
         state(S),
-        { member(error-show, S) }, 
-        mathml([A, cancel([Op, B])], M).
+        { member(error-show, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [A, B])
+        }, mathml([A, cancel([Op, B])], M).
 
-mathml(omit_right(A, Op, B), M) -->
+mathml(omit_right(quote(Expr)), M) -->
         state(S),
-        { member(error-fix, S) }, 
-        mathml([A, green([Op, B])], M).
+        { member(error-fix, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [A, B])
+        }, mathml([A, green([Op, B])], M).
 
-paren(omit_right(A, Op, B), Paren) -->
-    { compound_name_arguments(Exp, Op, [A, B]) },
-    paren(Exp, Paren).
+paren(omit_right(quote(Expr)), Paren) -->
+    paren(Expr, Paren).
 
-prec(omit_right(A, Op, B), Prec) -->
-    { compound_name_arguments(Exp, Op, [A, B]) },
-    paren(Exp, Prec).
+prec(omit_right(quote(Expr)), Prec) -->
+    paren(Expr, Prec).
 
 math(expert(A = B), A -> B) --> [].
 math(buggy(A \= B, _Bug), A ~> B) --> [].
