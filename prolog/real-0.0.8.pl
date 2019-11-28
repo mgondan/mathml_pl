@@ -25,8 +25,7 @@
 
 :- format_tratio <- (
        function(x) :-
-           s = sprintf(ifelse(abs(x) > 10, "%.1f", "%.2f"), x);
-           return(s)).
+           sprintf(ifelse(abs(x) > 10, "%.1f", "%.2f"), x)).
 
 :- sub <- (
     function(x, s) :-
