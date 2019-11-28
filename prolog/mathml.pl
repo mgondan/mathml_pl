@@ -315,6 +315,8 @@ math(format_tratio(A), round2(A)) -->
 math(format_tratio(A), A) --> 
     {\+ number(A)}.
 
+math(quote(A), A) --> [].
+
 example :- example(cancel('X')).
 example :- example(paren([paren(red(x)), green(paren(y))])).
 example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
