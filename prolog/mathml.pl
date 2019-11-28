@@ -430,13 +430,13 @@ example :- example([error-highlight], instead_of(sigma, s)).
 example :- example([error-fix], instead_of(sigma, s)).
 example :- example([error-show], instead_of(sigma, s)).
 
-example :- example([error-highlight], omit_left(1, +, 1)).
-example :- example([error-fix], omit_left(1, +, 1)).
-example :- example([error-show], omit_left(1, +, 1)).
+example :- example([error-highlight], omit_left(quote(1 + 1))).
+example :- example([error-fix], omit_left(quote(1 + 1))).
+example :- example([error-show], omit_left(quote(1 + 1))).
 
-example :- example([error-highlight], omit_right(1, +, 1)).
-example :- example([error-fix], omit_right(1, +, 1)).
-example :- example([error-show], omit_right(1, +, 1)).
+example :- example([error-highlight], omit_right(quote(1 + 1))).
+example :- example([error-fix], omit_right(quote(1 + 1))).
+example :- example([error-show], omit_right(quote(1 + 1))).
 
 %
 % Abbreviations
