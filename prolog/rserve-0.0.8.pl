@@ -8,6 +8,16 @@
        |}.
 
 :- <- {|r||
+       omit_left = function(l, op, r)
+           return(r)
+       |}.
+
+:- <- {|r||
+       omit_right = function(l, op, r)
+           return(l)
+       |}.
+
+:- <- {|r||
        denoting = function(x, y, desc)
            return(y)
        |}.
