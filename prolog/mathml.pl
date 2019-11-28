@@ -370,6 +370,7 @@ prec(instead_of(_, B), Prec) -->
         prec(B, Prec).
 
 mathml(omit0(Expr), M) -->
+        state(S),
         { member(error-highlight, S) }, 
         mathml(underbrace(Expr, "omitted"), M).
 
@@ -384,12 +385,13 @@ mathml(omit0(Expr), M) -->
         mathml(green(Expr), M).
 
 paren(omit0(Expr), Paren) -->
-    paren(Expr, Paren).
+        paren(Expr, Paren).
 
 prec(omit0(Expr), Prec) -->
-    paren(Expr, Prec).
+        paren(Expr, Prec).
 
 mathml(omit1(Expr), M) -->
+        state(S),
         { member(error-highlight, S) }, 
         mathml(underbrace(Expr, "omitted"), M).
 
