@@ -1,6 +1,7 @@
 :- module(mathml, [
     mathml/2,
     mml//1,
+    mml//2,
     op(400, yfx, invisible_times),
     op(180, xf, !),
     op(170, xf, '%'),
@@ -23,7 +24,10 @@
 % Interface
 %
 mml(A) -->
-    {phrase(mathml(A, M), [[error-highlight]], _)},
+    mml([error-highlight], A).
+    
+mml(Flags, A) -->
+    {phrase(mathml(A, M), [Flags], _)},
     html(math(M)).
 
 mathml(A, M) :-
