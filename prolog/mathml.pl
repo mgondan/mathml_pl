@@ -336,7 +336,7 @@ math(error(Err, A, M)) -->
 math(error(Err, A, M)) -->
     state(S),
     \+ member(error-Err, S),
-    state(S, [error-Err | S],
+    state(S, [error-Err | S]),
     math(A, M),
     state([error-Err | S], S).
     
