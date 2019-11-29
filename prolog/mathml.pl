@@ -54,8 +54,8 @@ example(Flags, A) :-
 %
 % For SWISH
 %
-%example(Flags, A) :-
-%    mathml(Flags, A, M) -> html(html(math(M))) ; writeln(failed).
+% example(Flags, A) :-
+%     mathml(Flags, A, M) -> html(html(math(M))) ; writeln(failed).
 
 %
 % Helper predicate for flags
@@ -328,6 +328,18 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 %
 % Mistakes
 %
+math(error(Err, A, M)) -->
+    state(S),
+    member(error-Err, S),
+    math(A, M).
+
+math(error(Err, A, M)) -->
+    state(S),
+    \+ member(error-Err, S),
+    state(S, [error-Err | S],
+    math(A, M),
+    state([error-Err | S], S).
+    
 mathml(instead_of(A, B), M) -->
         state(S),
         {member(error-highlight, S)},
