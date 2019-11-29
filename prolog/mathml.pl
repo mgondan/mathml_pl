@@ -328,18 +328,27 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 %
 % Mistakes
 %
-math(error(Err, A), M) -->
+mathml(error(Err, A), M) -->
     state(S),
-    {member(error-Err, S)},
-    math(A, M).
-
-math(error(Err, A), M) -->
+    {subtract(S, [error-_], New)},
+    state(S, [error-Err | New]),
+    mathml(A, M),
+    state([error-Err | New], S).
+  
+paren(error(Err, A), Paren) -->
     state(S),
-    {\+ member(error-Err, S)},
-    state(S, [error-Err | S]),
-    math(A, M),
-    state([error-Err | S], S).
-    
+    {subtract(S, [error-_], New)},
+    state(S, [error-Err | New]),
+    paren(A, Paren),
+    state([error-Err | New], S).
+  
+prec(error(Err, A), Prec) -->
+    state(S),
+    {subtract(S, [error-_], New)},
+    state(S, [error-Err | New]),
+    prec(A, Prec),
+    state([error-Err | New], S).
+  
 mathml(instead_of(A, B), M) -->
         state(S),
         {member(error-highlight, S)},
