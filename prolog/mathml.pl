@@ -394,6 +394,60 @@ prec(instead_of(_, B), Prec) -->
         {member(error-fix, S)},
         prec(B, Prec).
 
+mathml(omit_left(quote(Expr)), M) -->
+        state(S),
+        { member(error-highlight, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [L, R]) }, 
+        mathml([underbrace([L, Op], "omitted"), R], M).
+
+mathml(omit_left(quote(Expr)), M) -->
+        state(S),
+        { member(error-show, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [L, R]) }, 
+        mathml([cancel([L, Op]), R], M).
+
+mathml(omit_left(quote(Expr)), M) -->
+        state(S),
+        { member(error-fix, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [L, R]) }, 
+        mathml([green([L, Op]), R], M).
+
+paren(omit_left(quote(Expr)), Paren) -->
+        paren(Expr, Paren).
+
+prec(omit_left(quote(Expr)), Prec) -->
+        prec(Expr, Prec).
+        
+mathml(omit_right(quote(Expr)), M) -->
+        state(S),
+        { member(error-highlight, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [L, R]) }, 
+        mathml([L, underbrace([Op, R], "omitted")], M).
+
+mathml(omit_right(quote(Expr)), M) -->
+        state(S),
+        { member(error-show, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [L, R]) }, 
+        mathml([L, cancel([Op, R])], M).
+
+mathml(omit_right(quote(Expr)), M) -->
+        state(S),
+        { member(error-fix, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [L, R]) }, 
+        mathml([L, green([Op, R])], M).
+
+paren(omit_right(quote(Expr)), Paren) -->
+        paren(Expr, Paren).
+
+prec(omit_right(quote(Expr)), Prec) -->
+        prec(Expr, Prec).
+        
 mathml(omit0(Expr), M) -->
         state(S),
         { member(error-highlight, S) }, 
@@ -413,7 +467,7 @@ paren(omit0(Expr), Paren) -->
         paren(Expr, Paren).
 
 prec(omit0(Expr), Prec) -->
-        paren(Expr, Prec).
+        prec(Expr, Prec).
 
 mathml(omit1(Expr), M) -->
         state(S),
@@ -434,7 +488,7 @@ paren(omit1(Expr), Paren) -->
     paren(Expr, Paren).
 
 prec(omit1(Expr), Prec) -->
-    paren(Expr, Prec).
+    prec(Expr, Prec).
 
 math(expert(A = B), A -> B) --> [].
 math(buggy(A \= B, _Bug), A ~> B) --> [].
