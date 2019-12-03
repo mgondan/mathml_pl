@@ -1,5 +1,6 @@
 :- module(mathml, [
     mathml/2,
+    mathml//2,
     mml//1,
     mml//2,
     op(400, yfx, invisible_times),
@@ -19,6 +20,15 @@
 :- discontiguous paren//2.
 :- discontiguous prec//2.
 :- discontiguous math//2.
+
+%
+% Hook for custom atoms, e.g., s_D -> sub(s, 'D')
+%
+% mathml:atom_hook(s_D, X) -->
+%    mathml(sub(s, 'D'), X).
+%
+:- multifile atom_hook//2.
+atom_hook(_, _) --> {fail}.
 
 %
 % Interface
@@ -166,6 +176,7 @@ is_atom(A) -->
     \+ is_punct(A),
     \+ is_op(A).
 
+atom(A, X) --> atom_hook(A, X), !. 
 atom(A, mi(A)) --> {atom(A)}.
 
 mathml(A, M) -->
