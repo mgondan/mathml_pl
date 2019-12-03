@@ -24,7 +24,7 @@
 %
 % Hook for custom atoms, e.g., s_D -> sub(s, 'D')
 %
-% mathml:atom_hook(s_D, X) -->
+% atom_hook(s_D, X) -->
 %    mathml(sub(s, 'D'), X).
 %
 :- multifile atom_hook//2.
