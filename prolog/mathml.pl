@@ -28,8 +28,6 @@
 %    mathml(sub(s, 'D'), X).
 %
 :- multifile atom_hook//2.
-:- dynamic atom_hook//2.
-atom_hook(_, _) --> {fail}.
 
 %
 % Interface
