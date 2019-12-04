@@ -21,6 +21,8 @@
 :- discontiguous prec//2.
 :- discontiguous math//2.
 
+:- use_module(library(quantity)).
+
 %
 % Hook for custom atoms, e.g., s_D -> sub(s, 'D')
 %
@@ -818,43 +820,15 @@ prec(A, Prec) -->
     is_negative(A),
     prec(-a, Prec).
 
-% Force rendering as number
+% Force rendering string as number
 mathml(number(A), mn(A)) -->
-    { number_string(N, A), A >= 0 }.
+    { number_string(N, A), N >= 0 }.
 
 mathml(number(A), X) -->
-    { number_string(N, A), A < 0,
-      Abs is abs(A),
-      quantity(A, N, Options),
-      options(dec(0), Options, dec(none))
-    }, state(S, [round0 | S]),
-    mathml(-Abs, X),
-    state([round0 | S], S).
-
-mathml(number(A), X) -->
-    { number_string(N, A), A < 0,
-      Abs is abs(A),
-      quantity(A, N, Options),
-      options(dec(1), Options, dec(none))
-    }, state(S, [round1 | S]),
-    mathml(-Abs, X),
-    state([round1 | S], S).
-    
-mathml(number(A), X) -->
-    { number_string(N, A), A < 0,
-      Abs is abs(A),
-      quantity(A, N, Options),
-      options(dec(2), Options, dec(none))
-    }, state(S, [round2 | S]),
-    mathml(-Abs, X),
-    state([round2 | S], S).
-
-mathml(number(A), X) -->
-    { number_string(N, A), A < 0,
-      Abs is abs(A),
-      quantity(A, N, Options),
-      options(dec(none), Options, dec(none))
-    }, mathml(-Abs, X).
+    { quantity(A, N, Options), N < 0,
+      Abs is abs(N),
+      quantity(X, Abs, Options) 
+    }, mathml([-, X]).
 
 paren(number(A), Paren) -->
     { term_string(T, A) },
