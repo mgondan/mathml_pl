@@ -826,7 +826,7 @@ mathml(number(A), X) -->
     { number_string(N, A), A < 0,
       Abs is abs(A),
       quantity(A, N, Options),
-      options(dec(0), Options, dec(none)),
+      options(dec(0), Options, dec(none))
     }, state(S, [round0 | S]),
     mathml(-Abs, X),
     state([round0 | S], S).
@@ -835,7 +835,7 @@ mathml(number(A), X) -->
     { number_string(N, A), A < 0,
       Abs is abs(A),
       quantity(A, N, Options),
-      options(dec(1), Options, dec(none)),
+      options(dec(1), Options, dec(none))
     }, state(S, [round1 | S]),
     mathml(-Abs, X),
     state([round1 | S], S).
@@ -844,7 +844,7 @@ mathml(number(A), X) -->
     { number_string(N, A), A < 0,
       Abs is abs(A),
       quantity(A, N, Options),
-      options(dec(2), Options, dec(none)),
+      options(dec(2), Options, dec(none))
     }, state(S, [round2 | S]),
     mathml(-Abs, X),
     state([round2 | S], S).
@@ -853,7 +853,7 @@ mathml(number(A), X) -->
     { number_string(N, A), A < 0,
       Abs is abs(A),
       quantity(A, N, Options),
-      options(dec(none), Options, dec(none)),
+      options(dec(none), Options, dec(none))
     }, mathml(-Abs, X).
 
 paren(number(A), Paren) -->
