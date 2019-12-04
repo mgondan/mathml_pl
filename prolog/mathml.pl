@@ -819,7 +819,7 @@ prec(A, Prec) -->
     prec(-a, Prec).
 
 % Force rendering as number
-mathml(number(A), mn(A)).
+mathml(number(A), mn(A)) --> [].
 
 paren(number(A), Paren) -->
     { term_string(T, A) },
