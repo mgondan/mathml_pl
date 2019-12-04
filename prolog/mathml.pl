@@ -828,7 +828,7 @@ mathml(number(A), X) -->
     { quantity(A, N, Options), N < 0,
       Abs is abs(N),
       quantity(X, Abs, Options) 
-    }, mathml([-, X]).
+    }, mathml([-, number(X)]).
 
 paren(number(A), Paren) -->
     { term_string(T, A) },
