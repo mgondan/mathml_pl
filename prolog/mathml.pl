@@ -818,6 +818,17 @@ prec(A, Prec) -->
     is_negative(A),
     prec(-a, Prec).
 
+% Force rendering as number
+mathml(number(A), mn(A)).
+
+paren(number(A), Paren) -->
+    { term_string(T, A) },
+    paren(T, Paren).
+
+prec(number(A), Prec) -->
+    { term_string(T, A) },
+    prec(T, Prec).
+
 % SWISH sandbox restrictions do not allow
 % a general "round", but it is not needed
 % anyway.
