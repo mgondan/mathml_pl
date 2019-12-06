@@ -345,6 +345,12 @@ math(format_tratio(A), round2(A)) -->
 math(format_tratio(A), A) --> 
     {\+ number(A)}.
 
+math(format_pvalue(A), round2(A)) --> 
+    {number(A)}.
+
+math(format_pvalue(A), A) --> 
+    {\+ number(A)}.
+
 math(quote(A), A) --> [].
 
 example :- example(cancel('X')).
