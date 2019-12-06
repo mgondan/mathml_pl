@@ -232,6 +232,11 @@ paren(parentheses(_), 1) --> [].
 paren(bracket(_), 2) --> [].
 paren(curly(_), 3) --> [].
 
+prec(paren(_), 0) --> [].
+prec(parentheses(_), 0) --> [].
+prec(bracket(_), 0) --> [].
+prec(curly(_), 0) --> [].
+
 mathml(parentheses(A), mfenced(X)) -->
     mathml(A, X).
 
