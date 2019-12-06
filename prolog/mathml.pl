@@ -241,6 +241,15 @@ mathml(bracket(A), mfenced([open('['), close(']')], X)) -->
 mathml(curly(A), mfenced([open('{'), close('}')], X)) -->
     mathml(A, X).
 
+mathml(abs(A), mfenced([open('|'), close('|')], X)) -->
+    mathml(A, X).
+
+paren(abs(A), Paren) --> 
+    paren(A, Paren).
+
+prec(abs(A), Prec) --> 
+    prec(parentheses(A), Prec).
+
 example :- example(paren(x)).
 example :- example(paren(bracket(x))).
 example :- example(paren(paren(x))).
@@ -1068,6 +1077,9 @@ paren(sqrt(_), 0) --> [].
 prec(sqrt(_), Prec) -->
     prec(x^y, Prec).
 
+math(2 * pt(abs(T), df=DF, 'lower.tail'='FALSE'), pt_twotailed(T, DF)) --> [].
+math(pt_twotailed(T, DF), fun('P', (abs(T) >= t ; "df" = DF))) --> [].
+ 
 math(dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])) --> [].
 math(pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])) --> [].
 math(ubinom(K, N, P), fun('P' '_' "Bi", ['X' >= K ; (N, P)])) --> [].
