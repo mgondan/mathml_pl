@@ -783,6 +783,11 @@ positive(A, mn(N)) -->
     state(S), {member(round0, S)},
     !, {format(atom(N), '~0f', A)}.
 
+positive(A, mn(N)) --> 
+    {number(A), A >= 0}, 
+    state(S), {member(round, S)},
+    !, {format(atom(N), '~g', A)}.
+
 positive(A, mn(A)) --> 
     {number(A), A >= 0}.
 
@@ -841,6 +846,17 @@ prec(number(A), Prec) -->
 % SWISH sandbox restrictions do not allow
 % a general "round", but it is not needed
 % anyway.
+mathml(round(A), X) -->
+    state(S, [round | S]),
+    mathml(A, X),
+    state([round | S], S).
+
+paren(round(A), Paren) -->
+    paren(A, Paren).
+
+prec(round(A), Prec) -->
+    prec(A, Prec).
+
 mathml(round0(A), X) -->
     state(S, [round0 | S]),
     mathml(A, X),
