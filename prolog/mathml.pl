@@ -1088,8 +1088,10 @@ paren(sqrt(_), 0) --> [].
 prec(sqrt(_), Prec) -->
     prec(x^y, Prec).
 
-math(pt(abs(T), df=DF, 'lower.tail'='FALSE'), pt_twotailed(T, DF)) --> [].
-math(pt_twotailed(T, DF), fun('P', (abs('T') >= T ; "df" = DF))) --> [].
+% t-distribution
+math(tt(T, DF), fun('P', (abs('T') >= T ; "df" = DF))) --> [].
+math(ut(T, DF), fun('P', ('T' >= T ; "df" = DF))) --> [].
+math(pt(T, DF), fun('P', ('T' =< T ; "df" = DF))) --> [].
  
 math(dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])) --> [].
 math(pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])) --> [].
