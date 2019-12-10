@@ -498,8 +498,8 @@ mathml(invent_left(quote(Expr)), M) -->
         state(S),
         { member(error-fix, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([cancel([L, Op]), R], M).
+          compound_name_arguments(Expr, _Op, [_L, R]) }, 
+        mathml(R, M).
 
 paren(invent_left(quote(Expr)), Paren) -->
         paren(Expr, Paren).
@@ -525,8 +525,8 @@ mathml(invent_right(quote(Expr)), M) -->
         state(S),
         { member(error-fix, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([L, cancel([Op, R])], M).
+          compound_name_arguments(Expr, _Op, [L, _R]) }, 
+        mathml(L, M).
 
 paren(invent_right(quote(Expr)), Paren) -->
         paren(Expr, Paren).
