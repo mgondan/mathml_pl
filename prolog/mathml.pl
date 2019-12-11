@@ -339,6 +339,15 @@ paren(roundedbox(A), Paren) -->
 prec(roundedbox(A), Prec) -->
         prec(A, Prec).
 
+mathml(phantom(A), mphantom(X)) -->
+    mathml(A, X).
+
+paren(phantom(A), Paren) -->
+        paren(A, Paren).
+
+prec(phantom(A), Prec) -->
+        prec(A, Prec).
+
 mathml(strike(A), menclose(notation(updiagonalstrike), X)) -->
     mathml(A, X).
 
