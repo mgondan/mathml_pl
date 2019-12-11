@@ -503,14 +503,17 @@ mathml(left_elsewhere(quote(Expr)), M) -->
         { member(error-highlight, S),
           compound(Expr),
           compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([roundedbox(phantom([L, Op])), R], M).
+        mathml([roundedbox(cancel([L, Op])), R], M).
 
-mathml(left_elsewhere(quote(Expr)), M) -->
+mathml(left_elsewhere(quote(Expr)), mrow([X, Y])) -->
         state(S),
         { member(error-show, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([roundedbox(cancel([L, Op])), R], M).
+          compound_name_arguments(Expr, Op, [L, R]) },
+        state(S, [error-fix | S]),
+        mathml(roundedbox(phantom([L, Op])), X),
+        state([error-fix | S], S),
+        mathml(R, Y).
 
 mathml(left_elsewhere(quote(Expr)), M) -->
         state(S),
