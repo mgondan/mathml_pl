@@ -528,6 +528,36 @@ paren(left_elsewhere(quote(Expr)), Paren) -->
 prec(left_elsewhere(quote(Expr)), Prec) -->
         prec(Expr, Prec).
 
+mathml(right_elsewhere(quote(Expr)), M) -->
+        state(S),
+        { member(error-highlight, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [L, R]) }, 
+        mathml([L, roundedbox(cancel([Op, R]))], M).
+
+mathml(right_elsewhere(quote(Expr)), mrow([X, Y])) -->
+        state(S),
+        { member(error-show, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [L, R]) },
+        mathml(L, X),
+        state(S, [error-fix | S]),
+        mathml(roundedbox(phantom([Op, R])), Y),
+        state([error-fix | S], S).
+
+mathml(right_elsewhere(quote(Expr)), M) -->
+        state(S),
+        { member(error-fix, S),
+          compound(Expr),
+          compound_name_arguments(Expr, Op, [L, R]) }, 
+        mathml([L, green([Op, R])], M).
+
+paren(right_elsewhere(quote(Expr)), Paren) -->
+        paren(Expr, Paren).
+
+prec(right_elsewhere(quote(Expr)), Prec) -->
+        prec(Expr, Prec).
+
 mathml(invent_left(quote(Expr)), M) -->
         state(S),
         { member(error-highlight, S),
