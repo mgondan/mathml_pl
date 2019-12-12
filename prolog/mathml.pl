@@ -554,58 +554,58 @@ paren(right_landed(_, quote(Expr)), Paren) -->
 prec(right_landed(_, quote(Expr)), Prec) -->
         prec(Expr, Prec).
 
-mathml(left_elsewhere(quote(Expr)), M) -->
+mathml(left_elsewhere(Color, quote(Expr)), M) -->
         state(S),
         { member(error-highlight, S),
           compound(Expr),
           compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([lightred(roundedbox(phantom([L, Op]))), R], M).
+        mathml([color(Color, roundedbox(phantom([L, Op]))), R], M).
 
-mathml(left_elsewhere(quote(Expr)), M) -->
+mathml(left_elsewhere(_Color, quote(Expr)), M) -->
         state(S),
         { member(error-show, S),
           compound(Expr),
           compound_name_arguments(Expr, _Op, [_L, R]) },
         mathml(R, M).
 
-mathml(left_elsewhere(quote(Expr)), M) -->
+mathml(left_elsewhere(_Color, quote(Expr)), M) -->
         state(S),
         { member(error-fix, S),
           compound(Expr),
           compound_name_arguments(Expr, Op, [L, R]) }, 
         mathml([green([L, Op]), R], M).
 
-paren(left_elsewhere(quote(Expr)), Paren) -->
+paren(left_elsewhere(_, quote(Expr)), Paren) -->
         paren(Expr, Paren).
 
-prec(left_elsewhere(quote(Expr)), Prec) -->
+prec(left_elsewhere(_, quote(Expr)), Prec) -->
         prec(Expr, Prec).
 
-mathml(right_elsewhere(quote(Expr)), M) -->
+mathml(right_elsewhere(Color, quote(Expr)), M) -->
         state(S),
         { member(error-highlight, S),
           compound(Expr),
           compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([L, lightred(roundedbox(phantom([Op, R])))], M).
+        mathml([L, color(Color, roundedbox(phantom([Op, R])))], M).
 
-mathml(right_elsewhere(quote(Expr)), M) -->
+mathml(right_elsewhere(_Color, quote(Expr)), M) -->
         state(S),
         { member(error-show, S),
           compound(Expr),
           compound_name_arguments(Expr, _Op, [L, _R]) },
         mathml(L, M).
 
-mathml(right_elsewhere(quote(Expr)), M) -->
+mathml(right_elsewhere(_Color, quote(Expr)), M) -->
         state(S),
         { member(error-fix, S),
           compound(Expr),
           compound_name_arguments(Expr, Op, [L, R]) }, 
         mathml([L, green([Op, R])], M).
 
-paren(right_elsewhere(quote(Expr)), Paren) -->
+paren(right_elsewhere(_, quote(Expr)), Paren) -->
         paren(Expr, Paren).
 
-prec(right_elsewhere(quote(Expr)), Prec) -->
+prec(right_elsewhere(_, quote(Expr)), Prec) -->
         prec(Expr, Prec).
 
 mathml(invent_left(quote(Expr)), M) -->
