@@ -295,6 +295,7 @@ math(red(A), color(red, A)) --> [].
 math(green(A), color(green, A)) --> [].
 math(blue(A), color(blue, A)) --> [].
 math(black(A), color(black, A)) --> [].
+math(grey(A), color(grey, A)) --> [].
 
 mathml(color(Col, A), mstyle(color(Col), X)) -->
         mathml(A, X).
@@ -557,7 +558,7 @@ mathml(left_elsewhere(quote(Expr)), M) -->
         { member(error-highlight, S),
           compound(Expr),
           compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([roundedbox(phantom([L, Op])), R], M).
+        mathml([grey(roundedbox(phantom([L, Op]))), R], M).
 
 mathml(left_elsewhere(quote(Expr)), M) -->
         state(S),
@@ -584,7 +585,7 @@ mathml(right_elsewhere(quote(Expr)), M) -->
         { member(error-highlight, S),
           compound(Expr),
           compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([L, roundedbox(phantom([Op, R]))], M).
+        mathml([L, grey(roundedbox(phantom([Op, R])))], M).
 
 mathml(right_elsewhere(quote(Expr)), M) -->
         state(S),
