@@ -511,7 +511,7 @@ mathml(left_landed(quote(Expr)), M) -->
         { member(error-show, S),
           compound(Expr),
           compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([red(roundedbox([L, Op])), R], M).
+        mathml([red(roundedbox(black([L, Op]))), R], M).
 
 mathml(left_landed(quote(Expr)), M) -->
         state(S),
@@ -538,7 +538,7 @@ mathml(right_landed(quote(Expr)), M) -->
         { member(error-show, S),
           compound(Expr),
           compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([L, red(roundedbox([Op, R]))], M).
+        mathml([L, red(roundedbox(black([Op, R])))], M).
 
 mathml(right_landed(quote(Expr)), M) -->
         state(S),
