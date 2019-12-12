@@ -296,7 +296,7 @@ math(green(A), color(green, A)) --> [].
 math(blue(A), color(blue, A)) --> [].
 math(black(A), color(black, A)) --> [].
 math(grey(A), color(grey, A)) --> [].
-math(lightred(A), color(lightred, A)) --> [].
+math(lightred(A), color('#FFA0A0', A)) --> [].
 
 mathml(color(Col, A), mstyle(mathcolor(Col), X)) -->
         mathml(A, X).
