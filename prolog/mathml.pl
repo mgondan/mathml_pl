@@ -580,12 +580,13 @@ mathml(left_elsewhere(_Color, quote(Expr)), M) -->
           compound_name_arguments(Expr, _Op, [_L, R]) },
         mathml(R, M).
 
-mathml(left_elsewhere(_Color, quote(Expr)), M) -->
+mathml(left_elsewhere(Color, quote(Expr)), M) -->
         state(S),
         { member(error-fix, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([green([L, Op]), R], M).
+          compound_name_arguments(Expr, Op, [L, R]),
+          color(Color, C, _) }, 
+        mathml([color(C, [L, Op]), R], M).
 
 paren(left_elsewhere(_, quote(Expr)), Paren) -->
         paren(Expr, Paren).
@@ -608,12 +609,13 @@ mathml(right_elsewhere(_Color, quote(Expr)), M) -->
           compound_name_arguments(Expr, _Op, [L, _R]) },
         mathml(L, M).
 
-mathml(right_elsewhere(_Color, quote(Expr)), M) -->
+mathml(right_elsewhere(Color, quote(Expr)), M) -->
         state(S),
         { member(error-fix, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([L, green([Op, R])], M).
+          compound_name_arguments(Expr, Op, [L, R]), 
+          color(Color, C, _) }, 
+        mathml([L, color(C, [Op, R])], M).
 
 paren(right_elsewhere(_, quote(Expr)), Paren) -->
         paren(Expr, Paren).
