@@ -559,15 +559,12 @@ mathml(left_elsewhere(quote(Expr)), M) -->
           compound_name_arguments(Expr, Op, [L, R]) }, 
         mathml([roundedbox(phantom([L, Op])), R], M).
 
-mathml(left_elsewhere(quote(Expr)), mrow([X, Y])) -->
+mathml(left_elsewhere(quote(Expr)), M) -->
         state(S),
         { member(error-show, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) },
-        state(S, [error-fix | S]),
-        mathml(roundedbox(phantom([L, Op])), X),
-        state([error-fix | S], S),
-        mathml(R, Y).
+          compound_name_arguments(Expr, _Op, [_L, R]) },
+        mathml(R, M).
 
 mathml(left_elsewhere(quote(Expr)), M) -->
         state(S),
@@ -589,15 +586,12 @@ mathml(right_elsewhere(quote(Expr)), M) -->
           compound_name_arguments(Expr, Op, [L, R]) }, 
         mathml([L, roundedbox(phantom([Op, R]))], M).
 
-mathml(right_elsewhere(quote(Expr)), mrow([X, Y])) -->
+mathml(right_elsewhere(quote(Expr)), M) -->
         state(S),
         { member(error-show, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) },
-        mathml(L, X),
-        state(S, [error-fix | S]),
-        mathml(roundedbox(phantom([Op, R])), Y),
-        state([error-fix | S], S).
+          compound_name_arguments(Expr, _Op, [L, _R]) },
+        mathml(L, M).
 
 mathml(right_elsewhere(quote(Expr)), M) -->
         state(S),
