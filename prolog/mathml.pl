@@ -291,6 +291,13 @@ example :- example(paren([paren(x), paren(y)])).
 %
 % Decorations
 %
+color(1, red, '#FFA0A0').
+color(2, blue, '#A0A0FF').
+color(3, green, '#A0FFA0').
+color(4, '#FFFF00', '#DFDF80').
+color(5, '#FF00FF', '#DF80DF').
+color(6, '#00FFFF', '#DFDF80').
+
 math(red(A), color(red, A)) --> [].
 math(green(A), color(green, A)) --> [].
 math(blue(A), color(blue, A)) --> [].
@@ -504,15 +511,17 @@ mathml(left_landed(Color, quote(Expr)), M) -->
         state(S),
         { member(error-highlight, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) },
-        mathml([color(Color, roundedbox(black([L, Op]))), R], M).
+          compound_name_arguments(Expr, Op, [L, R]),
+          color(Color, C, _) },
+        mathml([color(C, roundedbox(black([L, Op]))), R], M).
 
 mathml(left_landed(Color, quote(Expr)), M) -->
         state(S),
         { member(error-show, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([color(Color, roundedbox(black([L, Op]))), R], M).
+          compound_name_arguments(Expr, Op, [L, R]),
+          color(Color, C, _) }, 
+        mathml([color(C, roundedbox(black([L, Op]))), R], M).
 
 mathml(left_landed(_Color, quote(Expr)), M) -->
         state(S),
@@ -531,8 +540,9 @@ mathml(right_landed(Color, quote(Expr)), M) -->
         state(S),
         { member(error-highlight, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) },
-        mathml([L, color(Color, roundedbox(black([Op, R])))], M).
+          compound_name_arguments(Expr, Op, [L, R]),
+          color(Color, C, _) },
+        mathml([L, color(C, roundedbox(black([Op, R])))], M).
 
 mathml(right_landed(Color, quote(Expr)), M) -->
         state(S),
@@ -558,8 +568,9 @@ mathml(left_elsewhere(Color, quote(Expr)), M) -->
         state(S),
         { member(error-highlight, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([color(Color, roundedbox(phantom([L, Op]))), R], M).
+          compound_name_arguments(Expr, Op, [L, R]),
+          color(Color, _, C) }, 
+        mathml([color(C, roundedbox(phantom([L, Op]))), R], M).
 
 mathml(left_elsewhere(_Color, quote(Expr)), M) -->
         state(S),
@@ -585,8 +596,9 @@ mathml(right_elsewhere(Color, quote(Expr)), M) -->
         state(S),
         { member(error-highlight, S),
           compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([L, color(Color, roundedbox(phantom([Op, R])))], M).
+          compound_name_arguments(Expr, Op, [L, R]),
+          color(Color, _, C) }, 
+        mathml([L, color(C, roundedbox(phantom([Op, R])))], M).
 
 mathml(right_elsewhere(_Color, quote(Expr)), M) -->
         state(S),
