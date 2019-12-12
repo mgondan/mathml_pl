@@ -298,7 +298,7 @@ math(black(A), color(black, A)) --> [].
 math(grey(A), color(grey, A)) --> [].
 math(lightred(A), color(lightred, A)) --> [].
 
-mathml(color(Col, A), mstyle(color(Col), X)) -->
+mathml(color(Col, A), mstyle(mathcolor(Col), X)) -->
         mathml(A, X).
 
 paren(color(_, A), Paren) -->
