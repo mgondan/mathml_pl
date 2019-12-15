@@ -92,7 +92,7 @@ paren(A, Paren) -->
     state(_, S).
 
 prec(A, Prec) -->
-    state(S).
+    state(S),
     math(A, X),
     !, prec(X, Prec),
     state(_, S).
