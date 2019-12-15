@@ -944,36 +944,52 @@ example :- example((a + b) * (a - b) = a^two - b^two).
 % Numbers
 %
 is_positive(A) --> positive(A, _).
+
+positive(A, X) --> 
+    state(S), 
+    { number(A), A >= 0, 
+      member(mult(M), S),
+      !, AM is A*M,
+      select(mult(M), S, New) },
+    state(S, New),
+    mathml(AM, X),
+    state(New, S).
+      
 positive(A, mn(N)) --> 
-    {number(A), A >= 0}, 
-    state(S), {member(round3, S)},
-    !, {format(atom(N), '~3f', A)}.
+    { number(A), A >= 0 }, 
+    state(S), 
+    { member(round3, S),
+    !, format(atom(N), '~3f', A) }.
+
+positive(A, mn(N)) --> 
+    { number(A), A >= 0 }, 
+    state(S), 
+    { member(round2, S),
+    !, format(atom(N), '~2f', A) }.
+
+positive(A, mn(N)) --> 
+    { number(A), A >= 0 }, 
+    state(S), 
+    { member(round1, S),
+    !, format(atom(N), '~1f', A) }.
+
+positive(A, mn(N)) --> 
+    { number(A), A >= 0 }, 
+    state(S), 
+    { member(round0, S),
+    !, format(atom(N), '~0f', A) }.
 
 positive(A, mn(N)) --> 
     {number(A), A >= 0}, 
-    state(S), {member(round2, S)},
-    !, {format(atom(N), '~2f', A)}.
-
-positive(A, mn(N)) --> 
-    {number(A), A >= 0}, 
-    state(S), {member(round1, S)},
-    !, {format(atom(N), '~1f', A)}.
-
-positive(A, mn(N)) --> 
-    {number(A), A >= 0}, 
-    state(S), {member(round0, S)},
-    !, {format(atom(N), '~0f', A)}.
-
-positive(A, mn(N)) --> 
-    {number(A), A >= 0}, 
-    state(S), {member(round, S)},
-    !, {format(atom(N), '~g', A)}.
+    state(S), 
+    { member(round, S),
+    !, format(atom(N), '~g', A) }.
 
 positive(A, mn(A)) --> 
-    {number(A), A >= 0}.
+    { number(A), A >= 0 }.
 
 positive(A, X) -->
-    {string(A), number_string(N, A)},
+    { string(A), number_string(N, A) },
     positive(N, X).
 
 mathml(A, M) -->
