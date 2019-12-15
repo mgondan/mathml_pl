@@ -6,11 +6,13 @@
     op(400, yfx, invisible_times),
     op(180, xf, !),
     op(170, xf, '%'),
+    op(170, xf, '100%'),
     op(200, xfy, '_'),
     op(1050, xfy, '~>')]).
 
 :- op(180, xf, !).
 :- op(170, xf, '%').
+:- op(170, xf, '100%').
 :- op(200, xfy, '_').
 :- op(400, yfx, invisible_times).
 :- op(1050, xfy, '~>').
@@ -132,6 +134,7 @@ op(>=, &(ge)).
 op(\=, &(ne)).
 op(!, !).
 op('%', '%').
+op('100%', '%').
 op(',', &(comma)).
 op(';', &('#59')).
 op('|', '|').
@@ -759,6 +762,17 @@ denoting_and([denoting(X, Exp, Des) | T], [M | MT]) -->
 %
 % Operators
 %
+mathml(A '100%', M) -->
+    state(S, [mult(100) | S]),
+    mathml(A '%', M),
+    state([mult(100) | S], S).
+
+paren(A '100%', Paren) -->
+    paren(A '%', Paren).
+
+prec(A '100%', Prec) -->
+    prec(A '%', Prec).
+
 math(A '_' B ^ C, subsup(A, B, C)) --> [].
 
 mathml(subsup(A, B, C), msubsup([X, Y, Z])) -->
@@ -1084,15 +1098,18 @@ is_unit(A) --> unit(A, _).
 unit(A, M) --> {unit(A, M)}.
 
 unit('%', "%").
+unit('100%', "%").
 unit('kg', "kg").
 
-mathml(A, [Num, ' ', Unit]) -->
+mathml(A, [X, ' ', Unit]) -->
     {compound(A),
      compound_name_arguments(A, U, [Num])},
     is_unit(U),
-    unit(U, Unit).
+    unit(U, Unit),
+    mathml(Num, X).
 
 example :- example(10 '%').
+example :- example(0.1 '100%').
 example :- example(kg(5)).
 
 %
