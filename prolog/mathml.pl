@@ -80,16 +80,22 @@ state(S0, S), [S] --> [S0].
 % Macros (e.g., red(X) for color(red, X)
 %
 mathml(A, M) -->
+    state(S),
     math(A, X),
-    !, mathml(X, M).
+    !, mathml(X, M),
+    state(_, S).
 
 paren(A, Paren) -->
+    state(S),
     math(A, X),
-    !, paren(X, Paren).
+    !, paren(X, Paren),
+    state(_, S).
 
 prec(A, Prec) -->
+    state(S).
     math(A, X),
-    !, prec(X, Prec).
+    !, prec(X, Prec),
+    state(_, S).
 
 %
 % Punctuation
@@ -762,16 +768,8 @@ denoting_and([denoting(X, Exp, Des) | T], [M | MT]) -->
 %
 % Operators
 %
-mathml(A '100%', M) -->
-    state(S, [mult(100) | S]),
-    mathml(A '%', M),
-    state([mult(100) | S], S).
-
-paren(A '100%', Paren) -->
-    paren(A '%', Paren).
-
-prec(A '100%', Prec) -->
-    prec(A '%', Prec).
+math(A '100%', A '%') --> 
+    state(S, [mult(100) | S]).
 
 math(A '_' B ^ C, subsup(A, B, C)) --> [].
 
