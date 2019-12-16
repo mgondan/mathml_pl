@@ -1270,7 +1270,13 @@ prec(sqrt(_), Prec) -->
 math(tt(T, DF), fun('P', (abs('T') >= T ; "df" = DF))) --> [].
 math(ut(T, DF), fun('P', ('T' >= T ; "df" = DF))) --> [].
 math(pt(T, DF), fun('P', ('T' =< T ; "df" = DF))) --> [].
- 
+
+math(instead_of(pt(T, DF), tt(T, DF)), 
+    instead_of(fun('P', ('T' =< T ; "df" = DF)), fun('P', (abs('T') >= T ; "df" = DF)))) --> [].
+
+math(instead_of(ut(T, DF), tt(T, DF)), 
+    instead_of(fun('P', ('T' >= T ; "df" = DF)), fun('P', (abs('T') >= T ; "df" = DF)))) --> [].
+
 math(dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])) --> [].
 math(pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])) --> [].
 math(ubinom(K, N, P), fun('P' '_' "Bi", ['X' >= K ; (N, P)])) --> [].
