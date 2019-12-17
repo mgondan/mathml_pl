@@ -283,10 +283,10 @@ mathml(list(Sep, [H | T]), mrow([HX | TX])) -->
     mathml(H, HX),
     mathml(tail(Sep, T), TX).
     
-mathml(tail(Sep, []), []) --> [].
+mathml(tail(_, []), []) --> [].
 
 mathml(tail(Sep, [H | T]), [SX, HX | TX]) -->
-    mathml(S, SX),
+    mathml(Sep, SX),
     mathml(H, HX),
     mathml(tail(Sep, T), TX).
 
