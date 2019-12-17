@@ -279,9 +279,16 @@ math((H; T), list(';', [H, T])) --> [].
 
 math((H | T), list('|', [H, T])) --> [].
 
-mathml(list(Sep, List), mfenced([open(''), close(''), separators(Sep)], L)) -->
-    state(S, New),
-    {maplist({S, New}/[A, X] >> mathml(A, X, [S], [New]), List, L)}.
+mathml(list(Sep, [H | T]), mrow([HX | TX])) -->
+    mathml(H, HX),
+    mathml(tail(Sep, T), TX).
+    
+mathml(tail(Sep, []), []) --> [].
+
+mathml(tail(Sep, [H | T]), [SX, HX | TX]) -->
+    mathml(S, SX),
+    mathml(H, HX),
+    mathml(tail(Sep, T), TX).
 
 paren(list(_, List), Paren) -->
     state(S, New),
