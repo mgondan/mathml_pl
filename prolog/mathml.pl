@@ -1158,7 +1158,7 @@ prec(choose(_, _), Prec) -->
     prec(x^y, Prec).
 
 mathml(dchoose(A, B), 
-  mrow([mo('('), mfrac(mstyle([displaystyle(true), linethickness(0)], [X, Y]), mo(')')])) -->
+  mrow([mo('('), mfrac(mstyle([displaystyle(true), linethickness(0)]), [X, Y]), mo(')')])) -->
     mathml(A, X),
     mathml(B, Y).
 
