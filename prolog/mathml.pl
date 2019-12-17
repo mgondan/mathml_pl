@@ -246,16 +246,16 @@ prec(parentheses(_), 0) --> [].
 prec(bracket(_), 0) --> [].
 prec(curly(_), 0) --> [].
 
-mathml(parentheses(A), mfenced(X)) -->
+mathml(parentheses(A), mrow([mo('('), X, mo(')')])) -->
     mathml(A, X).
 
-mathml(bracket(A), mfenced([open('['), close(']')], X)) -->
+mathml(bracket(A), mrow([mo('['), X, mo(']')])) -->
     mathml(A, X).
 
-mathml(curly(A), mfenced([open('{'), close('}')], X)) -->
+mathml(curly(A), mrow([mo('{'), X, mo('}')])) -->
     mathml(A, X).
 
-mathml(abs(A), mfenced([open('|'), close('|')], X)) -->
+mathml(abs(A), mrow([mo('|'), X, mo('|')])) -->
     mathml(A, X).
 
 paren(abs(A), Paren) --> 
@@ -1148,7 +1148,7 @@ paren(dfrac(A, B), Paren) -->
 prec(dfrac(A, B), Prec) -->
     prec(frac(A, B), Prec).
 
-mathml(choose(A, B), mfenced(mfrac(linethickness(0), [X, Y]))) -->
+mathml(choose(A, B), mrow([mo('('), mfrac(linethickness(0), [X, Y]), mo(')')])) -->
     mathml(A, X),
     mathml(B, Y).
 
@@ -1157,8 +1157,8 @@ paren(choose(_, _), 1) --> [].
 prec(choose(_, _), Prec) -->
     prec(x^y, Prec).
 
-mathml(dchoose(A, B), mfenced(mstyle(displaystyle(true),
-        mfrac(linethickness(0), [X, Y])))) -->
+mathml(dchoose(A, B), 
+  mrow([mo('('), mfrac(mstyle([displaystyle(true), linethickness(0)], [X, Y]), mo(')')])) -->
     mathml(A, X),
     mathml(B, Y).
 
