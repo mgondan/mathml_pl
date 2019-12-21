@@ -460,11 +460,11 @@ ml(Flags, instead_of(_, B), green(B)) :-
     option(error(fix), Flags).
 
 paren(Flags, instead_of(_, B), P) :-
-    option(error(show), Flags),
+    option(error(fix), Flags),
     paren(Flags, B, P).
 
 prec(Flags, instead_of(_, B), P) :-
-    option(error(show), Flags),
+    option(error(fix), Flags),
     prec(Flags, B, P).
 
 % Left part omitted
