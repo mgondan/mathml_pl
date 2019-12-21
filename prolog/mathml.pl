@@ -407,11 +407,11 @@ prec(Flags, phantom(A), P) :-
     prec(Flags, A, P).
 
 % formatting numbers
-math(format_tratio(A), round2(A)).
+math(_, format_tratio(A), round2(A)).
 
-math(format_pvalue(A), round2(A)).
+math(_, format_pvalue(A), round2(A)).
 
-math(quote(A), A).
+math(_, quote(A), A).
 
 example :- example(cancel('X')).
 example :- example(paren([paren(red(x)), green(paren(y))])).
