@@ -445,8 +445,9 @@ prec(Flags, instead_of(A, _), P) :-
     option(error(highlight), Flags, highlight),
     prec(Flags, A, P).
 
-ml(Flags, instead_of(A, _), red(A)) :-
-    option(error(show), Flags).
+ml(Flags, instead_of(A, _), M) :-
+    option(error(show), Flags),
+    ml(Flags, red(A), M).
 
 paren(Flags, instead_of(A, _), P) :-
     option(error(show), Flags),
@@ -456,8 +457,9 @@ prec(Flags, instead_of(A, _), P) :-
     option(error(show), Flags),
     prec(Flags, A, P).
 
-ml(Flags, instead_of(_, B), green(B)) :-
-    option(error(fix), Flags).
+ml(Flags, instead_of(_, B), M) :-
+    option(error(fix), Flags),
+    ml(Flags, green(B), M).
 
 paren(Flags, instead_of(_, B), P) :-
     option(error(fix), Flags),
