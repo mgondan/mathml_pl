@@ -1,122 +1,111 @@
 :- module(mathml, [
     mathml/2,
-    mathml//2,
+    mathml/3,
     mml//1,
     mml//2,
     op(400, yfx, invisible_times),
     op(180, xf, !),
     op(170, xf, '%'),
-    op(170, xf, '100%'),
     op(200, xfy, '_'),
     op(1050, xfy, '~>')]).
 
 :- op(180, xf, !).
 :- op(170, xf, '%').
-:- op(170, xf, '100%').
 :- op(200, xfy, '_').
 :- op(400, yfx, invisible_times).
 :- op(1050, xfy, '~>').
 
-:- discontiguous mathml//2.
+:- discontiguous ml/3.
+:- discontiguous paren/3.
+:- discontiguous prec/3.
+:- discontiguous math/3.
 :- discontiguous example/0.
-:- discontiguous paren//2.
-:- discontiguous prec//2.
-:- discontiguous math//2.
 
 :- use_module(library(quantity)).
+:- use_module(library(http/html_write)).
 
 %
-% Hook for custom atoms, e.g., s_D -> sub(s, 'D')
+% Hook for custom atoms
 %
-% atom_hook(s_D, X) -->
-%    mathml(sub(s, 'D'), X).
+% e.g., to replace s_D by sub(s, 'D')
 %
-:- multifile atom_hook//2.
+% atom_hook(Flags, s_D, X) :- mathml(Flags, sub(s, 'D'), X).
+%
+:- multifile atom_hook/3.
 
 %
 % Interface
 %
 mml(A) -->
-    mml([error-highlight], A).
-    
+    mml([error(highlight)], A).
+
 mml(Flags, A) -->
-    {phrase(mathml(A, M), [Flags], _)},
+    { mathml(Flags, A, M) },
     html(math(M)).
 
 mathml(A, M) :-
-    mathml([error-highlight], A, M).
+    mathml([error(highlight)], A, M).
 
 mathml(Flags, A, math(X)) :-
-    phrase(denoting(A, []), [Flags], _),
-    phrase(mathml(A, X), [Flags], _).
+    denoting(Flags, A, []),
+    ml(Flags, A, X).
 
-mathml(Flags, A, math([mrow([M, ',']),
-        mspace(width(thickmathspace), ''), H | T])) :-
-    phrase(denoting(A, [H | T]), [Flags], _),
-    phrase(mathml(A, M), [Flags], _).
+mathml(Flags, A, math([M, H | T])) :-
+    denoting(Flags, A, [H | T]),
+    ml(Flags, [A, ',', ' '], M).
 
 %
 % Show example
 %
 example(A) :-
-    example([error-highlight], A).
+    example([], A).
 
 example(Flags, A) :-
-    mathml(Flags, A, M) -> writeln(math:A = ml:M) ;  writeln(math:A = failed).
+    mathml(Flags, A, M)
+    -> writeln(math:A = ml:M)
+    ; writeln(math:A = ml:failed).
 
 %
 % For SWISH
 %
 % example(Flags, A) :-
-%     mathml(Flags, A, M) -> html(html(math(M))) ; writeln(failed).
-
-%
-% Helper predicate for flags
-%
-state(S), [S] --> [S].
-state(S0, S), [S] --> [S0].
+%     ml(Flags, A, M) -> html(html(math(M))) ; writeln(failed).
 
 %
 % Macros (e.g., red(X) for color(red, X)
 %
-mathml(A, M) -->
-    state(S),
-    math(A, X),
-    !, mathml(X, M),
-    state(_, S).
+ml(Flags, A, M) :-
+    math(Flags, A, X),
+    !, ml(Flags, X, M).
 
-paren(A, Paren) -->
-    state(S),
-    math(A, X),
-    !, paren(X, Paren),
-    state(_, S).
+paren(Flags, A, P) :-
+    math(Flags, A, X),
+    !, paren(Flags, X, P).
 
-prec(A, Prec) -->
-    state(S),
-    math(A, X),
-    !, prec(X, Prec),
-    state(_, S).
+prec(Flags, A, P) :-
+    math(Flags, A, X),
+    !, prec(Flags, X, P).
 
 %
 % Punctuation
 %
-is_punct(A) --> punct(A, _).
-punct(A, M) --> {punct(A, M)}.
+is_punctuation(Flags, A) :-
+    punctuation(Flags, A, _).
 
-punct('_', &(nbsp)).
-punct(' ', mspace(width(thickmathspace), '')).
-punct(ldots, mi(&(hellip))).
-punct(cdots, mi(&(ctdot))).
+punctuation(_, '_', &(nbsp)).
+punctuation(_, ' ', mspace(width(thickmathspace), [])).
+punctuation(_, ldots, mi(&(hellip))).
+punctuation(_, cdots, mi(&(ctdot))).
 
-mathml(A, M) -->
-    is_punct(A),
-    punct(A, M).
+ml(Flags, A, M) :-
+    is_punctuation(Flags, A),
+    punctuation(Flags, A, M).
 
-paren(A, 0) -->
-    is_punct(A).
+paren(Flags, A, 0) :-
+    is_punctuation(Flags, A).
 
-prec(A, 0) -->
-    is_punct(A).
+prec(Flags, A, 0) :-
+    is_punctuation(Flags, A).
 
 example :- example(' ').
 example :- example('_').
@@ -124,8 +113,11 @@ example :- example('_').
 %
 % Operators
 %
-is_op(A) --> op(A, _).
-op(A, mo(M)) --> {op(A, M)}.
+is_operator(Flags, A) :-
+    operator(Flags, A, _).
+
+operator(_, A, mo(M)) :-
+    op(A, M).
 
 op(+, +).
 op(-, -).
@@ -140,7 +132,6 @@ op(>=, &(ge)).
 op(\=, &(ne)).
 op(!, !).
 op('%', '%').
-op('100%', '%').
 op(',', &(comma)).
 op(';', &('#59')).
 op('|', '|').
@@ -148,155 +139,177 @@ op(invisible_times, &('#x2062')).
 op(->, &(rArr)).
 op(~>, &(zigrarr)).
 
-mathml(A, M) -->
-    is_op(A),
-    op(A, M).
+ml(Flags, A, M) :-
+    is_operator(Flags, A),
+    operator(Flags, A, M).
 
-paren(A, 0) --> is_op(A).
-prec(A, 0) --> is_op(A).
+paren(Flags, A, 0) :-
+    is_operator(Flags, A).
+
+prec(Flags, A, 0) :-
+    is_operator(Flags, A).
 
 example :- example(/).
 
 %
 % Identifiers
 %
-is_id(A) --> id(A, _).
-id(A, mi(M)) --> {id(A, M)}.
+is_identifier(Flags, A) :-
+    identifier(Flags, A, _).
+
+identifier(_, A, mi(M)) :-
+    id(A, M).
 
 id(alpha, &(alpha)).
 id(mu, &(mu)).
 id(pi, &(pi)).
 id(sigma, &(sigma)).
 
-mathml(A, M) -->
-    is_id(A),
-    id(A, M).
+ml(Flags, A, M) :-
+    is_identifier(Flags, A),
+    identifier(Flags, A, M).
 
-paren(A, 0) --> is_id(A).
-prec(A, 0) --> is_id(A).
+paren(Flags, A, 0) :-
+    is_identifier(Flags, A).
+
+prec(Flags, A, 0) :-
+    is_identifier(Flags, A).
 
 example :- example(alpha).
 
 %
 % General atoms
 %
-is_atom(A) -->
-    atom(A, _),
-    \+ is_id(A),
-    \+ is_punct(A),
-    \+ is_op(A).
+is_atom(Flags, A) :-
+    atom(Flags, A, _),
+    \+ is_identifier(Flags, A),
+    \+ is_punctuation(Flags, A),
+    \+ is_operator(Flags, A).
 
-atom(A, X) --> atom_hook(A, X), !. 
-atom(A, mi(A)) --> {atom(A)}.
+atom(Flags, A, X) :-
+    atom_hook(Flags, A, M),
+    !, X = M.
 
-mathml(A, M) -->
-    is_atom(A),
-    atom(A, M).
+atom(_, A, mi(A)) :-
+    atom(A).
 
-paren(A, 0) --> is_atom(A).
-prec(A, 0) --> is_atom(A).
+ml(Flags, A, M) :-
+    is_atom(Flags, A),
+    atom(Flags, A, M).
+
+paren(Flags, A, 0) :-
+    is_atom(Flags, A).
+
+prec(Flags, A, 0) :-
+    is_atom(Flags, A).
 
 example :- example(k).
 
 %
 % Strings (non-italicized)
 %
-is_string(A) --> string(A, _).
-string(A, mtext(A)) --> {string(A)}.
+is_string(Flags, A) :-
+    string(Flags, A, _).
 
-mathml(A, M) -->
-    is_string(A),
-    string(A, M).
+string(_, A, mtext(A)) :-
+    string(A).
 
-paren(A, 0) --> is_string(A).
-prec(A, 0) --> is_string(A).
+ml(Flags, A, M) :-
+    is_string(Flags, A),
+    string(Flags, A, M).
+
+paren(Flags, A, 0) :-
+    is_string(Flags, A).
+
+prec(Flags, A, 0) :-
+    is_string(Flags, A).
 
 example :- example("text").
 
 %
-% Parentheses
+% Parentheses: generic
 %
-mathml(paren(A), M) -->
-    paren(A, 0),
-    mathml(parentheses(A), M).
+ml(Flags, paren(A), M) :-
+    paren(Flags, A, 1),
+    !, ml(Flags, bracket(A), M).
 
-mathml(paren(A), M) -->
-    paren(A, 1),
-    mathml(bracket(A), M).
+ml(Flags, paren(A), M) :-
+    paren(Flags, A, 2),
+    !, ml(Flags, curly(A), M).
 
-mathml(paren(A), M) -->
-    paren(A, 2),
-    mathml(curly(A), M).
+ml(Flags, paren(A), M) :-
+    ml(Flags, parentheses(A), M).
 
-mathml(paren(A), M) -->
-    paren(A, P),
-    {P > 2},
-    mathml(parentheses(A), M).
+paren(Flags, paren(A), P) :-
+    paren(Flags, A, P0),
+    P is P0 + 1.
 
-paren(paren(A), P) -->
-    paren(A, P0),
-    {P is P0 + 1}.
+prec(_, paren(_), 0).
 
-paren(parentheses(_), 1) --> [].
-paren(bracket(_), 2) --> [].
-paren(curly(_), 3) --> [].
+% specific
+ml(Flags, parentheses(A), mrow([mo('('), X, mo(')')])) :-
+    ml(Flags, A, X).
 
-prec(paren(_), 0) --> [].
-prec(parentheses(_), 0) --> [].
-prec(bracket(_), 0) --> [].
-prec(curly(_), 0) --> [].
+paren(_, parentheses(_), 1).
 
-mathml(parentheses(A), mrow([mo('('), X, mo(')')])) -->
-    mathml(A, X).
+prec(_, parentheses(_), 0).
 
-mathml(bracket(A), mrow([mo('['), X, mo(']')])) -->
-    mathml(A, X).
+ml(Flags, bracket(A), mrow([mo('['), X, mo(']')])) :-
+    ml(Flags, A, X).
 
-mathml(curly(A), mrow([mo('{'), X, mo('}')])) -->
-    mathml(A, X).
+paren(_, bracket(_), 2).
 
-mathml(abs(A), mrow([mo('|'), X, mo('|')])) -->
-    mathml(A, X).
+prec(_, bracket(_), 0).
 
-paren(abs(A), Paren) --> 
-    paren(A, Paren).
+ml(Flags, curly(A), mrow([mo('{'), X, mo('}')])) :-
+    ml(Flags, A, X).
 
-prec(abs(A), Prec) --> 
-    prec(parentheses(A), Prec).
+paren(_, curly(_), 3).
+
+prec(_, curly(_), 0).
+
+ml(Flags, abs(A), mrow([mo('|'), X, mo('|')])) :-
+    ml(Flags, A, X).
+
+paren(Flags, abs(A), P) :-
+    paren(Flags, A, P).
+
+prec(Flags, abs(A), P) :-
+    prec(Flags, parentheses(A), P).
 
 example :- example(paren(x)).
 example :- example(paren(bracket(x))).
 example :- example(paren(paren(x))).
+example :- example(paren(abs(x))).
 
 %
 % Lists (e.g., function arguments)
 %
-math([H | T], list('', [H | T])) --> [].
+math(_, [H | T], list('', [H | T])).
+math(_, (H, T), list(',', [H, T])).
+math(_, (H; T), list(';', [H, T])).
+math(_, (H| T), list('|', [H, T])).
 
-math((H, T), list(',', [H, T])) --> [].
+ml(Flags, list(Sep, [H | T]), mrow([HX | TX])) :-
+    ml(Flags, H, HX),
+    ml(Flags, tail(Sep, T), TX).
 
-math((H; T), list(';', [H, T])) --> [].
+ml(_, tail(_, []), []).
 
-math((H | T), list('|', [H, T])) --> [].
+ml(Flags, tail(Sep, [H | T]), [SX, HX | TX]) :-
+    ml(Flags, Sep, SX),
+    ml(Flags, H, HX),
+    ml(Flags, tail(Sep, T), TX).
 
-mathml(list(Sep, [H | T]), mrow([HX | TX])) -->
-    mathml(H, HX),
-    mathml(tail(Sep, T), TX).
-    
-mathml(tail(_, []), []) --> [].
+paren(Flags, list(_, List), P) :-
+    maplist({Flags}/[A, X] >> paren(Flags, A, X), List, PX),
+    max_list(PX, P).
 
-mathml(tail(Sep, [H | T]), [SX, HX | TX]) -->
-    mathml(Sep, SX),
-    mathml(H, HX),
-    mathml(tail(Sep, T), TX).
+prec(_, list(Sep, _), P) :-
+    current_op(Prec, _, Sep),
+    !, P = Prec.
 
-paren(list(_, List), Paren) -->
-    state(S, New),
-    {maplist({S, New}/[A, X] >> paren(A, X, [S], [New]), List, P),
-     sort(0, @>, P, [Paren | _])}.
-
-prec(list(Sep, _), Prec) -->
-    {current_op(P, _, Sep), Prec = P -> true ; Prec = 1}.
+prec(_, list(_, _), 0).
 
 example :- example([x, y, z]).
 example :- example((x, y, z)).
@@ -305,7 +318,7 @@ example :- example((x | y, z)).
 example :- example(paren([paren(x), paren(y)])).
 
 %
-% Decorations
+% Colors
 %
 color(1, red, '#FFA0A0').
 color(2, blue, '#A0A0FF').
@@ -314,87 +327,91 @@ color(4, '#FFFF00', '#DFDF80').
 color(5, '#FF00FF', '#DF80DF').
 color(6, '#00FFFF', '#DFDF80').
 
-math(red(A), color(red, A)) --> [].
-math(green(A), color(green, A)) --> [].
-math(blue(A), color(blue, A)) --> [].
-math(black(A), color(black, A)) --> [].
-math(grey(A), color(grey, A)) --> [].
-math(lightred(A), color('#FFA0A0', A)) --> [].
+math(_, red(A), color(red, A)).
+math(_, green(A), color(green, A)).
+math(_, blue(A), color(blue, A)).
+math(_, black(A), color(black, A)).
+math(_, grey(A), color(grey, A)).
+math(_, lightred(A), color('#FFA0A0', A)).
 
-mathml(color(Col, A), mstyle(mathcolor(Col), X)) -->
-        mathml(A, X).
+ml(Flags, color(Col, A), mstyle(mathcolor(Col), X)) :-
+    ml(Flags, A, X).
 
-paren(color(_, A), Paren) -->
-        paren(A, Paren).
+paren(Flags, color(_, A), P) :-
+    paren(Flags, A, P).
 
-prec(color(_, A), Prec) -->
-        prec(A, Prec).
+prec(Flags, color(_, A), P) :-
+    prec(Flags, A, P).
 
-% Only decoration
-mathml(overline(A), mover(accent(true), [X, mo(&(macr))])) -->
-        mathml(A, X).
+%
+% Other decorations
+%
+ml(Flags, overline(A), mover(accent(true), [X, mo(&(macr))])) :-
+    ml(Flags, A, X).
 
-paren(overline(A), Paren) -->
-        paren(A, Paren).
+paren(Flags, overline(A), P) :-
+    paren(Flags, A, P).
 
-prec(overline(A), Prec) -->
-        prec(A, Prec).
+prec(Flags, overline(A), P) :-
+    prec(Flags, A, P).
 
 % Proper average
-math(mean(A), overline(A)) --> [].
+math(_, mean(A), overline(A)).
 
-mathml(underbrace(A, Under), munder([munder(accentunder(true), [X, mo(stretchy(true), &('UnderBrace'))]), Y])) -->
-    mathml(A, X),
-    mathml(Under, Y).
+% Underbrace with text
+ml(
+    Flags,
+    underbrace(A, Under),
+    munder([
+        munder(accentunder(true), [X, mo(stretchy(true), &('UnderBrace'))]),
+        Y])) :-
+    ml(Flags, A, X),
+    ml(Flags, Under, Y).
 
-paren(underbrace(A, _), Paren) -->
-        paren(A, Paren).
+paren(Flags, underbrace(A, _), P) :-
+    paren(Flags, A, P).
 
-prec(underbrace(A, _), Prec) -->
-        prec(A, Prec).
+prec(Flags, underbrace(A, _), P) :-
+    prec(Flags, A, P).
 
-math(cancel(A), red(strike(black(A)))) --> [].
+% red strike through
+math(_, cancel(A), red(strike(black(A)))).
 
-mathml(roundedbox(A), menclose(notation(roundedbox), X)) -->
-    mathml(A, X).
+ml(Flags, strike(A), menclose(notation(updiagonalstrike), X)) :-
+    ml(Flags, A, X).
 
-paren(roundedbox(A), Paren) -->
-        paren(A, Paren).
+paren(Flags, strike(A), P) :-
+    paren(Flags, A, P).
 
-prec(roundedbox(A), Prec) -->
-        prec(A, Prec).
+prec(Flags, strike(A), P) :-
+    prec(Flags, A, P).
 
-mathml(phantom(A), mphantom(X)) -->
-    mathml(A, X).
+% rounded box
+ml(Flags, roundedbox(A), menclose(notation(roundedbox), X)) :-
+    ml(Flags, A, X).
 
-paren(phantom(A), Paren) -->
-        paren(A, Paren).
+paren(Flags, roundedbox(A), P) :-
+    paren(Flags, A, P).
 
-prec(phantom(A), Prec) -->
-        prec(A, Prec).
+prec(Flags, roundedbox(A), P) :-
+    prec(Flags, A, P).
 
-mathml(strike(A), menclose(notation(updiagonalstrike), X)) -->
-    mathml(A, X).
+% invisible
+ml(Flags, phantom(A), mphantom(X)) :-
+    ml(Flags, A, X).
 
-paren(strike(A), Paren) -->
-        paren(A, Paren).
+paren(Flags, phantom(A), P) :-
+    paren(Flags, A, P).
 
-prec(strike(A), Prec) -->
-        prec(A, Prec).
+prec(Flags, phantom(A), P) :-
+    prec(Flags, A, P).
 
-math(format_tratio(A), round2(A)) --> 
-    {number(A)}.
+% formatting numbers
+math(format_tratio(A), round2(A)).
 
-math(format_tratio(A), A) --> 
-    {\+ number(A)}.
+math(format_pvalue(A), round2(A)).
 
-math(format_pvalue(A), round2(A)) --> 
-    {number(A)}.
-
-math(format_pvalue(A), A) --> 
-    {\+ number(A)}.
-
-math(quote(A), A) --> [].
+math(quote(A), A).
 
 example :- example(cancel('X')).
 example :- example(paren([paren(red(x)), green(paren(y))])).
@@ -403,538 +420,487 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 %
 % Mistakes
 %
-mathml(error(Err, A), M) -->
-    state(S),
-    {subtract(S, [error-_], New)},
-    state(S, [error-Err | New]),
-    mathml(A, M),
-    state([error-Err | New], S).
-  
-paren(error(Err, A), Paren) -->
-    state(S),
-    {subtract(S, [error-_], New)},
-    state(S, [error-Err | New]),
-    paren(A, Paren),
-    state([error-Err | New], S).
-  
-prec(error(Err, A), Prec) -->
-    state(S),
-    {subtract(S, [error-_], New)},
-    state(S, [error-Err | New]),
-    prec(A, Prec),
-    state([error-Err | New], S).
-  
-mathml(instead_of(A, B), M) -->
-        state(S),
-        {member(error-highlight, S)},
-        mathml(underbrace(A, ["instead of", ' ', B]), M).
+ml(Flags, error(Err, A), M) :-
+    select_option(error(_), Flags, New),
+    ml([error(Err) | New], A, M).
 
-mathml(instead_of(A, _), M) -->
-        state(S),
-        {member(error-show, S)},
-        mathml(red(A), M).
+paren(Flags, error(Err, A), P) :-
+    select_option(error(_), Flags, New),
+    paren([error(Err) | New], A, P).
 
-mathml(instead_of(_, B), M) -->
-        state(S),
-        {member(error-fix, S)},
-        mathml(green(B), M).
+prec(Flags, error(Err, A), P) :-
+    select_option(error(_), Flags, New),
+    prec([error(Err) | New], A, P).
 
-paren(instead_of(A, _), Paren) -->
-        state(S),
-        {member(error-highlight, S)},
-        paren(A, Paren).
+% A instead of B
+ml(Flags, instead_of(A, B), M) :-
+    option(error(highlight), Flags, highlight),
+    ml(Flags, underbrace(A, ["instead of", ' ', B]), M).
 
-paren(instead_of(A, _), Paren) -->
-        state(S),
-        {member(error-show, S)},
-        paren(A, Paren).
+paren(Flags, instead_of(A, _), P) :-
+    option(error(highlight), Flags, highlight),
+    paren(Flags, A, P).
 
-paren(instead_of(_, B), Paren) -->
-        state(S),
-        {member(error-fix, S)},
-        paren(B, Paren).
+prec(Flags, instead_of(A, _), P) :-
+    option(error(highlight), Flags, highlight),
+    prec(Flags, A, P).
 
-prec(instead_of(A, _), Prec) -->
-        state(S),
-        {member(error-highlight, S)},
-        prec(A, Prec).
+ml(Flags, instead_of(A, _), red(A)) :-
+    option(error(show), Flags).
 
-prec(instead_of(A, _), Prec) -->
-        state(S),
-        {member(error-show, S)},
-        prec(A, Prec).
+paren(Flags, instead_of(A, _), P) :-
+    option(error(show), Flags),
+    paren(Flags, A, P).
 
-prec(instead_of(_, B), Prec) -->
-        state(S),
-        {member(error-fix, S)},
-        prec(B, Prec).
+prec(Flags, instead_of(A, _), P) :-
+    option(error(show), Flags),
+    prec(Flags, A, P).
 
-mathml(omit_left(quote(Expr)), M) -->
-        state(S),
-        { member(error-highlight, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([underbrace([L, Op], "omitted"), R], M).
+ml(Flags, instead_of(_, B), green(B)) :-
+    option(error(fix), Flags).
 
-mathml(omit_left(quote(Expr)), M) -->
-        state(S),
-        { member(error-show, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([cancel([L, Op]), R], M).
+paren(Flags, instead_of(_, B), P) :-
+    option(error(show), Flags),
+    paren(Flags, B, P).
 
-mathml(omit_left(quote(Expr)), M) -->
-        state(S),
-        { member(error-fix, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([green([L, Op]), R], M).
+prec(Flags, instead_of(_, B), P) :-
+    option(error(show), Flags),
+    prec(Flags, B, P).
 
-paren(omit_left(quote(Expr)), Paren) -->
-        paren(Expr, Paren).
+% Left part omitted
+ml(Flags, omit_left(quote(Expr)), M) :-
+    option(error(highlight), Flags, highlight),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    ml(Flags, [underbrace([L, Op], "omitted"), R], M).
 
-prec(omit_left(quote(Expr)), Prec) -->
-        prec(Expr, Prec).
+ml(Flags, omit_left(quote(Expr)), M) :-
+    option(error(show), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    ml(Flags, [cancel([L, Op]), R], M).
 
-mathml(omit_right(quote(Expr)), M) -->
-        state(S),
-        { member(error-highlight, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([L, underbrace([Op, R], "omitted")], M).
+ml(Flags, omit_left(quote(Expr)), M) :-
+    option(error(fix), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    ml(Flags, [green([L, Op]), R], M).
 
-mathml(omit_right(quote(Expr)), M) -->
-        state(S),
-        { member(error-show, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([L, cancel([Op, R])], M).
+paren(Flags, omit_left(quote(Expr)), P) :-
+    paren(Flags, Expr, P).
 
-mathml(omit_right(quote(Expr)), M) -->
-        state(S),
-        { member(error-fix, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([L, green([Op, R])], M).
+prec(Flags, omit_left(quote(Expr)), P) :-
+    prec(Flags, Expr, P).
 
-paren(omit_right(quote(Expr)), Paren) -->
-        paren(Expr, Paren).
+ml(Flags, omit_right(quote(Expr)), M) :-
+    option(error(highlight), Flags, highlight),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    ml(Flags, [L, underbrace([Op, R], "omitted")], M).
 
-prec(omit_right(quote(Expr)), Prec) -->
-        prec(Expr, Prec).
+ml(Flags, omit_right(quote(Expr)), M) :-
+    option(error(show), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    ml(Flags, [L, cancel([Op, R])], M).
 
-mathml(left_landed(Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-highlight, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]),
-          color(Color, C, _) },
-        mathml([color(C, roundedbox(black([L, Op]))), R], M).
+ml(Flags, omit_right(quote(Expr)), M) :-
+    option(error(fix), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    ml(Flags, [L, green([Op, R])], M).
 
-mathml(left_landed(Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-show, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]),
-          color(Color, C, _) }, 
-        mathml([color(C, roundedbox(black([L, Op]))), R], M).
+paren(Flags, omit_right(quote(Expr)), P) :-
+    paren(Flags, Expr, P).
 
-mathml(left_landed(_Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-fix, S),
-          compound(Expr),
-          compound_name_arguments(Expr, _Op, [_L, R]) }, 
-        mathml(R, M).
+prec(Flags, omit_right(quote(Expr)), P) :-
+    prec(Flags, Expr, P).
 
-paren(left_landed(_, quote(Expr)), Paren) -->
-        paren(Expr, Paren).
+ml(Flags, left_landed(Color, quote(Expr)), M) :-
+    option(error(highlight), Flags, highlight),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    color(Color, C, _),
+    ml(Flags, [color(C, roundedbox(black([L, Op]))), R], M).
 
-prec(left_landed(_, quote(Expr)), Prec) -->
-        prec(Expr, Prec).
+ml(Flags, left_landed(Color, quote(Expr)), M) :-
+    option(error(show), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    color(Color, C, _),
+    ml(Flags, [color(C, roundedbox(black([L, Op]))), R], M).
 
-mathml(right_landed(Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-highlight, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]),
-          color(Color, C, _) },
-        mathml([L, color(C, roundedbox(black([Op, R])))], M).
+ml(Flags, left_landed(_Color, quote(Expr)), M) :-
+    option(error(fix), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, _, [_, R]),
+    ml(Flags, R, M).
 
-mathml(right_landed(Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-show, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]), 
-          color(Color, C, _) },
-        mathml([L, color(C, roundedbox(black([Op, R])))], M).
+paren(Flags, left_landed(_, quote(Expr)), P) :-
+    paren(Flags, Expr, P).
 
-mathml(right_landed(_Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-fix, S),
-          compound(Expr),
-          compound_name_arguments(Expr, _Op, [L, _R]) }, 
-        mathml(L, M).
+prec(Flags, left_landed(_, quote(Expr)), P) :-
+    prec(Flags, Expr, P).
 
-paren(right_landed(_, quote(Expr)), Paren) -->
-        paren(Expr, Paren).
+ml(Flags, right_landed(Color, quote(Expr)), M) :-
+    option(error(highlight), Flags, highlight),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    color(Color, C, _),
+    ml(Flags, [L, color(C, roundedbox(black([Op, R])))], M).
 
-prec(right_landed(_, quote(Expr)), Prec) -->
-        prec(Expr, Prec).
+ml(Flags, right_landed(Color, quote(Expr)), M) :-
+    option(error(show), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    color(Color, C, _),
+    ml(Flags, [L, color(C, roundedbox(black([Op, R])))], M).
 
-mathml(left_elsewhere(Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-highlight, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]),
-          color(Color, _, C) }, 
-        mathml([color(C, roundedbox(phantom([L, Op]))), R], M).
+ml(Flags, right_landed(_Color, quote(Expr)), M) :-
+    option(error(fix), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, _Op, [L, _R]),
+    ml(Flags, L, M).
 
-mathml(left_elsewhere(_Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-show, S),
-          compound(Expr),
-          compound_name_arguments(Expr, _Op, [_L, R]) },
-        mathml(R, M).
+paren(Flags, right_landed(_, quote(Expr)), P) :-
+    paren(Flags, Expr, P).
 
-mathml(left_elsewhere(Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-fix, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]),
-          color(Color, C, _) }, 
-        mathml([color(C, [L, Op]), R], M).
+prec(Flags, right_landed(_, quote(Expr)), P) :-
+    prec(Flags, Expr, P).
 
-paren(left_elsewhere(_, quote(Expr)), Paren) -->
-        paren(Expr, Paren).
+ml(Flags, left_elsewhere(Color, quote(Expr)), M) :-
+    option(error(highlight), Flags, highlight),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    color(Color, _, C),
+    ml(Flags, [color(C, roundedbox(phantom([L, Op]))), R], M).
 
-prec(left_elsewhere(_, quote(Expr)), Prec) -->
-        prec(Expr, Prec).
+ml(Flags, left_elsewhere(_Color, quote(Expr)), M) :-
+    option(error(show), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, _Op, [_L, R]),
+    ml(Flags, R, M).
 
-mathml(right_elsewhere(Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-highlight, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]),
-          color(Color, _, C) }, 
-        mathml([L, color(C, roundedbox(phantom([Op, R])))], M).
+ml(Flags, left_elsewhere(Color, quote(Expr)), M) :-
+    option(error(fix), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    color(Color, C, _),
+    ml(Flags, [color(C, [L, Op]), R], M).
 
-mathml(right_elsewhere(_Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-show, S),
-          compound(Expr),
-          compound_name_arguments(Expr, _Op, [L, _R]) },
-        mathml(L, M).
+paren(Flags, left_elsewhere(_, quote(Expr)), P) :-
+    paren(Flags, Expr, P).
 
-mathml(right_elsewhere(Color, quote(Expr)), M) -->
-        state(S),
-        { member(error-fix, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]), 
-          color(Color, C, _) }, 
-        mathml([L, color(C, [Op, R])], M).
+prec(Flags, left_elsewhere(_, quote(Expr)), P) :-
+    prec(Flags, Expr, P).
 
-paren(right_elsewhere(_, quote(Expr)), Paren) -->
-        paren(Expr, Paren).
+ml(Flags, right_elsewhere(Color, quote(Expr)), M) :-
+    option(error(highlight), Flags, highlight),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    color(Color, _, C),
+    ml(Flags, [L, color(C, roundedbox(phantom([Op, R])))], M).
 
-prec(right_elsewhere(_, quote(Expr)), Prec) -->
-        prec(Expr, Prec).
+ml(Flags, right_elsewhere(_Color, quote(Expr)), M) :-
+    option(error(show), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, _Op, [L, _R]),
+    ml(Flags, L, M).
 
-mathml(invent_left(quote(Expr)), M) -->
-        state(S),
-        { member(error-highlight, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([underbrace([L, Op], "invented"), R], M).
+ml(Flags, right_elsewhere(Color, quote(Expr)), M) :-
+    option(error(fix), Flags),
+    compound(Expr),
+    compound_name_arguments(Expr, Op, [L, R]),
+    color(Color, C, _),
+    ml(Flags, [L, color(C, [Op, R])], M).
 
-mathml(invent_left(quote(Expr)), M) -->
-        state(S),
-        { member(error-show, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([red([L, Op]), R], M).
+paren(Flags, right_elsewhere(_, quote(Expr)), P) :-
+        paren(Flags, Expr, P).
 
-mathml(invent_left(quote(Expr)), M) -->
-        state(S),
-        { member(error-fix, S),
-          compound(Expr),
-          compound_name_arguments(Expr, _Op, [_L, R]) }, 
-        mathml(R, M).
+prec(Flags, right_elsewhere(_, quote(Expr)), P) -->
+        prec(Flags, Expr, P).
 
-paren(invent_left(quote(Expr)), Paren) -->
-        paren(Expr, Paren).
+math(_, expert(A = B), A -> B).
+math(_, buggy(A \= B, _), A ~> B).
 
-prec(invent_left(quote(Expr)), Prec) -->
-        prec(Expr, Prec).
-
-mathml(invent_right(quote(Expr)), M) -->
-        state(S),
-        { member(error-highlight, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([L, underbrace([Op, R], "invented")], M).
-
-mathml(invent_right(quote(Expr)), M) -->
-        state(S),
-        { member(error-show, S),
-          compound(Expr),
-          compound_name_arguments(Expr, Op, [L, R]) }, 
-        mathml([L, red([Op, R])], M).
-
-mathml(invent_right(quote(Expr)), M) -->
-        state(S),
-        { member(error-fix, S),
-          compound(Expr),
-          compound_name_arguments(Expr, _Op, [L, _R]) }, 
-        mathml(L, M).
-
-paren(invent_right(quote(Expr)), Paren) -->
-        paren(Expr, Paren).
-
-prec(invent_right(quote(Expr)), Prec) -->
-        prec(Expr, Prec).
-        
-math(expert(A = B), A -> B) --> [].
-math(buggy(A \= B, _Bug), A ~> B) --> [].
-
-example :- example([error-highlight], instead_of(sigma, s)).
-example :- example([error-fix], instead_of(sigma, s)).
-example :- example([error-show], instead_of(sigma, s)).
+example :- example([error(highlight)], instead_of(sigma, s)).
+example :- example([error(fix)], instead_of(sigma, s)).
+example :- example([error(show)], instead_of(sigma, s)).
 
 %
 % Abbreviations
 %
-mathml(denoting(A, _, _), M) -->
-        mathml(A, M).
-
-paren(denoting(A, _, _), Paren) -->
-        paren(A, Paren).
-
-prec(denoting(A, _, _), Paren) -->
-        prec(A, Paren).
+math(_, denoting(A, _, _), A).
 
 example :- example(denoting(s, t + u, "something")).
 example :- example(a + denoting(s, t + u, "something")).
 
 % Collect abbreviations
-abbrev(A, W) -->
-        denoting0(A, X),
-        {list_to_set(X, W)}.
+abbreviations(Flags, A, W) :-
+    denot(Flags, A, X),
+    list_to_set(X, W).
 
-denoting0(A, []) -->
-        {atomic(A)}.
+denot(_, A, []) :-
+    atomic(A).
 
-denoting0(denoting(Abbrev, Exp, Desc), W) -->
-        !, denoting0(Exp, T),
-        {W = [denoting(Abbrev, Exp, Desc) | T]}.
+denot(Flags, denoting(Abbrev, Expr, Desc), W) :-
+    !, denot(Flags, Expr, T),
+    W = [denoting(Abbrev, Expr, Desc) | T].
 
-denoting0(instead_of(A, B, _), W) -->
-        state(S),
-        {member(error-highlight, S)},
-        !, denoting0(A, X),
-        denoting0(B, Y),
-        {append(X, Y, W)}.
+% See compound below
+%
+% denot(Flags, instead_of(A, B), W) :-
+%     option(error(highlight), Flags, highlight),
+%     !, denot(Flags, A, X),
+%     denot(Flags, B, Y),
+%     append(X, Y, W).
 
-denoting0(instead_of(A, _), W) -->
-        state(S),
-        {member(error-show, S)},
-        !, denoting0(A, W).
+denot(Flags, instead_of(A, _), W) :-
+    option(error(show), Flags),
+    !, denot(Flags, A, W).
 
-denoting0(instead_of(_, B), W) -->
-        state(S),
-        {member(error-fix, S)},
-        !, denoting0(B, W).
+denot(Flags, instead_of(_, B), W) :-
+    option(error(fix), Flags),
+    !, denot(Flags, B, W).
 
-denoting0(Comp, With) -->
-    state(S, New),
-    {compound(Comp),
-     compound_name_arguments(Comp, _, Args)},
-    {maplist({S, New}/[A, W] >> denoting0(A, W, [S], [New]), Args, Withs),
-     append(Withs, With)}.
+denot(Flags, Comp, With) :-
+    compound(Comp),
+    compound_name_arguments(Comp, _, Args),
+    maplist({Flags}/[A, W] >> denot(Flags, A, W), Args, List),
+    append(List, With).
 
 % Render abbreviations
-denoting(A, []) -->
-        abbrev(A, []),
-        !.
+denoting(Flags, A, Empty) :-
+    abbreviations(Flags, A, []),
+    !, Empty = [].
 
-denoting(A, [M]) -->
-        abbrev(A, [denoting(X, Exp, Des)]),
-        !, mathml([' ', "with", ' ', X = Exp, ' ', "denoting", ' ', Des, "."], M).
+denoting(Flags, A, [M]) :-
+    abbreviations(Flags, A, [denoting(X, Exp, Des)]),
+    !,
+    ml(Flags, [' ', "with", ' ', X = Exp, ' ', "denoting", ' ', Des, "."], M).
 
-denoting(A, [M | MT]) -->
-        abbrev(A, [denoting(X, Exp, Des) | T]),
-        mathml(["with", ' ', X = Exp, ' ', "denoting", ' ', Des, ",", ' '], M),
-        denoting_and(T, MT).
+denoting(Flags, A, [M | MT]) :-
+    abbreviations(Flags, A, [denoting(X, Exp, Des) | T]),
+    !,
+    ml(Flags, ["with", ' ', X = Exp, ' ', "denoting", ' ', Des, ",", ' '], M),
+    and(Flags, T, MT).
 
-denoting_and([], [X]) -->
-        mathml(".", X).
+and(Flags, [], [X]) :-
+    ml(Flags, ".", X).
 
-denoting_and([denoting(X, Exp, Des) | T], [M | MT]) -->
-        mathml(["and", ' ', X = Exp, ' ', "denoting", ' ', Des], M),
-        denoting_and(T, MT).
+and(Flags, [denoting(X, Exp, Des) | T], [M | MT]) :-
+    ml(Flags, ["and", ' ', X = Exp, ' ', "denoting", ' ', Des], M),
+    and(Flags, T, MT).
 
 %
 % Operators
 %
-math(A '100%', A '%') --> 
-    state(S, [mult(100) | S]).
+ml(Flags, '100%'(A), X) :-
+    select_option(mult(M), Flags, New, 1),
+    _100M is 100 * M,
+    ml([mult(_100M) | New], A '%', X).
 
-math(A '_' B ^ C, subsup(A, B, C)) --> [].
+math(_, A '_' B ^ C, subsup(A, B, C)).
 
-mathml(subsup(A, B, C), msubsup([X, Y, Z])) -->
-    prec(subsup(A, B, C), Prec),
-    prec(A, Inner),
-    (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ),
-    mathml(B, Y),
-    mathml(C, Z).
+ml(Flags, subsup(A, B, C), msubsup([X, Y, Z])) :-
+    prec(Flags, subsup(A, B, C), P),
+    prec(Flags, A, Inner),
+    ( P =< Inner
+      -> ml(Flags, paren(A), X)
+      ; ml(Flags, A, X)
+    ), ml(Flags, B, Y),
+    ml(Flags, C, Z).
 
-paren(subsup(A, _, _), Paren) -->
-    paren(A, Paren).
+paren(Flags, subsup(A, _, _), P) :-
+    paren(Flags, A, P).
 
-prec(subsup(_, _, _), Prec) -->
-    prec(x^y, Prec).
+prec(Flags, subsup(X, _, Z), P) :-
+    prec(Flags, X^Z, P).
 
-math(A '_' B, sub(A, B)) --> [].
+math(_, A '_' B, sub(A, B)).
 
-mathml(sub(A, B), msub([X, Y])) -->
-    prec(sub(A, B), Prec),
-    prec(A, Inner),
-    (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ),
-    mathml(B, Y).
+ml(Flags, sub(A, B), msub([X, Y])) :-
+    prec(Flags, sub(A, B), P),
+    prec(Flags, A, Inner),
+    ( P =< Inner
+      -> ml(Flags, paren(A), X)
+      ; ml(Flags, A, X)
+    ), ml(Flags, B, Y).
 
-paren(sub(A, _), Paren) -->
-    paren(A, Paren).
+paren(Flags, sub(A, _), P) :-
+    paren(Flags, A, P).
 
-prec(sub(_, _), Prec) -->
-    prec(x^y, Prec).
+prec(Flags, sub(A, _), P) :-
+    prec(Flags, A, P).
 
-math(A^B, sup(A, B)) --> [].
+math(_, A^B, sup(A, B)).
 
 % experimental: sin^2 x for "simple" x
-mathml(sup(Sin, X), M) -->
-    prec(Sin, Prec),
-    prec(sin(x), Prec),
-    paren(X, 0),
-    prec(X, 0),
-    !, state(S, [replace(Sin^X, Sin) | S]),
-    mathml(Sin, M).
+ml(Flags, sup(Sin, X), M) :-
+    prec(Flags, Sin, P),
+    prec(Flags, sin(x), P),
+    paren(Flags, X, 0),
+    prec(Flags, X, 0),
+    !, ml([replace(Sin^X, Sin)], Sin, M).
 
-mathml(sup(A, B), msup([X, Y])) -->
-    prec(sup(A, B), Prec),
-    prec(A, Inner),
-    (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ),
-    mathml(B, Y).
+ml(Flags, sup(A, B), msup([X, Y])) :-
+    prec(Flags, sup(A, B), P),
+    prec(Flags, A, Inner),
+    ( P =< Inner
+      -> ml(Flags, paren(A), X)
+      ; ml(Flags, A, X)
+    ), ml(Flags, B, Y).
 
-paren(sup(A, _), Paren) -->
-    paren(A, Paren).
+paren(Flags, sup(A, _), P) :-
+    paren(Flags, A, P).
 
-prec(sup(_, _), Prec) -->
-    {current_op(P, xfy, ^), Prec = P}.
+prec(_, sup(_, _), P) :-
+    current_op(Prec, xfy, ^),
+    P = Prec.
 
 % Omit multiplication sign in "simple" products
-math(A * B, M) -->
-    paren(A / x, 0),
-    !, {M = A invisible_times B}.
+math(Flags, A * B, M) :-
+    paren(Flags, A / x, 0),
+    !, M = A invisible_times B.
 
 % Negative sign has same precedence as binary minus
-math(-A, operator(Prec, fx, -, A)) -->
-    prec(a-b, Prec).
+math(Flags, -A, operator(P, fx, -, A)) :-
+    prec(Flags, a-b, P).
 
 % Prefix and postfix operators (e.g., factorial)
-math(Comp, operator(Prec, Fix, Op, A)) -->
-    {compound(Comp),
-     compound_name_arguments(Comp, Op, [A]),
-     current_op(P, Fix, Op), Prec = P,
-     member(Fix, [xf, yf, fx, fy])}.
+math(_, Comp, operator(Prec, Fix, Op, A)) :-
+    compound(Comp),
+    compound_name_arguments(Comp, Op, [A]),
+    current_op(P, Fix, Op), Prec = P,
+    member(Fix, [xf, yf, fx, fy]).
 
-mathml(operator(Prec, fx, Op, A), mrow([F, X])) -->
-    mathml(Op, F),
-    prec(A, Inner),
-    (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ).
+ml(Flags, operator(P, fx, Op, A), mrow([F, X])) :-
+    prec(Flags, A, Inner),
+    ( P =< Inner
+      -> ml(Flags, paren(A), X)
+      ; ml(Flags, A, X)
+    ), ml(Flags, Op, F).
 
-mathml(operator(Prec, fy, Op, A), mrow([F, Y])) -->
-    mathml(Op, F),
-    prec(A, Inner),
-    (   {Prec < Inner} -> mathml(paren(A), Y) ; mathml(A, Y) ).
+ml(Flags, operator(P, fy, Op, A), mrow([F, Y])) :-
+    prec(Flags, A, Inner),
+    ( P < Inner
+      -> ml(Flags, paren(A), Y)
+      ; ml(Flags, A, Y)
+    ), ml(Flags, Op, F).
 
-mathml(operator(Prec, xf, Op, A), mrow([X, F])) -->
-    mathml(Op, F),
-    prec(A, Inner),
-    (   {Prec =< Inner} -> mathml(paren(A), X) ; mathml(A, X) ).
+ml(Flags, operator(P, xf, Op, A), mrow([X, F])) :-
+    prec(Flags, A, Inner),
+    ( P =< Inner
+      -> ml(Flags, paren(A), X)
+      ; ml(Flags, A, X)
+    ), ml(Flags, Op, F).
 
-mathml(operator(Prec, yf, Op, A), mrow([Y, F])) -->
-    mathml(Op, F),
-    prec(A, Inner),
-    (   {Prec < Inner} -> mathml(paren(A), Y) ; mathml(A, Y) ).
+ml(Flags, operator(P, yf, Op, A), mrow([Y, F])) :-
+    prec(Flags, A, Inner),
+    ( P < Inner
+      -> ml(Flags, paren(A), Y)
+      ; ml(Flags, A, Y)
+    ), ml(Flags, Op, F).
 
-paren(operator(Prec, Fix, _, A), Paren) -->
-    {member(Fix, [xf, fx])},
-    paren(A, P),
-    prec(A, Inner),
-    (   {Prec =< Inner -> Paren is P + 1 ; Paren = P}).
+paren(Flags, operator(Prec, Fix, _, A), Paren) :-
+    member(Fix, [xf, fx]),
+    paren(Flags, A, P),
+    prec(Flags, A, Inner),
+    ( Prec =< Inner
+      -> Paren is P + 1
+      ; Paren = P
+    ).
 
-paren(operator(Prec, Fix, _, A), Paren) -->
-    {member(Fix, [yf, fy])},
-    paren(A, P),
-    prec(A, Inner),
-    (   {Prec < Inner -> Paren is P + 1 ; Paren = P}).
+paren(Flags, operator(Prec, Fix, _, A), Paren) :-
+    member(Fix, [yf, fy]),
+    paren(Flags, A, P),
+    prec(Flags, A, Inner),
+    ( Prec < Inner
+      -> Paren is P + 1
+      ; Paren = P
+    ).
 
-prec(operator(Prec, _, _, _), Prec) --> [].
+prec(_, operator(P, _, _, _), P).
 
-math(Comp, operator(Prec, Fix, Op, A, B)) -->
-    {compound(Comp),
-     compound_name_arguments(Comp, Op, [A, B]),
-     current_op(P, Fix, Op), Prec = P,
-     member(Fix, [xfx, yfx, xfy])}.
+math(_, Comp, operator(Prec, Fix, Op, A, B)) :-
+    compound(Comp),
+    compound_name_arguments(Comp, Op, [A, B]),
+    current_op(P, Fix, Op), Prec = P,
+    member(Fix, [xfx, yfx, xfy]).
 
-mathml(operator(Prec, xfx, Op, A, B), mrow([X, F, Y])) -->
-    mathml(Op, F),
-    prec(A, PrecA),
-    (   {Prec =< PrecA} -> mathml(paren(A), X) ; mathml(A, X) ),
-    prec(B, PrecB),
-    (   {Prec =< PrecB} -> mathml(paren(B), Y) ; mathml(B, Y) ).
+ml(Flags, operator(P, xfx, Op, A, B), mrow([X, F, Y])) :-
+    prec(Flags, A, PrecA),
+    ( P =< PrecA
+      -> ml(Flags, paren(A), X)
+      ; ml(Flags, A, X)
+    ), prec(Flags, B, PrecB),
+    ( P =< PrecB
+      -> ml(Flags, paren(B), Y)
+      ; ml(Flags, B, Y)
+    ), ml(Flags, Op, F).
 
-mathml(operator(Prec, xfy, Op, A, B), mrow([X, F, Y])) -->
-    mathml(Op, F),
-    prec(A, PrecA),
-    (   {Prec =< PrecA} -> mathml(paren(A), X) ; mathml(A, X) ),
-    prec(B, PrecB),
-    (   {Prec < PrecB} -> mathml(paren(B), Y) ; mathml(B, Y) ).
+ml(Flags, operator(P, xfy, Op, A, B), mrow([X, F, Y])) :-
+    prec(Flags, A, PrecA),
+    ( P =< PrecA
+      -> ml(Flags, paren(A), X)
+      ; ml(Flags, A, X)
+    ), prec(Flags, B, PrecB),
+    ( P < PrecB
+      -> ml(Flags, paren(B), Y)
+      ; ml(Flags, B, Y)
+    ), ml(Flags, Op, F).
 
-mathml(operator(Prec, yfx, Op, A, B), mrow([Y, F, X])) -->
-    mathml(Op, F),
-    prec(A, PrecA),
-    (   {Prec < PrecA} -> mathml(paren(A), Y) ; mathml(A, Y) ),
-    prec(B, PrecB),
-    (   {Prec =< PrecB} -> mathml(paren(B), X) ; mathml(B, X) ).
+ml(Flags, operator(P, yfx, Op, A, B), mrow([Y, F, X])) :-
+    prec(Flags, A, PrecA),
+    ( P < PrecA
+      -> ml(Flags, paren(A), Y)
+      ; ml(Flags, A, Y)
+    ), prec(Flags, B, PrecB),
+    ( P =< PrecB
+      -> ml(Flags, paren(B), X)
+      ; ml(Flags, B, X)
+    ), ml(Flags, Op, F).
 
-paren(operator(Prec, xfx, _, A, B), Paren) -->
-    paren(A, PA),
-    prec(A, PrecA),
-    (   {Prec =< PrecA -> ParenA is PA + 1 ; ParenA = PA} ),
-    paren(B, PB),
-    prec(B, PrecB),
-    (   {Prec =< PrecB -> ParenB is PB + 1 ; ParenB = PB} ),
-    {Paren is max(ParenA, ParenB)}.
+paren(Flags, operator(Prec, xfx, _, A, B), P) :-
+    paren(Flags, A, PA),
+    prec(Flags, A, PrecA),
+    ( Prec =< PrecA
+      -> ParenA is PA + 1
+      ; ParenA = PA
+    ), paren(Flags, B, PB),
+    prec(Flags, B, PrecB),
+    ( Prec =< PrecB
+      -> ParenB is PB + 1
+      ; ParenB = PB
+    ), P is max(ParenA, ParenB).
 
-paren(operator(Prec, yfx, _, A, B), Paren) -->
-    paren(A, PA),
-    prec(A, PrecA),
-    (   {Prec < PrecA -> ParenA is PA + 1 ; ParenA = PA} ),
-    paren(B, PB),
-    prec(B, PrecB),
-    (   {Prec =< PrecB -> ParenB is PB + 1 ; ParenB = PB} ),
-    {Paren is max(ParenA, ParenB)}.
+paren(Flags, operator(Prec, yfx, _, A, B), P) :-
+    paren(Flags, A, PA),
+    prec(Flags, A, PrecA),
+    ( Prec < PrecA
+      -> ParenA is PA + 1
+      ; ParenA = PA
+    ), paren(Flags, B, PB),
+    prec(Flags, B, PrecB),
+    ( Prec =< PrecB
+      -> ParenB is PB + 1
+      ; ParenB = PB
+    ), P is max(ParenA, ParenB).
 
-paren(operator(Prec, xfy, _, A, B), Paren) -->
-    paren(A, PA),
-    prec(A, PrecA),
-    (   {Prec =< PrecA -> ParenA is PA + 1 ; ParenA = PA} ),
-    paren(B, PB),
-    prec(B, PrecB),
-    (   {Prec < PrecB -> ParenB is PB + 1 ; ParenB = PB} ),
-    {Paren is max(ParenA, ParenB)}.
+paren(Flags, operator(Prec, xfy, _, A, B), P) :-
+    paren(Flags, A, PA),
+    prec(Flags, A, PrecA),
+    ( Prec =< PrecA
+      -> ParenA is PA + 1
+      ; ParenA = PA
+    ), paren(Flags, B, PB),
+    prec(Flags, B, PrecB),
+    ( Prec < PrecB
+      -> ParenB is PB + 1
+      ; ParenB = PB
+    ), P is max(ParenA, ParenB).
 
-prec(operator(Prec, _, _, _, _), Prec) --> [].
+prec(_, operator(P, _, _, _, _), P).
 
 example :- example(a^3 + 3*a^2*b + 3*a*b^2 + b^3).
 example :- example(a^b).
@@ -948,160 +914,154 @@ example :- example((a + b) * (a - b) = a^two - b^two).
 %
 % Numbers
 %
-is_positive(A) --> positive(A, _).
+is_positive(Flags, A) :-
+    positive(Flags, A, _).
 
-positive(A, X) --> 
-    state(S), 
-    { number(A), A >= 0, 
-      member(mult(M), S),
-      !, AM is A*M,
-      select(mult(M), S, New) },
-    state(S, New),
-    mathml(AM, X),
-    state(New, S).
-      
-positive(A, mn(N)) --> 
-    { number(A), A >= 0 }, 
-    state(S), 
-    { member(round3, S),
-    !, format(atom(N), '~3f', A) }.
+positive(Flags, A, X) :-
+    number(A), A >= 0,
+    select_option(mult(M), Flags, New),
+    !, AM is A*M,
+    ml(New, AM, X).
 
-positive(A, mn(N)) --> 
-    { number(A), A >= 0 }, 
-    state(S), 
-    { member(round2, S),
-    !, format(atom(N), '~2f', A) }.
+positive(Flags, A, mn(N)) :-
+    number(A),
+    A >= 0,
+    option(round(3), Flags),
+    !, format(atom(N), '~3f', A).
 
-positive(A, mn(N)) --> 
-    { number(A), A >= 0 }, 
-    state(S), 
-    { member(round1, S),
-    !, format(atom(N), '~1f', A) }.
+positive(Flags, A, mn(N)) :-
+    number(A),
+    A >= 0,
+    option(round(2), Flags),
+    !, format(atom(N), '~2f', A).
 
-positive(A, mn(N)) --> 
-    { number(A), A >= 0 }, 
-    state(S), 
-    { member(round0, S),
-    !, format(atom(N), '~0f', A) }.
+positive(Flags, A, mn(N)) :-
+    number(A),
+    A >= 0,
+    option(round(1), Flags),
+    !, format(atom(N), '~1f', A).
 
-positive(A, mn(N)) --> 
-    {number(A), A >= 0}, 
-    state(S), 
-    { member(round, S),
-    !, format(atom(N), '~g', A) }.
+positive(Flags, A, mn(N)) :-
+    number(A),
+    A >= 0,
+    option(round(0), Flags),
+    !, format(atom(N), '~0f', A).
 
-positive(A, mn(A)) --> 
-    { number(A), A >= 0 }.
+positive(Flags, A, mn(N)) :-
+    number(A),
+    A >= 0,
+    option(round(g), Flags),
+    !, format(atom(N), '~g', A).
 
-positive(A, X) -->
-    { string(A), number_string(N, A) },
-    positive(N, X).
+positive(_, A, mn(A)) :-
+    number(A),
+    A >= 0.
 
-mathml(A, M) -->
-    is_positive(A),
-    positive(A, M).
+positive(Flags, A, X) :-
+    string(A),
+    number_string(N, A),
+    positive(Flags, N, X).
 
-paren(A, 0) -->
-    is_positive(A).
+ml(Flags, A, M) :-
+    is_positive(Flags, A),
+    positive(Flags, A, M).
 
-prec(A, 0) -->
-    is_positive(A).
+paren(Flags, A, 0) :-
+    is_positive(Flags, A).
 
-is_negative(A) --> negative(A, _).
-negative(A, X) --> 
-    {number(A), A < 0, P is abs(A)},
-    mathml(-P, X).
+prec(Flags, A, 0) :-
+    is_positive(Flags, A).
 
-negative(A, X) --> 
-    {string(A), number_string(N, A)},
-    negative(N, X).
+is_negative(Flags, A) :-
+    negative(Flags, A, _).
 
-mathml(A, M) -->
-    is_negative(A),
-    negative(A, M).
+negative(Flags, A, X) :-
+    number(A),
+    A < 0,
+    P is abs(A),
+    ml(Flags, -P, X).
 
-paren(A, 0) -->
-    is_negative(A).
+negative(Flags, A, X) :-
+    string(A),
+    number_string(N, A),
+    negative(Flags, N, X).
 
-prec(A, Prec) -->
-    is_negative(A),
-    prec(-a, Prec).
+ml(Flags, A, M) :-
+    is_negative(Flags, A),
+    negative(Flags, A, M).
+
+paren(Flags, A, 0) :-
+    is_negative(Flags, A).
+
+prec(Flags, A, P) :-
+    is_negative(Flags, A),
+    prec(Flags, -A, P).
 
 % Force rendering string as number
-mathml(number(A), mn(A)) -->
-    { number_string(N, A), N >= 0 }.
+ml(_, number(A), M) :-
+    number_string(N, A),
+    N >= 0,
+    !, M = mn(A).
 
-mathml(number(A), X) -->
-    { quantity(A, N, Options), N < 0,
-      Abs is abs(N),
-      quantity(AX, Abs, Options) 
-    }, mathml([-, number(AX)], X).
+ml(Flags, number(A), X) :-
+    quantity(A, N, Options),
+    N < 0,
+    Abs is abs(N),
+    quantity(AX, Abs, Options),
+    ml(Flags, [-, number(AX)], X).
 
-paren(number(A), Paren) -->
-    { term_string(T, A) },
-    paren(T, Paren).
+paren(Flags, number(A), P) :-
+    term_string(T, A),
+    paren(Flags, T, P).
 
-prec(number(A), Prec) -->
-    { term_string(T, A) },
-    prec(T, Prec).
+prec(Flags, number(A), P) :-
+    term_string(T, A),
+    prec(Flags, T, P).
 
-% SWISH sandbox restrictions do not allow
-% a general "round", but it is not needed
-% anyway.
-mathml(round(A), X) -->
-    state(S, [round | S]),
-    mathml(A, X),
-    state([round | S], S).
+ml(Flags, round(A), M) :-
+    ml([round(g) | Flags], A, M).
 
-paren(round(A), Paren) -->
-    paren(A, Paren).
+paren(Flags, round(A), P) :-
+    paren(Flags, A, P).
 
-prec(round(A), Prec) -->
-    prec(A, Prec).
+prec(Flags, round(A), P) :-
+    prec(Flags, A, P).
 
-mathml(round0(A), X) -->
-    state(S, [round0 | S]),
-    mathml(A, X),
-    state([round0 | S], S).
+ml(Flags, round0(A), M) :-
+    ml([round(0) | Flags], A, M).
 
-paren(round0(A), Paren) -->
-    paren(A, Paren).
+paren(Flags, round0(A), P) :-
+    paren(Flags, A, P).
 
-prec(round0(A), Prec) -->
-    prec(A, Prec).
+prec(Flags, round0(A), P) :-
+    prec(Flags, A, P).
 
-mathml(round1(A), X) -->
-    state(S, [round1 | S]),
-    mathml(A, X),
-    state([round1 | S], S).
+ml(Flags, round1(A), M) :-
+    ml([round(1) | Flags], A, M).
 
-paren(round1(A), Paren) -->
-    paren(A, Paren).
+paren(Flags, round1(A), P) :-
+    paren(Flags, A, P).
 
-prec(round1(A), Prec) -->
-    prec(A, Prec).
+prec(Flags, round1(A), P) :-
+    prec(Flags, A, P).
 
-mathml(round2(A), X) -->
-    state(S, [round2 | S]),
-    mathml(A, X),
-    state([round2 | S], S).
+ml(Flags, round2(A), M) :-
+    ml([round(2) | Flags], A, M).
 
-paren(round2(A), Paren) -->
-    paren(A, Paren).
+paren(Flags, round2(A), P) :-
+    paren(Flags, A, P).
 
-prec(round2(A), Prec) -->
-    prec(A, Prec).
+prec(Flags, round2(A), P) :-
+    prec(Flags, A, P).
 
-mathml(round3(A), X) -->
-    state(S, [round3 | S]),
-    mathml(A, X),
-    state([round3 | S], S).
+ml(Flags, round3(A), M) :-
+    ml([round(3) | Flags], A, M).
 
-paren(round3(A), Paren) -->
-    paren(A, Paren).
+paren(Flags, round3(A), P) :-
+    paren(Flags, A, P).
 
-prec(round3(A), Prec) -->
-    prec(A, Prec).
+prec(Flags, round3(A), P) :-
+    prec(Flags, A, P).
 
 example :- example(5^2).
 example :- example((-5)^(-2)).
@@ -1115,71 +1075,70 @@ example :- example((a + b) * (a - b) = a^2 - b^2).
 %
 % Units
 %
-is_unit(A) --> unit(A, _).
-unit(A, M) --> {unit(A, M)}.
+is_unit(Flags, A) :-
+    unit(Flags, A, _).
+
+unit(_, A, M) :-
+    unit(A, M).
 
 unit('%', "%").
-unit('100%', "%").
 unit('kg', "kg").
 
-mathml(A, [X, ' ', Unit]) -->
-    {compound(A),
-     compound_name_arguments(A, U, [Num])},
-    is_unit(U),
-    unit(U, Unit),
-    mathml(Num, X).
+ml(Flags, A, mrow([X, Sp, Unit])) :-
+    compound(A),
+    compound_name_arguments(A, U, [Num]),
+    is_unit(Flags, U),
+    unit(Flags, U, Unit),
+    ml(Flags, Num, X),
+    ml(Flags, '_', Sp).
 
 example :- example(10 '%').
-example :- example(0.1 '100%').
+example :- example('100%'(0.1)).
 example :- example(kg(5)).
 
 %
 % Fractions
 %
-mathml(frac(A, B), mfrac([X, Y])) -->
-    mathml(A, X),
-    mathml(B, Y).
+ml(Flags, frac(A, B), mfrac([X, Y])) :-
+    ml(Flags, A, X),
+    ml(Flags, B, Y).
 
-paren(frac(_, _), 0) --> [].
+paren(_, frac(_, _), 0).
 
-prec(frac(_, _), Prec) -->
-    prec(x/y, Prec).
+prec(Flags, frac(A, B), P) :-
+    prec(Flags, A/B, P).
 
 % Large fraction
-mathml(dfrac(A, B), mstyle(displaystyle(true), X)) -->
-    mathml(frac(A, B), X).
+ml(Flags, dfrac(A, B), mstyle(displaystyle(true), X)) :-
+    ml(Flags, frac(A, B), X).
 
-paren(dfrac(A, B), Paren) -->
-    paren(frac(A, B), Paren).
+paren(Flags, dfrac(A, B), P) :-
+    paren(Flags, frac(A, B), P).
 
-prec(dfrac(A, B), Prec) -->
-    prec(frac(A, B), Prec).
+prec(Flags, dfrac(A, B), P) :-
+    prec(Flags, frac(A, B), P).
 
-mathml(choose(A, B), mrow([mo('('), mfrac(linethickness(0), [X, Y]), mo(')')])) -->
-    mathml(A, X),
-    mathml(B, Y).
+ml(Flags, choose(A, B),
+        mrow([mo('('), mfrac(linethickness(0), [X, Y]), mo(')')])) :-
+    ml(Flags, A, X),
+    ml(Flags, B, Y).
 
-paren(choose(_, _), 1) --> [].
+paren(_, choose(_, _), 1).
 
-prec(choose(_, _), Prec) -->
-    prec(x^y, Prec).
+prec(Flags, choose(A, B), P) :-
+    prec(Flags, A^B, P).
 
-mathml(dchoose(A, B), 
-  mrow([mo('('), mfrac(mstyle([displaystyle(true), linethickness(0)]), [X, Y]), mo(')')])) -->
-    mathml(A, X),
-    mathml(B, Y).
+ml(Flags, dchoose(A, B),
+       mrow([mo('('), mfrac(mstyle([displaystyle(true), linethickness(0)]),
+                            [X, Y]), mo(')')])) :-
+    ml(Flags, A, X),
+    ml(Flags, B, Y).
 
-paren(dchoose(A, B), Paren) -->
-    paren(choose(A, B), Paren).
+paren(Flags, dchoose(A, B), P) :-
+    paren(Flags, choose(A, B), P).
 
-prec(dchoose(A, B), Prec) -->
-    prec(choose(A, B), Prec).
-
-math('TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
-     fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))) --> [].
-
-math(tratio(X, Mu, S, N), 
-    fun("paired t-test", (X, S; Mu, N))) --> [].
+prec(Flags, dchoose(A, B), P) :-
+    prec(Flags, choose(A, B), P).
 
 example :- example(frac(1.5, 2)^2).
 example :- example(frac(small, small) = dfrac(large, large)).
@@ -1187,34 +1146,36 @@ example :- example(frac(small, small) = dfrac(large, large)).
 %
 % Trigonometric functions
 %
-math(sin(A), trig(sin, A)) --> [].
-math(cos(A), trig(cos, A)) --> [].
-math(tan(A), trig(tan, A)) --> [].
+math(_, sin(A), trig(sin, A)).
+math(_, cos(A), trig(cos, A)).
+math(_, tan(A), trig(tan, A)).
 
-mathml(trig(Fun, Arg), M) -->
-    paren(Arg, 0),
-    prec(Arg, 0),
-    !, (state(Replace, S), {select(replace(Sin^N, Sin), Replace, S)}
-            -> mathml(Fun^N, F) ; mathml(Fun, F)),
-    mathml(Arg, X),
-    {M = mrow([F, mo(&(af)), X])}.
+ml(Flags, trig(Fun, Arg), M) :-
+    paren(Flags, Arg, 0),
+    prec(Flags, Arg, 0),
+    !, ( select_option(replace(Sin^N, Sin), Flags, New)
+      -> ml(New, Fun^N, F)
+      ; ml(Flags, Fun, F)
+    ), ml(Flags, Arg, X),
+    M = mrow([F, mo(&(af)), X]).
 
-mathml(trig(Fun, Arg), mrow([F, mo(&(af)), X])) -->
-    (   state(Replace, S), {select(replace(Sin^N, Sin), Replace, S)}
-            -> mathml(Fun^N, F) ; mathml(Fun, F)),
-    mathml(paren(Arg), X).
+ml(Flags, trig(Fun, Arg), mrow([F, mo(&(af)), X])) :-
+    ( select_option(replace(Sin^N, Sin), Flags, New)
+      -> ml(New, Fun^N, F)
+      ; ml(Flags, Fun, F)
+    ), ml(Flags, paren(Arg), X).
 
-prec(trig(_, _), Prec) -->
-    prec(x*y, P),
-    {Prec is P - 1}.
+paren(Flags, trig(_, Arg), P) :-
+    prec(Flags, Arg, 0),
+    !, paren(Flags, Arg, P).
 
-paren(trig(_, A), Paren) -->
-    prec(A, 0),
-    !, paren(A, Paren).
+paren(Flags, trig(_, Arg), P) :-
+    paren(Flags, Arg, Paren),
+    P is Paren + 1.
 
-paren(trig(_, A), Paren) -->
-    paren(A, P),
-    {Paren is P + 1}.
+prec(Flags, trig(Fun, Arg), P) :-
+    prec(Flags, Fun*Arg, Prec),
+    P is Prec - 1.
 
 example :- example(sin(pi)).
 example :- example(sin(pi/2)).
@@ -1226,85 +1187,90 @@ example :- example(sin(a!)^2).
 %
 % Special functions
 %
-mathml(sum(I, From, To, A), mrow([munderover([\['&sum;'], XFrom, XTo]), X])) -->
-    mathml(I = From, XFrom),
-    mathml(To, XTo),
-    mathml(A, X).
+math(_, 'TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
+     fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))).
 
-paren(sum(_, _, _, A), Paren) -->
-    paren(A, Paren).
+math(_, tratio(X, Mu, S, N), fun("paired t-test", (X, S; Mu, N))).
 
-prec(sum(_, _, _, _), Prec) -->
-    prec(x+y, Prec).
+ml(Flags, sum(I, From, To, A), mrow([munderover([\['&sum;'], XFrom, XTo]), X])) :-
+    ml(Flags, I = From, XFrom),
+    ml(Flags, To, XTo),
+    ml(Flags, A, X).
 
-mathml(argmin(I, _, _, A), M) -->
-    mathml(fun(under("argmin", I), A), M).
+paren(Flags, sum(_, _, _, A), P) :-
+    paren(Flags, A, P).
 
-paren(argmin(_, _, _, A), Paren) -->
-    paren(A, Paren).
+prec(Flags, sum(_, _, _, _), P) :-
+    prec(Flags, x+y, P).
 
-prec(argmin(_, _, _, _), Prec) -->
-    prec(x+y, Prec).
+ml(Flags, argmin(I, _, _, A), M) :-
+    ml(Flags, fun(under("argmin", I), A), M).
 
-mathml(argmax(I, _, _, A), M) -->
-    mathml(fun(under("argmax", I), A), M).
+paren(Flags, argmin(_, _, _, A), Paren) :-
+    paren(Flags, A, Paren).
 
-paren(argmax(_, _, _, A), Paren) -->
-    paren(A, Paren).
+prec(Flags, argmin(_, _, _, _), Prec) :-
+    prec(Flags, x+y, Prec).
 
-prec(argmax(_, _, _, _), Prec) -->
-    prec(x+y, Prec).
+ml(Flags, argmax(I, _, _, A), M) :-
+    ml(Flags, fun(under("argmax", I), A), M).
 
-mathml(under(A, B), munder([X, Y])) -->
-    mathml(A, X),
-    mathml(B, Y).
+paren(Flags, argmax(_, _, _, A), Paren) :-
+    paren(Flags, A, Paren).
 
-paren(under(A, _), Paren) -->
-    paren(A, Paren).
+prec(Flags, argmax(_, _, _, _), Prec) :-
+    prec(Flags, x+y, Prec).
 
-prec(under(A, _), Prec) -->
-    prec(A, Prec).
+ml(Flags, under(A, B), munder([X, Y])) :-
+    ml(Flags, A, X),
+    ml(Flags, B, Y).
 
-mathml(sqrt(A), msqrt(X)) -->
-    mathml(A, X).
+paren(Flags, under(A, _), Paren) :-
+    paren(Flags, A, Paren).
 
-paren(sqrt(_), 0) --> [].
+prec(Flags, under(A, _), Prec) :-
+    prec(Flags, A, Prec).
 
-prec(sqrt(_), Prec) -->
-    prec(x^y, Prec).
+ml(Flags, sqrt(A), msqrt(X)) :-
+    ml(Flags, A, X).
+
+paren(_, sqrt(_), 0).
+
+prec(Flags, sqrt(_), Prec) :-
+    prec(Flags, x^y, Prec).
 
 % t-distribution
-math(tt(T, DF), fun('P', (abs('T') >= T ; "df" = DF))) --> [].
-math(ut(T, DF), fun('P', ('T' >= T ; "df" = DF))) --> [].
-math(pt(T, DF), fun('P', ('T' =< T ; "df" = DF))) --> [].
+math(_, tt(T, DF), fun('P', (abs('T') >= T ; "df" = DF))).
+math(_, ut(T, DF), fun('P', ('T' >= T ; "df" = DF))).
+math(_, pt(T, DF), fun('P', ('T' =< T ; "df" = DF))).
 
-math(instead_of(pt(PT, DF), tt(TT, DF)), 
-    fun('P', (instead_of('T' =< PT, abs('T') >= TT) ; "df" = DF))) --> [].
+math(_, instead_of(pt(PT, DF), tt(TT, DF)),
+    fun('P', (instead_of('T' =< PT, abs('T') >= TT) ; "df" = DF))).
 
-math(instead_of(ut(UT, DF), tt(TT, DF)), 
-    fun('P', (instead_of('T' >= UT, abs('T') >= TT) ; "df" = DF))) --> [].
+math(_, instead_of(ut(UT, DF), tt(TT, DF)),
+    fun('P', (instead_of('T' >= UT, abs('T') >= TT) ; "df" = DF))).
 
-math(dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])) --> [].
-math(pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])) --> [].
-math(ubinom(K, N, P), fun('P' '_' "Bi", ['X' >= K ; (N, P)])) --> [].
-math(qbinom(Alpha, N, P), fun('Q' '_' "Bi", [Alpha ; (N, P)])) --> [].
-math(uqbinom(Alpha, N, P), fun('Q' '_' "Bi", [1 - Alpha ; (N, P)])) --> [].
+math(_, dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])).
+math(_, pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])).
+math(_, ubinom(K, N, P), fun('P' '_' "Bi", ['X' >= K ; (N, P)])).
+math(_, qbinom(Alpha, N, P), fun('Q' '_' "Bi", [Alpha ; (N, P)])).
+math(_, uqbinom(Alpha, N, P), fun('Q' '_' "Bi", [1 - Alpha ; (N, P)])).
 
 % Bit unusual terminology
-math(bernoulli(Succ, N, Pi), successes(Succ, Pi) * failures(N-Succ, Pi)) --> [].
-math(successes(Succ, Pi), Pi^Succ) --> [].
-math(failures(Fail, Pi), (1-Pi)^Fail) --> [].
+math(_, bernoulli(Succ, N, Pi), successes(Succ, Pi) * failures(N-Succ, Pi)).
+math(_, successes(Succ, Pi), Pi^Succ).
+math(_, failures(Fail, Pi), (1-Pi)^Fail).
 
 % General functions
-mathml(fun(Name, Args), mrow([N, &(af), A])) -->
-    mathml(Name, N),
-    mathml(paren(Args), A).
+ml(Flags, fun(Name, Args), mrow([N, &(af), A])) :-
+    ml(Flags, Name, N),
+    ml(Flags, paren(Args), A).
 
-paren(fun(_, Args), Paren) -->
-    paren(paren(Args), Paren).
+paren(Flags, fun(_, Args), Paren) :-
+    paren(Flags, paren(Args), Paren).
 
-prec(fun(_, _), Prec) -->
-    prec(x^y, Prec).
+prec(Flags, fun(_, _), Prec) :-
+    prec(Flags, x^y, Prec).
 
 example :- example(sqrt(2)).
 example :- example(sqrt(2)^2).
@@ -1318,3 +1284,8 @@ example :- example(dbinom(k, n, pi) =
 example :- example(pbinom(k, 'N', pi) =
                    sum(i, k, 'N', choose('N', k) * dbinom(i, 'N', k))).
 example :- example(sum(i, k, 'N', i) + sum(i, k, 'N', i)).
+
+
+
+
+
