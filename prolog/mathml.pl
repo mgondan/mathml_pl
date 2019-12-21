@@ -700,6 +700,12 @@ ml(Flags, '100%'(A), X) :-
     _100M is 100 * M,
     ml([mult(_100M) | New], A '%', X).
 
+paren(Flags, '100%'(A), P) :-
+    paren(Flags, A, P).
+
+prec(Flags, '100%'(A), P) :-
+    prec(Flags, A, P).
+
 math(_, A '_' B ^ C, subsup(A, B, C)).
 
 ml(Flags, subsup(A, B, C), msubsup([X, Y, Z])) :-
@@ -1206,38 +1212,38 @@ prec(Flags, sum(_, _, _, _), P) :-
 ml(Flags, argmin(I, _, _, A), M) :-
     ml(Flags, fun(under("argmin", I), A), M).
 
-paren(Flags, argmin(_, _, _, A), Paren) :-
-    paren(Flags, A, Paren).
+paren(Flags, argmin(_, _, _, A), P) :-
+    paren(Flags, A, P).
 
-prec(Flags, argmin(_, _, _, _), Prec) :-
-    prec(Flags, x+y, Prec).
+prec(Flags, argmin(_, _, _, _), P) :-
+    prec(Flags, x+y, P).
 
 ml(Flags, argmax(I, _, _, A), M) :-
     ml(Flags, fun(under("argmax", I), A), M).
 
-paren(Flags, argmax(_, _, _, A), Paren) :-
-    paren(Flags, A, Paren).
+paren(Flags, argmax(_, _, _, A), P) :-
+    paren(Flags, A, P).
 
-prec(Flags, argmax(_, _, _, _), Prec) :-
-    prec(Flags, x+y, Prec).
+prec(Flags, argmax(_, _, _, _), P) :-
+    prec(Flags, x+y, P).
 
 ml(Flags, under(A, B), munder([X, Y])) :-
     ml(Flags, A, X),
     ml(Flags, B, Y).
 
-paren(Flags, under(A, _), Paren) :-
-    paren(Flags, A, Paren).
+paren(Flags, under(A, _), P) :-
+    paren(Flags, A, P).
 
-prec(Flags, under(A, _), Prec) :-
-    prec(Flags, A, Prec).
+prec(Flags, under(A, _), P) :-
+    prec(Flags, A, P).
 
 ml(Flags, sqrt(A), msqrt(X)) :-
     ml(Flags, A, X).
 
 paren(_, sqrt(_), 0).
 
-prec(Flags, sqrt(_), Prec) :-
-    prec(Flags, x^y, Prec).
+prec(Flags, sqrt(_), P) :-
+    prec(Flags, x^y, P).
 
 % t-distribution
 math(_, tt(T, DF), fun('P', (abs('T') >= T ; "df" = DF))).
@@ -1266,11 +1272,11 @@ ml(Flags, fun(Name, Args), mrow([N, &(af), A])) :-
     ml(Flags, Name, N),
     ml(Flags, paren(Args), A).
 
-paren(Flags, fun(_, Args), Paren) :-
-    paren(Flags, paren(Args), Paren).
+paren(Flags, fun(_, Args), P) :-
+    paren(Flags, paren(Args), P).
 
-prec(Flags, fun(_, _), Prec) :-
-    prec(Flags, x^y, Prec).
+prec(Flags, fun(_, _), P) :-
+    prec(Flags, x^y, P).
 
 example :- example(sqrt(2)).
 example :- example(sqrt(2)^2).
