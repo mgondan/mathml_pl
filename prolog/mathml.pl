@@ -728,7 +728,7 @@ math(_, A '_' B, sub(A, B)).
 ml(Flags, sub(A, B), msub([X, Y])) :-
     prec(Flags, sub(A, B), P),
     prec(Flags, A, Inner),
-    ( P =< Inner
+    ( P < Inner
       -> ml(Flags, paren(A), X)
       ; ml(Flags, A, X)
     ), ml(Flags, B, Y).
