@@ -25,15 +25,6 @@
 :- use_module(library(http/html_write)).
 
 %
-% Hook for custom atoms
-%
-% e.g., to replace s_D by sub(s, 'D')
-%
-% atom_hook(Flags, s_D, X) :- mathml(Flags, sub(s, 'D'), X).
-%
-:- multifile atom_hook/3.
-
-%
 % Interface
 %
 mml(A) -->
@@ -85,6 +76,17 @@ paren(Flags, A, P) :-
 prec(Flags, A, P) :-
     math(Flags, A, X),
     !, prec(Flags, X, P).
+
+%
+% Hook for custom definitions
+%
+% e.g., to replace s_D by sub(s, 'D'), use ml_hook(_, s_D, sub(s, 'D')).
+%
+:- multifile ml_hook/3.
+
+math(Flags, A, M) :-
+    ml_hook(Flags, A, M),
+    !.
 
 %
 % Punctuation
@@ -185,10 +187,6 @@ is_atom(Flags, A) :-
     \+ is_identifier(Flags, A),
     \+ is_punctuation(Flags, A),
     \+ is_operator(Flags, A).
-
-atom(Flags, A, X) :-
-    atom_hook(Flags, A, M),
-    !, X = M.
 
 atom(_, A, mi(A)) :-
     atom(A).
