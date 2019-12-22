@@ -63,6 +63,21 @@ example(Flags, A) :-
 %     ml(Flags, A, M) -> html(html(math(M))) ; writeln(failed).
 
 %
+% Hook for custom definitions
+%
+% e.g., to replace s_D by sub(s, 'D'), use math_hook(_, s_D, sub(s, 'D')).
+%
+:- multifile math_hook/3.
+
+ml(Flags, A, M) :-
+    ml_hook(Flags, A, M),
+    !.
+
+math(Flags, A, M) :-
+    math_hook(Flags, A, M),
+    !.
+
+%
 % Macros (e.g., red(X) for color(red, X)
 %
 ml(Flags, A, M) :-
@@ -76,17 +91,6 @@ paren(Flags, A, P) :-
 prec(Flags, A, P) :-
     math(Flags, A, X),
     !, prec(Flags, X, P).
-
-%
-% Hook for custom definitions
-%
-% e.g., to replace s_D by sub(s, 'D'), use ml_hook(_, s_D, sub(s, 'D')).
-%
-:- multifile ml_hook/3.
-
-math(Flags, A, M) :-
-    ml_hook(Flags, A, M),
-    !.
 
 %
 % Punctuation
