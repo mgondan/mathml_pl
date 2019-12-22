@@ -67,6 +67,7 @@ example(Flags, A) :-
 %
 % e.g., to replace s_D by sub(s, 'D'), use math_hook(_, s_D, sub(s, 'D')).
 %
+:- multifile ml_hook/3.
 :- multifile math_hook/3.
 
 ml(Flags, A, M) :-
