@@ -436,6 +436,10 @@ prec(Flags, error(Err, A), P) :-
     prec([error(Err) | New], A, P).
 
 % A instead of B
+ml(Flags, instead_of(Instead, Instead, Of), M) :-
+    option(error(highlight), Flags, highlight),
+    !, ml(Flags, underbrace(Instead, ["instead of", ' ', Of]), M).
+
 ml(Flags, instead_of(A, Instead, Of), M) :-
     option(error(highlight), Flags, highlight),
     ml(Flags, underbrace(A, [Instead, ' ', "instead of", ' ', Of]), M).
