@@ -436,41 +436,41 @@ prec(Flags, error(Err, A), P) :-
     prec([error(Err) | New], A, P).
 
 % A instead of B
-ml(Flags, instead_of(A, B), M) :-
+ml(Flags, instead_of(A, Instead, Of), M) :-
     option(error(highlight), Flags, highlight),
-    ml(Flags, underbrace(A, ["instead of", ' ', B]), M).
+    ml(Flags, underbrace(A, [Instead, ' ', "instead of", ' ', Of]), M).
 
-paren(Flags, instead_of(A, _), P) :-
+paren(Flags, instead_of(A, _, _), P) :-
     option(error(highlight), Flags, highlight),
     paren(Flags, A, P).
 
-prec(Flags, instead_of(A, _), P) :-
+prec(Flags, instead_of(A, _, _), P) :-
     option(error(highlight), Flags, highlight),
     prec(Flags, A, P).
 
-ml(Flags, instead_of(A, _), M) :-
+ml(Flags, instead_of(A, _, _), M) :-
     option(error(show), Flags),
     ml(Flags, red(A), M).
 
-paren(Flags, instead_of(A, _), P) :-
+paren(Flags, instead_of(A, _, _), P) :-
     option(error(show), Flags),
     paren(Flags, A, P).
 
-prec(Flags, instead_of(A, _), P) :-
+prec(Flags, instead_of(A, _, _), P) :-
     option(error(show), Flags),
     prec(Flags, A, P).
 
-ml(Flags, instead_of(_, B), M) :-
+ml(Flags, instead_of(_, _, Of), M) :-
     option(error(fix), Flags),
-    ml(Flags, green(B), M).
+    ml(Flags, green(Of), M).
 
-paren(Flags, instead_of(_, B), P) :-
+paren(Flags, instead_of(_, _, Of), P) :-
     option(error(fix), Flags),
-    paren(Flags, B, P).
+    paren(Flags, Of, P).
 
-prec(Flags, instead_of(_, B), P) :-
+prec(Flags, instead_of(_, _, Of), P) :-
     option(error(fix), Flags),
-    prec(Flags, B, P).
+    prec(Flags, Of, P).
 
 % Left part omitted
 ml(Flags, omit_left(quote(Expr)), M) :-
@@ -628,9 +628,9 @@ prec(Flags, right_elsewhere(_, quote(Expr)), P) -->
 math(_, expert(A = B), A -> B).
 math(_, buggy(A \= B, _), A ~> B).
 
-example :- example([error(highlight)], instead_of(sigma, s)).
-example :- example([error(fix)], instead_of(sigma, s)).
-example :- example([error(show)], instead_of(sigma, s)).
+example :- example([error(highlight)], instead_of(sigma, sigma, s)).
+example :- example([error(fix)], instead_of(sigma, sigma, s)).
+example :- example([error(show)], instead_of(sigma, sigma, s)).
 
 %
 % Abbreviations
@@ -654,19 +654,20 @@ denot(Flags, denoting(Abbrev, Expr, Desc), W) :-
 
 % See compound below
 %
-% denot(Flags, instead_of(A, B), W) :-
+% denot(Flags, instead_of(A, Instead, Of), W) :-
 %     option(error(highlight), Flags, highlight),
 %     !, denot(Flags, A, X),
-%     denot(Flags, B, Y),
-%     append(X, Y, W).
+%     denot(Flags, Instead, Y),
+%     denot(Flags, Of, Z),
+%     append([X, Y, Z], W).
 
-denot(Flags, instead_of(A, _), W) :-
+denot(Flags, instead_of(A, _, _), W) :-
     option(error(show), Flags),
     !, denot(Flags, A, W).
 
-denot(Flags, instead_of(_, B), W) :-
+denot(Flags, instead_of(_, _, Of), W) :-
     option(error(fix), Flags),
-    !, denot(Flags, B, W).
+    !, denot(Flags, Of, W).
 
 denot(Flags, Comp, With) :-
     compound(Comp),
@@ -1261,11 +1262,11 @@ math(_, tt(T, DF), fun('P', (abs('T') >= T ; "df" = DF))).
 math(_, ut(T, DF), fun('P', ('T' >= T ; "df" = DF))).
 math(_, pt(T, DF), fun('P', ('T' =< T ; "df" = DF))).
 
-math(_, instead_of(pt(PT, DF), tt(TT, DF)),
-    fun('P', (instead_of('T' =< PT, abs('T') >= TT) ; "df" = DF))).
+math(_, instead_of(pt(PT, PT, DF), tt(TT, TT, DF)),
+    fun('P', (instead_of('T' =< PT, 'T' =< PT, abs('T') >= TT) ; "df" = DF))).
 
-math(_, instead_of(ut(UT, DF), tt(TT, DF)),
-    fun('P', (instead_of('T' >= UT, abs('T') >= TT) ; "df" = DF))).
+math(_, instead_of(ut(UT, UT, DF), tt(TT, TT, DF)),
+    fun('P', (instead_of('T' >= UT, 'T' >= UT, abs('T') >= TT) ; "df" = DF))).
 
 math(_, dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])).
 math(_, pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])).
