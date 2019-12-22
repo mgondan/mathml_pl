@@ -1203,6 +1203,9 @@ math(_, tratio(X, Mu, S, N), fun("paired t-test", (X, S; Mu, N))).
 math(_, tgroups_tratio(M_A, S_A, N_A, M_B, S_B, N_B, Mu),
      fun("independent t-test", (M_A, S_A, M_B, S_B; Mu, N_A, N_B))).
 
+math(_, var_pool(V_A, N_A, V_B, N_B),
+     fun(sub("Var", "pool"), (V_A, V_B; N_A, N_B))).
+
 ml(Flags, sum(I, From, To, A), mrow([munderover([\['&sum;'], XFrom, XTo]), X])) :-
     ml(Flags, I = From, XFrom),
     ml(Flags, To, XTo),
