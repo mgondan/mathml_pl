@@ -705,7 +705,8 @@ paren(Flags, '100%'(A), P) :-
 prec(Flags, '100%'(A), P) :-
     precedence(Flags, a*A, P).
 
-math(_, A '_' B ^ C, subsup(A, B, C)).
+math(_, sup(sub(A, B), C), subsup(A, B, C)).
+math(_, sub(sup(A, B), C), subsup(A, C, B)).
 
 ml(Flags, subsup(A, B, C), msubsup([X, Y, Z])) :-
     precedence(Flags, subsup(A, B, C), P),
