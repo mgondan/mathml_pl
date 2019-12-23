@@ -89,9 +89,28 @@ paren(Flags, A, P) :-
     math(Flags, A, X),
     !, paren(Flags, X, P).
 
-prec(Flags, A, P) :-
+%
+% Precedence
+%
+% Macros
+precedence(Flags, A, P) :-
     math(Flags, A, X),
-    !, prec(Flags, X, P).
+    !, precedence(Flags, X, P).
+
+% Explicit definitions
+precedence(Flags, A, P) :-
+    prec(Flags, A, X),
+    !, P = X.
+
+% Compounds definitions
+precedence(Flags, A, P) :-
+    compound(A),
+    !, compound_name_arguments(A, _, Args),
+    maplist({Flags}/[AX, PX] >> precedence(Flags, AX, PX), Args, Precs),
+    max_list(Precs, P).
+
+% Otherwise, zero
+precedence(_, _, 0).
 
 %
 % Punctuation
@@ -109,9 +128,6 @@ ml(Flags, A, M) :-
     punctuation(Flags, A, M).
 
 paren(Flags, A, 0) :-
-    is_punctuation(Flags, A).
-
-prec(Flags, A, 0) :-
     is_punctuation(Flags, A).
 
 example :- example(' ').
@@ -153,9 +169,6 @@ ml(Flags, A, M) :-
 paren(Flags, A, 0) :-
     is_operator(Flags, A).
 
-prec(Flags, A, 0) :-
-    is_operator(Flags, A).
-
 example :- example(/).
 
 %
@@ -179,9 +192,6 @@ ml(Flags, A, M) :-
 paren(Flags, A, 0) :-
     is_identifier(Flags, A).
 
-prec(Flags, A, 0) :-
-    is_identifier(Flags, A).
-
 example :- example(alpha).
 
 %
@@ -203,9 +213,6 @@ ml(Flags, A, M) :-
 paren(Flags, A, 0) :-
     is_atom(Flags, A).
 
-prec(Flags, A, 0) :-
-    is_atom(Flags, A).
-
 example :- example(k).
 
 %
@@ -222,9 +229,6 @@ ml(Flags, A, M) :-
     string(Flags, A, M).
 
 paren(Flags, A, 0) :-
-    is_string(Flags, A).
-
-prec(Flags, A, 0) :-
     is_string(Flags, A).
 
 example :- example("text").
@@ -277,8 +281,7 @@ ml(Flags, abs(A), mrow([mo('|'), X, mo('|')])) :-
 paren(Flags, abs(A), P) :-
     paren(Flags, A, P).
 
-prec(Flags, abs(A), P) :-
-    prec(Flags, parentheses(A), P).
+prec(_, abs(_), 0).
 
 example :- example(paren(x)).
 example :- example(paren(bracket(x))).
@@ -343,8 +346,8 @@ ml(Flags, color(Col, A), mstyle(mathcolor(Col), X)) :-
 paren(Flags, color(_, A), P) :-
     paren(Flags, A, P).
 
-prec(Flags, color(_, A), P) :-
-    prec(Flags, A, P).
+% prec(Flags, color(_, A), P) :-
+%     prec(Flags, A, P).
 
 %
 % Other decorations
@@ -355,8 +358,9 @@ ml(Flags, overline(A), mover(accent(true), [X, mo(&(macr))])) :-
 paren(Flags, overline(A), P) :-
     paren(Flags, A, P).
 
+% Put average(x)^2 in parentheses
 prec(Flags, overline(A), P) :-
-    prec(Flags, A, P).
+    precedence(Flags, a*A, P).
 
 % Proper average
 math(_, mean(A), overline(A)).
@@ -375,7 +379,7 @@ paren(Flags, underbrace(A, _), P) :-
     paren(Flags, A, P).
 
 prec(Flags, underbrace(A, _), P) :-
-    prec(Flags, A, P).
+    precedence(Flags, A, P).
 
 % red strike through
 math(_, cancel(A), red(strike(black(A)))).
@@ -386,9 +390,6 @@ ml(Flags, strike(A), menclose(notation(updiagonalstrike), X)) :-
 paren(Flags, strike(A), P) :-
     paren(Flags, A, P).
 
-prec(Flags, strike(A), P) :-
-    prec(Flags, A, P).
-
 % rounded box
 ml(Flags, roundedbox(A), menclose(notation(roundedbox), X)) :-
     ml(Flags, A, X).
@@ -396,18 +397,12 @@ ml(Flags, roundedbox(A), menclose(notation(roundedbox), X)) :-
 paren(Flags, roundedbox(A), P) :-
     paren(Flags, A, P).
 
-prec(Flags, roundedbox(A), P) :-
-    prec(Flags, A, P).
-
 % invisible
 ml(Flags, phantom(A), mphantom(X)) :-
     ml(Flags, A, X).
 
 paren(Flags, phantom(A), P) :-
     paren(Flags, A, P).
-
-prec(Flags, phantom(A), P) :-
-    prec(Flags, A, P).
 
 % formatting numbers
 math(_, format_tratio(A), round2(A)).
@@ -433,7 +428,7 @@ paren(Flags, error(Err, A), P) :-
 
 prec(Flags, error(Err, A), P) :-
     select_option(error(_), Flags, New),
-    prec([error(Err) | New], A, P).
+    precedence([error(Err) | New], A, P).
 
 % A instead of B
 ml(Flags, instead_of(Instead, Instead, Of), M) :-
@@ -450,7 +445,7 @@ paren(Flags, instead_of(A, _, _), P) :-
 
 prec(Flags, instead_of(A, _, _), P) :-
     option(error(highlight), Flags, highlight),
-    prec(Flags, A, P).
+    precedence(Flags, A, P).
 
 ml(Flags, instead_of(A, _, _), M) :-
     option(error(show), Flags),
@@ -462,7 +457,7 @@ paren(Flags, instead_of(A, _, _), P) :-
 
 prec(Flags, instead_of(A, _, _), P) :-
     option(error(show), Flags),
-    prec(Flags, A, P).
+    precedence(Flags, A, P).
 
 ml(Flags, instead_of(_, _, Of), M) :-
     option(error(fix), Flags),
@@ -474,7 +469,7 @@ paren(Flags, instead_of(_, _, Of), P) :-
 
 prec(Flags, instead_of(_, _, Of), P) :-
     option(error(fix), Flags),
-    prec(Flags, Of, P).
+    precedence(Flags, Of, P).
 
 % Left part omitted
 ml(Flags, omit_left(quote(Expr)), M) :-
@@ -498,9 +493,6 @@ ml(Flags, omit_left(quote(Expr)), M) :-
 paren(Flags, omit_left(quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
-prec(Flags, omit_left(quote(Expr)), P) :-
-    prec(Flags, Expr, P).
-
 ml(Flags, omit_right(quote(Expr)), M) :-
     option(error(highlight), Flags, highlight),
     compound(Expr),
@@ -521,9 +513,6 @@ ml(Flags, omit_right(quote(Expr)), M) :-
 
 paren(Flags, omit_right(quote(Expr)), P) :-
     paren(Flags, Expr, P).
-
-prec(Flags, omit_right(quote(Expr)), P) :-
-    prec(Flags, Expr, P).
 
 ml(Flags, left_landed(Color, quote(Expr)), M) :-
     option(error(highlight), Flags, highlight),
@@ -548,8 +537,8 @@ ml(Flags, left_landed(_Color, quote(Expr)), M) :-
 paren(Flags, left_landed(_, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
-prec(Flags, left_landed(_, quote(Expr)), P) :-
-    prec(Flags, Expr, P).
+% prec(Flags, left_landed(_, quote(Expr)), P) :-
+%     precedence(Flags, Expr, P).
 
 ml(Flags, right_landed(Color, quote(Expr)), M) :-
     option(error(highlight), Flags, highlight),
@@ -574,8 +563,8 @@ ml(Flags, right_landed(_Color, quote(Expr)), M) :-
 paren(Flags, right_landed(_, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
-prec(Flags, right_landed(_, quote(Expr)), P) :-
-    prec(Flags, Expr, P).
+% prec(Flags, right_landed(_, quote(Expr)), P) :-
+%     precedence(Flags, Expr, P).
 
 ml(Flags, left_elsewhere(Color, quote(Expr)), M) :-
     option(error(highlight), Flags, highlight),
@@ -600,8 +589,8 @@ ml(Flags, left_elsewhere(Color, quote(Expr)), M) :-
 paren(Flags, left_elsewhere(_, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
-prec(Flags, left_elsewhere(_, quote(Expr)), P) :-
-    prec(Flags, Expr, P).
+% prec(Flags, left_elsewhere(_, quote(Expr)), P) :-
+%     precedence(Flags, Expr, P).
 
 ml(Flags, right_elsewhere(Color, quote(Expr)), M) :-
     option(error(highlight), Flags, highlight),
@@ -626,8 +615,8 @@ ml(Flags, right_elsewhere(Color, quote(Expr)), M) :-
 paren(Flags, right_elsewhere(_, quote(Expr)), P) :-
         paren(Flags, Expr, P).
 
-prec(Flags, right_elsewhere(_, quote(Expr)), P) -->
-        prec(Flags, Expr, P).
+% prec(Flags, right_elsewhere(_, quote(Expr)), P) -->
+%         precedence(Flags, Expr, P).
 
 math(_, expert(A = B), A -> B).
 math(_, buggy(A \= B, _), A ~> B).
@@ -714,13 +703,13 @@ paren(Flags, '100%'(A), P) :-
     paren(Flags, A, P).
 
 prec(Flags, '100%'(A), P) :-
-    prec(Flags, A, P).
+    precedence(Flags, a*A, P).
 
 math(_, A '_' B ^ C, subsup(A, B, C)).
 
 ml(Flags, subsup(A, B, C), msubsup([X, Y, Z])) :-
-    prec(Flags, subsup(A, B, C), P),
-    prec(Flags, A, Inner),
+    precedence(Flags, subsup(A, B, C), P),
+    precedence(Flags, A, Inner),
     ( P =< Inner
       -> ml(Flags, paren(A), X)
       ; ml(Flags, A, X)
@@ -731,13 +720,13 @@ paren(Flags, subsup(A, _, _), P) :-
     paren(Flags, A, P).
 
 prec(Flags, subsup(X, _, Z), P) :-
-    prec(Flags, X^Z, P).
+    precedence(Flags, X^Z, P).
 
 math(_, A '_' B, sub(A, B)).
 
 ml(Flags, sub(A, B), msub([X, Y])) :-
-    prec(Flags, sub(A, B), P),
-    prec(Flags, A, Inner),
+    precedence(Flags, sub(A, B), P),
+    precedence(Flags, A, Inner),
     ( P < Inner
       -> ml(Flags, paren(A), X)
       ; ml(Flags, A, X)
@@ -747,21 +736,21 @@ paren(Flags, sub(A, _), P) :-
     paren(Flags, A, P).
 
 prec(Flags, sub(A, _), P) :-
-    prec(Flags, A, P).
+    precedence(Flags, A, P).
 
 math(_, A^B, sup(A, B)).
 
 % experimental: sin^2 x for "simple" x
 ml(Flags, sup(Sin, X), M) :-
-    prec(Flags, Sin, P),
-    prec(Flags, sin(x), P),
+    precedence(Flags, Sin, P),
+    precedence(Flags, sin(x), P),
     paren(Flags, X, 0),
-    prec(Flags, X, 0),
+    precedence(Flags, X, 0),
     !, ml([replace(Sin^X, Sin)], Sin, M).
 
 ml(Flags, sup(A, B), msup([X, Y])) :-
-    prec(Flags, sup(A, B), P),
-    prec(Flags, A, Inner),
+    precedence(Flags, sup(A, B), P),
+    precedence(Flags, A, Inner),
     ( P =< Inner
       -> ml(Flags, paren(A), X)
       ; ml(Flags, A, X)
@@ -781,7 +770,7 @@ math(Flags, A * B, M) :-
 
 % Negative sign has same precedence as binary minus
 math(Flags, -A, operator(P, fx, -, A)) :-
-    prec(Flags, a-b, P).
+    precedence(Flags, a-b, P).
 
 % Prefix and postfix operators (e.g., factorial)
 math(_, Comp, operator(Prec, Fix, Op, A)) :-
@@ -791,28 +780,28 @@ math(_, Comp, operator(Prec, Fix, Op, A)) :-
     member(Fix, [xf, yf, fx, fy]).
 
 ml(Flags, operator(P, fx, Op, A), mrow([F, X])) :-
-    prec(Flags, A, Inner),
+    precedence(Flags, A, Inner),
     ( P =< Inner
       -> ml(Flags, paren(A), X)
       ; ml(Flags, A, X)
     ), ml(Flags, Op, F).
 
 ml(Flags, operator(P, fy, Op, A), mrow([F, Y])) :-
-    prec(Flags, A, Inner),
+    precedence(Flags, A, Inner),
     ( P < Inner
       -> ml(Flags, paren(A), Y)
       ; ml(Flags, A, Y)
     ), ml(Flags, Op, F).
 
 ml(Flags, operator(P, xf, Op, A), mrow([X, F])) :-
-    prec(Flags, A, Inner),
+    precedence(Flags, A, Inner),
     ( P =< Inner
       -> ml(Flags, paren(A), X)
       ; ml(Flags, A, X)
     ), ml(Flags, Op, F).
 
 ml(Flags, operator(P, yf, Op, A), mrow([Y, F])) :-
-    prec(Flags, A, Inner),
+    precedence(Flags, A, Inner),
     ( P < Inner
       -> ml(Flags, paren(A), Y)
       ; ml(Flags, A, Y)
@@ -821,7 +810,7 @@ ml(Flags, operator(P, yf, Op, A), mrow([Y, F])) :-
 paren(Flags, operator(Prec, Fix, _, A), Paren) :-
     member(Fix, [xf, fx]),
     paren(Flags, A, P),
-    prec(Flags, A, Inner),
+    precedence(Flags, A, Inner),
     ( Prec =< Inner
       -> Paren is P + 1
       ; Paren = P
@@ -830,7 +819,7 @@ paren(Flags, operator(Prec, Fix, _, A), Paren) :-
 paren(Flags, operator(Prec, Fix, _, A), Paren) :-
     member(Fix, [yf, fy]),
     paren(Flags, A, P),
-    prec(Flags, A, Inner),
+    precedence(Flags, A, Inner),
     ( Prec < Inner
       -> Paren is P + 1
       ; Paren = P
@@ -845,33 +834,33 @@ math(_, Comp, operator(Prec, Fix, Op, A, B)) :-
     member(Fix, [xfx, yfx, xfy]).
 
 ml(Flags, operator(P, xfx, Op, A, B), mrow([X, F, Y])) :-
-    prec(Flags, A, PrecA),
+    precedence(Flags, A, PrecA),
     ( P =< PrecA
       -> ml(Flags, paren(A), X)
       ; ml(Flags, A, X)
-    ), prec(Flags, B, PrecB),
+    ), precedence(Flags, B, PrecB),
     ( P =< PrecB
       -> ml(Flags, paren(B), Y)
       ; ml(Flags, B, Y)
     ), ml(Flags, Op, F).
 
 ml(Flags, operator(P, xfy, Op, A, B), mrow([X, F, Y])) :-
-    prec(Flags, A, PrecA),
+    precedence(Flags, A, PrecA),
     ( P =< PrecA
       -> ml(Flags, paren(A), X)
       ; ml(Flags, A, X)
-    ), prec(Flags, B, PrecB),
+    ), precedence(Flags, B, PrecB),
     ( P < PrecB
       -> ml(Flags, paren(B), Y)
       ; ml(Flags, B, Y)
     ), ml(Flags, Op, F).
 
 ml(Flags, operator(P, yfx, Op, A, B), mrow([Y, F, X])) :-
-    prec(Flags, A, PrecA),
+    precedence(Flags, A, PrecA),
     ( P < PrecA
       -> ml(Flags, paren(A), Y)
       ; ml(Flags, A, Y)
-    ), prec(Flags, B, PrecB),
+    ), precedence(Flags, B, PrecB),
     ( P =< PrecB
       -> ml(Flags, paren(B), X)
       ; ml(Flags, B, X)
@@ -879,12 +868,12 @@ ml(Flags, operator(P, yfx, Op, A, B), mrow([Y, F, X])) :-
 
 paren(Flags, operator(Prec, xfx, _, A, B), P) :-
     paren(Flags, A, PA),
-    prec(Flags, A, PrecA),
+    precedence(Flags, A, PrecA),
     ( Prec =< PrecA
       -> ParenA is PA + 1
       ; ParenA = PA
     ), paren(Flags, B, PB),
-    prec(Flags, B, PrecB),
+    precedence(Flags, B, PrecB),
     ( Prec =< PrecB
       -> ParenB is PB + 1
       ; ParenB = PB
@@ -892,12 +881,12 @@ paren(Flags, operator(Prec, xfx, _, A, B), P) :-
 
 paren(Flags, operator(Prec, yfx, _, A, B), P) :-
     paren(Flags, A, PA),
-    prec(Flags, A, PrecA),
+    precedence(Flags, A, PrecA),
     ( Prec < PrecA
       -> ParenA is PA + 1
       ; ParenA = PA
     ), paren(Flags, B, PB),
-    prec(Flags, B, PrecB),
+    precedence(Flags, B, PrecB),
     ( Prec =< PrecB
       -> ParenB is PB + 1
       ; ParenB = PB
@@ -905,12 +894,12 @@ paren(Flags, operator(Prec, yfx, _, A, B), P) :-
 
 paren(Flags, operator(Prec, xfy, _, A, B), P) :-
     paren(Flags, A, PA),
-    prec(Flags, A, PrecA),
+    precedence(Flags, A, PrecA),
     ( Prec =< PrecA
       -> ParenA is PA + 1
       ; ParenA = PA
     ), paren(Flags, B, PB),
-    prec(Flags, B, PrecB),
+    precedence(Flags, B, PrecB),
     ( Prec < PrecB
       -> ParenB is PB + 1
       ; ParenB = PB
@@ -985,9 +974,6 @@ ml(Flags, A, M) :-
 paren(Flags, A, 0) :-
     is_positive(Flags, A).
 
-prec(Flags, A, 0) :-
-    is_positive(Flags, A).
-
 is_negative(Flags, A) :-
     negative(Flags, A, _).
 
@@ -1011,7 +997,7 @@ paren(Flags, A, 0) :-
 
 prec(Flags, A, P) :-
     is_negative(Flags, A),
-    prec(Flags, -A, P).
+    precedence(Flags, -A, P).
 
 % Force rendering string as number
 ml(_, number(A), M) :-
@@ -1032,7 +1018,7 @@ paren(Flags, number(A), P) :-
 
 prec(Flags, number(A), P) :-
     term_string(T, A),
-    prec(Flags, T, P).
+    precedence(Flags, T, P).
 
 ml(Flags, round(A), M) :-
     ml([round(g) | Flags], A, M).
@@ -1040,17 +1026,11 @@ ml(Flags, round(A), M) :-
 paren(Flags, round(A), P) :-
     paren(Flags, A, P).
 
-prec(Flags, round(A), P) :-
-    prec(Flags, A, P).
-
 ml(Flags, round0(A), M) :-
     ml([round(0) | Flags], A, M).
 
 paren(Flags, round0(A), P) :-
     paren(Flags, A, P).
-
-prec(Flags, round0(A), P) :-
-    prec(Flags, A, P).
 
 ml(Flags, round1(A), M) :-
     ml([round(1) | Flags], A, M).
@@ -1058,26 +1038,17 @@ ml(Flags, round1(A), M) :-
 paren(Flags, round1(A), P) :-
     paren(Flags, A, P).
 
-prec(Flags, round1(A), P) :-
-    prec(Flags, A, P).
-
 ml(Flags, round2(A), M) :-
     ml([round(2) | Flags], A, M).
 
 paren(Flags, round2(A), P) :-
     paren(Flags, A, P).
 
-prec(Flags, round2(A), P) :-
-    prec(Flags, A, P).
-
 ml(Flags, round3(A), M) :-
     ml([round(3) | Flags], A, M).
 
 paren(Flags, round3(A), P) :-
     paren(Flags, A, P).
-
-prec(Flags, round3(A), P) :-
-    prec(Flags, A, P).
 
 example :- example(5^2).
 example :- example((-5)^(-2)).
@@ -1122,7 +1093,7 @@ ml(Flags, frac(A, B), mfrac([X, Y])) :-
 paren(_, frac(_, _), 0).
 
 prec(Flags, frac(A, B), P) :-
-    prec(Flags, A/B, P).
+    precedence(Flags, A/B, P).
 
 % Large fraction
 ml(Flags, dfrac(A, B), mstyle(displaystyle(true), X)) :-
@@ -1132,7 +1103,7 @@ paren(Flags, dfrac(A, B), P) :-
     paren(Flags, frac(A, B), P).
 
 prec(Flags, dfrac(A, B), P) :-
-    prec(Flags, frac(A, B), P).
+    precedence(Flags, frac(A, B), P).
 
 ml(Flags, choose(A, B),
         mrow([mo('('), mfrac(linethickness(0), [X, Y]), mo(')')])) :-
@@ -1142,7 +1113,7 @@ ml(Flags, choose(A, B),
 paren(_, choose(_, _), 1).
 
 prec(Flags, choose(A, B), P) :-
-    prec(Flags, A^B, P).
+    precedence(Flags, A^B, P).
 
 ml(Flags, dchoose(A, B),
        mrow([mo('('), mfrac(mstyle([displaystyle(true), linethickness(0)]),
@@ -1154,7 +1125,7 @@ paren(Flags, dchoose(A, B), P) :-
     paren(Flags, choose(A, B), P).
 
 prec(Flags, dchoose(A, B), P) :-
-    prec(Flags, choose(A, B), P).
+    precedence(Flags, choose(A, B), P).
 
 example :- example(frac(1.5, 2)^2).
 example :- example(frac(small, small) = dfrac(large, large)).
@@ -1168,7 +1139,7 @@ math(_, tan(A), trig(tan, A)).
 
 ml(Flags, trig(Fun, Arg), M) :-
     paren(Flags, Arg, 0),
-    prec(Flags, Arg, 0),
+    precedence(Flags, Arg, 0),
     !, ( select_option(replace(Sin^N, Sin), Flags, New)
       -> ml(New, Fun^N, F)
       ; ml(Flags, Fun, F)
@@ -1182,7 +1153,7 @@ ml(Flags, trig(Fun, Arg), mrow([F, mo(&(af)), X])) :-
     ), ml(Flags, paren(Arg), X).
 
 paren(Flags, trig(_, Arg), P) :-
-    prec(Flags, Arg, 0),
+    precedence(Flags, Arg, 0),
     !, paren(Flags, Arg, P).
 
 paren(Flags, trig(_, Arg), P) :-
@@ -1190,7 +1161,7 @@ paren(Flags, trig(_, Arg), P) :-
     P is Paren + 1.
 
 prec(Flags, trig(Fun, Arg), P) :-
-    prec(Flags, Fun*Arg, Prec),
+    precedence(Flags, Fun*Arg, Prec),
     P is Prec - 1.
 
 example :- example(sin(pi)).
@@ -1223,7 +1194,7 @@ paren(Flags, sum(_, _, _, A), P) :-
     paren(Flags, A, P).
 
 prec(Flags, sum(_, _, _, _), P) :-
-    prec(Flags, x+y, P).
+    precedence(Flags, x + y, P).
 
 ml(Flags, argmin(I, _, _, A), M) :-
     ml(Flags, fun(under("argmin", I), A), M).
@@ -1232,7 +1203,7 @@ paren(Flags, argmin(_, _, _, A), P) :-
     paren(Flags, A, P).
 
 prec(Flags, argmin(_, _, _, _), P) :-
-    prec(Flags, x+y, P).
+    precedence(Flags, x + y, P).
 
 ml(Flags, argmax(I, _, _, A), M) :-
     ml(Flags, fun(under("argmax", I), A), M).
@@ -1241,7 +1212,7 @@ paren(Flags, argmax(_, _, _, A), P) :-
     paren(Flags, A, P).
 
 prec(Flags, argmax(_, _, _, _), P) :-
-    prec(Flags, x+y, P).
+    precedence(Flags, x + y, P).
 
 ml(Flags, under(A, B), munder([X, Y])) :-
     ml(Flags, A, X),
@@ -1251,7 +1222,7 @@ paren(Flags, under(A, _), P) :-
     paren(Flags, A, P).
 
 prec(Flags, under(A, _), P) :-
-    prec(Flags, A, P).
+    precedence(Flags, A, P).
 
 ml(Flags, sqrt(A), msqrt(X)) :-
     ml(Flags, A, X).
@@ -1259,7 +1230,7 @@ ml(Flags, sqrt(A), msqrt(X)) :-
 paren(_, sqrt(_), 0).
 
 prec(Flags, sqrt(_), P) :-
-    prec(Flags, x^y, P).
+    precedence(Flags, x^y, P).
 
 % t-distribution
 math(_, tt(T, DF), fun('P', (abs('T') >= T ; "df" = DF))).
@@ -1292,7 +1263,7 @@ paren(Flags, fun(_, Args), P) :-
     paren(Flags, paren(Args), P).
 
 prec(Flags, fun(_, _), P) :-
-    prec(Flags, x^y, P).
+    precedence(Flags, x^y, P).
 
 example :- example(sqrt(2)).
 example :- example(sqrt(2)^2).
