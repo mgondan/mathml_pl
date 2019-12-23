@@ -705,15 +705,15 @@ math(_, sup(sub(A, B), C), Subsup) :-
     !, Subsup = subsup(A, B, C).
 
 % Unclear if math works both ways
-math(_, sup(Sub, C), subsup(A, B, C)) :-
-    math(Sub, sub(A, B)).
+math(Flags, sup(Sub, C), subsup(A, B, C)) :-
+    math(Flags, Sub, sub(A, B)).
     
 math(_, sub(sup(A, B), C), Subsup) :-
     !, Subsup = subsup(A, C, B).
 
 % Unclear if math works both ways
-math(_, sub(Sup, C), subsup(A, C, B)) :-
-    math(Sup, sup(A, B)).
+math(Flags, sub(Sup, C), subsup(A, C, B)) :-
+    math(Flags, Sup, sup(A, B)).
     
 ml(Flags, subsup(A, B, C), msubsup([X, Y, Z])) :-
     precedence(Flags, subsup(A, B, C), P),
