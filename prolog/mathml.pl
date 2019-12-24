@@ -346,8 +346,8 @@ ml(Flags, color(Col, A), mstyle(mathcolor(Col), X)) :-
 paren(Flags, color(_, A), P) :-
     paren(Flags, A, P).
 
-% prec(Flags, color(_, A), P) :-
-%     prec(Flags, A, P).
+prec(Flags, color(_, A), P) :-
+    precedence(Flags, A, P).
 
 %
 % Other decorations
@@ -701,19 +701,43 @@ paren(Flags, '100%'(A), P) :-
 prec(Flags, '100%'(A), atomic-P) :-
     precedence(Flags, a*A, _-P).
 
-math(_, sup(sub(A, B), C), Subsup) :-
-    !, Subsup = subsup(A, B, C).
-
+%math(_, sup(sub(A, B), C), Subsup) :-
+%    !, Subsup = subsup(A, B, C).
+%
 % Unclear if math works both ways
-math(Flags, sup(Sub, C), subsup(A, B, C)) :-
-    math(Flags, Sub, sub(A, B)).
-
-math(_, sub(sup(A, B), C), Subsup) :-
-    !, Subsup = subsup(A, C, B).
-
+% math(Flags, sup(Sub, C), subsup(A, B, C)) :-
+%     math(Flags, Sub, sub(A, B)).
+%
+%math(_, sub(sup(A, B), C), Subsup) :-
+%    !, Subsup = subsup(A, C, B).
+%
 % Unclear if math works both ways
-math(Flags, sub(Sup, C), subsup(A, C, B)) :-
-    math(Flags, Sup, sup(A, B)).
+%math(Flags, sub(Sup, C), subsup(A, C, B)) :-
+%    math(Flags, Sup, sup(A, B)).
+
+ml(Flags, sup(Sub, C), M) :-
+    precedence(Flags, Sub, sub-_),
+    !, ml([replace(sub(A, B), subsup(A, B, C)) | Flags], Sub, M).
+
+paren(Flags, sup(Sub, C), P) :-
+    precedence(Flags, Sub, sub-_),
+    !, paren([replace(sub(A, B), subsup(A, B, C)) | Flags], Sub, P).
+
+prec(Flags, sup(Sub, C), P) :-
+    precedence(Flags, Sub, sub-_),
+    !, precedence([replace(sub(A, B), subsup(A, B, C)) | Flags], Sub, P).
+
+ml(Flags, sub(Sup, C), M) :-
+    precedence(Flags, Sup, sup-_),
+    !, ml([replace(sup(A, B), subsup(A, C, B)) | Flags], Sup, M).
+
+paren(Flags, sub(Sup, C), P) :-
+    precedence(Flags, Sup, sup-_),
+    !, paren([replace(sup(A, B), subsup(A, C, B)) | Flags], Sup, P).
+
+prec(Flags, sub(Sup, C), P) :-
+    precedence(Flags, Sup, sup-_),
+    !, precedence([replace(sup(A, B), subsup(A, C, B)) | Flags], Sup, P).
 
 ml(Flags, subsup(A, B, C), msubsup([X, Y, Z])) :-
     precedence(Flags, subsup(A, B, C), _-P),
@@ -731,6 +755,18 @@ prec(Flags, subsup(X, _, Z), P) :-
     precedence(Flags, X^Z, P).
 
 math(_, A '_' B, sub(A, B)).
+
+ml(Flags, sub(A, B), M) :-
+    select_option(replace(sub(A, B), subsup(A, B, C)), Flags, New),
+    !, ml(New, subsup(A, B, C), M).
+
+paren(Flags, sub(A, B), P) :-
+    select_option(replace(sub(A, B), subsup(A, B, C)), Flags, New),
+    !, paren(New, subsup(A, B, C), P).
+
+prec(Flags, sub(A, B), P) :-
+    select_option(replace(sub(A, B), subsup(A, B, C)), Flags, New),
+    !, precedence(New, subsup(A, B, C), P).
 
 ml(Flags, sub(A, B), msub([X, Y])) :-
     precedence(Flags, sub(A, B), _-P),
@@ -750,11 +786,22 @@ math(_, A^B, sup(A, B)).
 
 % experimental: sin^2 x for "simple" x
 ml(Flags, sup(Sin, X), M) :-
-    precedence(Flags, Sin, P),
-    precedence(Flags, sin(x), P),
+    precedence(Flags, Sin, trig-_),
     paren(Flags, X, 0),
     precedence(Flags, X, _-0),
     !, ml([replace(Sin^X, Sin)], Sin, M).
+
+ml(Flags, sup(A, B), M) :-
+    select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
+    !, ml(New, subsup(A, C, B), M).
+
+paren(Flags, sup(A, B), P) :-
+    select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
+    !, paren(New, subsup(A, C, B), P).
+
+prec(Flags, sup(A, B), P) :-
+    select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
+    !, precedence(New, subsup(A, C, B), P).
 
 ml(Flags, sup(A, B), msup([X, Y])) :-
     precedence(Flags, sup(A, B), _-P),
