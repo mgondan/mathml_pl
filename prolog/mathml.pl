@@ -414,87 +414,85 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 %
 % Mistakes
 %
-ml(Flags, highlight(Err, A), M) :-
-    ml([highlight(Err) | Flags], A, M).
+ml(Flags, error(Err, Mode, A), M) :-
+    C =.. [Err, Mode],
+    ml([C | Flags], A, M).
 
-ml(Flags, show(Err, A), M) :-
-    ml([show(Err) | Flags], A, M).
+paren(Flags, error(Err, Mode, A), P) :-
+    C =.. [Err, Mode],
+    paren([C | Flags], A, P).
 
-ml(Flags, fix(Err, A), M) :-
-    ml([fix(Err) | Flags], A, M).
-
-paren(Flags, highlight(Err, A), P) :-
-    paren([highlight(Err) | Flags], A, P).
-
-paren(Flags, show(Err, A), P) :-
-    paren([show(Err) | Flags], A, P).
-
-paren(Flags, fix(Err, A), P) :-
-    paren([fix(Err) | Flags], A, P).
-
-prec(Flags, highlight(Err, A), P) :-
-    precedence([highlight(Err) | Flags], A, P).
-
-prec(Flags, show(Err, A), P) :-
-    precedence([show(Err) | Flags], A, P).
-
-prec(Flags, fix(Err, A), P) :-
-    precedence([fix(Err) | Flags], A, P).
+prec(Flags, error(Err, Mode, A), P) :-
+    C =.. [Err, Mode],
+    precedence([C | Flags], A, P).
 
 % A instead of B
 ml(Flags, instead_of(Err, Instead, Instead, Of), M) :-
-    member(highlight(Err), Flags),
+    C =.. [Err, highlight],
+    option(C, Flags),
     !, ml(Flags, underbrace(Instead, ["instead of", ' ', Of]), M).
 
 ml(Flags, instead_of(Err, A, Instead, Of), M) :-
-    member(highlight(Err), Flags),
+    C =.. [Err, highlight],
+    option(C, Flags),
     ml(Flags, underbrace(A, [Instead, ' ', "instead of", ' ', Of]), M).
 
 paren(Flags, instead_of(Err, A, _, _), P) :-
-    member(highlight(Err), Flags),
+    C =.. [Err, highlight],
+    option(C, Flags),
     paren(Flags, A, P).
 
 prec(Flags, instead_of(Err, A, _, _), P) :-
-    member(highlight(Err), Flags),
+    C =.. [Err, highlight],
+    option(C, Flags),
     precedence(Flags, A, P).
 
 ml(Flags, instead_of(Err, A, _, _), M) :-
-    member(show(Err), Flags),
+    C =.. [Err, show],
+    option(C, Flags),
     ml(Flags, red(A), M).
 
 paren(Flags, instead_of(Err, A, _, _), P) :-
-    member(show(Err), Flags),
+    C =.. [Err, show],
+    option(C, Flags),
     paren(Flags, A, P).
 
 prec(Flags, instead_of(Err, A, _, _), P) :-
-    member(show(Err), Flags),
+    C =.. [Err, show],
+    option(C, Flags),
     precedence(Flags, A, P).
 
 ml(Flags, instead_of(Err, _, _, Of), M) :-
-    member(fix(Err), Flags),
+    C =.. [Err, fix],
+    option(C, Flags, fix),
     ml(Flags, green(Of), M).
 
 paren(Flags, instead_of(Err, _, _, Of), P) :-
-    member(fix(Err), Flags),
+    C =.. [Err, fix],
+    option(C, Flags, fix),
     paren(Flags, Of, P).
 
 prec(Flags, instead_of(Err, _, _, Of), P) :-
-    member(fix(Err), Flags),
+    C =.. [Err, fix],
+    option(C, Flags, fix),
     precedence(Flags, Of, P).
 
 % Left part omitted
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
-    member(highlight(Err), Flags),
+    C =.. [Err, highlight],
+    option(C, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [underbrace([L, Op], "omitted"), R], M).
 
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
-    member(show(Err), Flags),
+    C =.. [Err, show],
+    option(C, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [cancel([L, Op]), R], M).
 
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
-    member(fix(Err), Flags),
+    C =.. [Err, fix],
+    option(C, Flags, fix),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [green([L, Op]), R], M).
 
@@ -502,17 +500,20 @@ paren(Flags, omit_left(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
-    member(highlight(Err), Flags),
+    C =.. [Err, highlight],
+    option(C, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [L, underbrace([Op, R], "omitted")], M).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
-    member(show(Err), Flags),
+    C =.. [Err, show],
+    option(C, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [L, cancel([Op, R])], M).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
-    member(fix(Err), Flags),
+    C =.. [Err, fix],
+    option(C, Flags, fix),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [L, green([Op, R])], M).
 
@@ -520,19 +521,22 @@ paren(Flags, omit_right(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
 ml(Flags, left_landed(Err, Color, quote(Expr)), M) :-
-    member(highlight(Err), Flags),
+    C =.. [Err, highlight],
+    option(C, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Color, C, _),
     ml(Flags, [color(C, roundedbox(black([L, Op]))), R], M).
 
 ml(Flags, left_landed(Err, Color, quote(Expr)), M) :-
-    member(show(Err), Flags),
+    C =.. [Err, show],
+    option(C, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Color, C, _),
     ml(Flags, [color(C, roundedbox(black([L, Op]))), R], M).
 
 ml(Flags, left_landed(Err, _Color, quote(Expr)), M) :-
-    member(fix(Err), Flags),
+    C =.. [Err, fix],
+    option(C, Flags, fix),
     compound_name_arguments(Expr, _, [_, R]),
     ml(Flags, R, M).
 
@@ -540,19 +544,22 @@ paren(Flags, left_landed(_Err, _, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
 ml(Flags, right_landed(Err, Color, quote(Expr)), M) :-
-    member(highlight(Err), Flags),
+    C =.. [Err, highlight],
+    option(C, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Color, C, _),
     ml(Flags, [L, color(C, roundedbox(black([Op, R])))], M).
 
 ml(Flags, right_landed(Err, Color, quote(Expr)), M) :-
-    member(show(Err), Flags),
+    C =.. [Err, show],
+    option(C, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Color, C, _),
     ml(Flags, [L, color(C, roundedbox(black([Op, R])))], M).
 
 ml(Flags, right_landed(Err, _Color, quote(Expr)), M) :-
-    member(fix(Err), Flags),
+    C =.. [Err, fix],
+    option(C, Flags, fix),
     compound_name_arguments(Expr, _Op, [L, _R]),
     ml(Flags, L, M).
 
@@ -560,18 +567,21 @@ paren(Flags, right_landed(_Err, _, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
 ml(Flags, left_elsewhere(Err, Color, quote(Expr)), M) :-
-    member(highlight(Err), Flags),
+    C =.. [Err, highlight],
+    option(C, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Color, _, C),
     ml(Flags, [color(C, roundedbox(phantom([L, Op]))), R], M).
 
 ml(Flags, left_elsewhere(Err, _Color, quote(Expr)), M) :-
-    member(show(Err), Flags),
+    C =.. [Err, show],
+    option(C, Flags),
     compound_name_arguments(Expr, _Op, [_L, R]),
     ml(Flags, R, M).
 
 ml(Flags, left_elsewhere(Err, Color, quote(Expr)), M) :-
-    member(fix(Err), Flags),
+    C =.. [Err, fix],
+    option(C, Flags, fix),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Color, C, _),
     ml(Flags, [color(C, [L, Op]), R], M).
@@ -580,18 +590,21 @@ paren(Flags, left_elsewhere(_Err, _, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
 ml(Flags, right_elsewhere(Err, Color, quote(Expr)), M) :-
-    member(highlight(Err), Flags),
+    C =.. [Err, highlight],
+    option(C, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Color, _, C),
     ml(Flags, [L, color(C, roundedbox(phantom([Op, R])))], M).
 
 ml(Flags, right_elsewhere(Err, _Color, quote(Expr)), M) :-
-    member(show(Err), Flags),
+    C =.. [Err, show],
+    option(C, Flags),
     compound_name_arguments(Expr, _Op, [L, _R]),
     ml(Flags, L, M).
 
 ml(Flags, right_elsewhere(Err, Color, quote(Expr)), M) :-
-    member(fix(Err), Flags),
+    C =.. [Err, fix],
+    option(C, Flags, fix),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Color, C, _),
     ml(Flags, [L, color(C, [Op, R])], M).
@@ -602,9 +615,9 @@ paren(Flags, right_elsewhere(_Err, _, quote(Expr)), P) :-
 math(_, expert(A = B), A -> B).
 math(_, buggy(A \= B, _), A ~> B).
 
-example :- example([highlight(err1)], instead_of(err1, sigma, sigma, s)).
-example :- example([fix(err1)], instead_of(err1, sigma, sigma, s)).
-example :- example([show(err1)], instead_of(err1, sigma, sigma, s)).
+example :- example([err1(highlight)], instead_of(err1, sigma, sigma, s)).
+example :- example([err1(fix)], instead_of(err1, sigma, sigma, s)).
+example :- example([err1(show)], instead_of(err1, sigma, sigma, s)).
 
 %
 % Abbreviations
@@ -636,11 +649,13 @@ denot(Flags, denoting(Abbrev, Expr, Desc), W) :-
 %     append([X, Y, Z], W).
 
 denot(Flags, instead_of(Err, A, _, _), W) :-
-    member(show(Err), Flags),
+    C =.. [Err, show],
+    option(C, Flags),
     !, denot(Flags, A, W).
 
 denot(Flags, instead_of(Err, _, _, Of), W) :-
-    member(fix(Err), Flags),
+    C =.. [Err, fix],
+    option(C, Flags, fix),
     !, denot(Flags, Of, W).
 
 denot(Flags, Comp, With) :-
