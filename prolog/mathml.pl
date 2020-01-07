@@ -415,31 +415,31 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 % Mistakes
 %
 ml(Flags, highlight(Err, A), M) :-
-    ml([highlight(Err) | New], A, M).
+    ml([highlight(Err) | Flags], A, M).
 
 ml(Flags, show(Err, A), M) :-
-    ml([show(Err) | New], A, M).
+    ml([show(Err) | Flags], A, M).
 
 ml(Flags, fix(Err, A), M) :-
-    ml([fix(Err) | New], A, M).
+    ml([fix(Err) | Flags], A, M).
 
 paren(Flags, highlight(Err, A), P) :-
-    paren([highlight(Err) | New], A, P).
+    paren([highlight(Err) | Flags], A, P).
 
 paren(Flags, show(Err, A), P) :-
-    paren([show(Err) | New], A, P).
+    paren([show(Err) | Flags], A, P).
 
 paren(Flags, fix(Err, A), P) :-
-    paren([fix(Err) | New], A, P).
+    paren([fix(Err) | Flags], A, P).
 
 prec(Flags, highlight(Err, A), P) :-
-    precedence([highlight(Err) | New], A, P).
+    precedence([highlight(Err) | Flags], A, P).
 
 prec(Flags, show(Err, A), P) :-
-    precedence([show(Err) | New], A, P).
+    precedence([show(Err) | Flags], A, P).
 
 prec(Flags, fix(Err, A), P) :-
-    precedence([fix(Err) | New], A, P).
+    precedence([fix(Err) | Flags], A, P).
 
 % A instead of B
 ml(Flags, instead_of(Err, Instead, Instead, Of), M) :-
