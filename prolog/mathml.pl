@@ -326,12 +326,25 @@ example :- example(paren([paren(x), paren(y)])).
 %
 % Colors
 %
+%
+% Colors
+%
 color(1, red, '#FFA0A0').
 color(2, blue, '#A0A0FF').
 color(3, green, '#A0FFA0').
 color(4, '#FFFF00', '#DFDF80').
 color(5, '#FF00FF', '#DF80DF').
 color(6, '#00FFFF', '#DFDF80').
+
+color(Flags, Error, Color, Flags) :-
+    member(color(Error, Color), Flags),
+    !.
+
+color(Flags, Error, Color, [color(Error, Color) | Flags]) :-
+    findall(C, member(color(_, C), Flags), List),
+    length(List, Len),
+    Index is Len mod 6 + 1,
+    color(Index, Color, _).
 
 math(_, red(A), color(red, A)).
 math(_, green(A), color(green, A)).
@@ -520,96 +533,100 @@ ml(Flags, omit_right(Err, quote(Expr)), M) :-
 paren(Flags, omit_right(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
-ml(Flags, left_landed(Err, Color, quote(Expr)), M) :-
+ml(Flags, left_landed(Err, quote(Expr)), M) :-
     Comp =.. [Err, highlight],
     option(Comp, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Color, C, _),
-    ml(Flags, [color(C, roundedbox(black([L, Op]))), R], M).
+    color(Flags, Err, Color, New),
+    ml(New, [color(Color, roundedbox(black([L, Op]))), R], M).
 
-ml(Flags, left_landed(Err, Color, quote(Expr)), M) :-
+ml(Flags, left_landed(Err, quote(Expr)), M) :-
     Comp =.. [Err, show],
     option(Comp, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Color, C, _),
-    ml(Flags, [color(C, [L, Op]), R], M).
+    color(Flags, Err, Color, New),
+    ml(New, [color(Color, [L, Op]), R], M).
 
-ml(Flags, left_landed(Err, _Color, quote(Expr)), M) :-
+ml(Flags, left_landed(Err, quote(Expr)), M) :-
     Comp =.. [Err, fix],
     option(Comp, Flags, fix),
     compound_name_arguments(Expr, _, [_, R]),
-    ml(Flags, R, M).
+    color(Flags, Err, _, New),
+    ml(New, R, M).
 
-paren(Flags, left_landed(_Err, _, quote(Expr)), P) :-
+paren(Flags, left_landed(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
-ml(Flags, right_landed(Err, Color, quote(Expr)), M) :-
+ml(Flags, right_landed(Err, quote(Expr)), M) :-
     Comp =.. [Err, highlight],
     option(Comp, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Color, C, _),
-    ml(Flags, [L, color(C, roundedbox(black([Op, R])))], M).
+    color(Flags, Err, Color, New),
+    ml(New, [L, color(Color, roundedbox(black([Op, R])))], M).
 
-ml(Flags, right_landed(Err, Color, quote(Expr)), M) :-
+ml(Flags, right_landed(Err, quote(Expr)), M) :-
     Comp =.. [Err, show],
     option(Comp, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Color, C, _),
-    ml(Flags, [L, color(C, [Op, R])], M).
+    color(Flags, Err, Color, New),
+    ml(New, [L, color(Color, [Op, R])], M).
 
-ml(Flags, right_landed(Err, _Color, quote(Expr)), M) :-
+ml(Flags, right_landed(Err, quote(Expr)), M) :-
     Comp =.. [Err, fix],
     option(Comp, Flags, fix),
     compound_name_arguments(Expr, _Op, [L, _R]),
-    ml(Flags, L, M).
+    color(Flags, Err, _, New),
+    ml(New, L, M).
 
-paren(Flags, right_landed(_Err, _, quote(Expr)), P) :-
+paren(Flags, right_landed(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
-ml(Flags, left_elsewhere(Err, Color, quote(Expr)), M) :-
+ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     Comp =.. [Err, highlight],
     option(Comp, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Color, _, C),
-    ml(Flags, [color(C, roundedbox(phantom([L, Op]))), R], M).
+    color(Flags, Err, Color, New),
+    ml(New, [color(Color, roundedbox(phantom([L, Op]))), R], M).
 
-ml(Flags, left_elsewhere(Err, _Color, quote(Expr)), M) :-
+ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     Comp =.. [Err, show],
     option(Comp, Flags),
     compound_name_arguments(Expr, _Op, [_L, R]),
-    ml(Flags, R, M).
+    color(Flags, Err, _, New),
+    ml(New, R, M).
 
-ml(Flags, left_elsewhere(Err, Color, quote(Expr)), M) :-
+ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     Comp =.. [Err, fix],
     option(Comp, Flags, fix),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Color, C, _),
-    ml(Flags, [color(C, [L, Op]), R], M).
+    color(Flags, Err, Color, New),
+    ml(New, [color(Color, [L, Op]), R], M).
 
-paren(Flags, left_elsewhere(_Err, _, quote(Expr)), P) :-
+paren(Flags, left_elsewhere(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
-ml(Flags, right_elsewhere(Err, Color, quote(Expr)), M) :-
+ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     Comp =.. [Err, highlight],
     option(Comp, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Color, _, C),
-    ml(Flags, [L, color(C, roundedbox(phantom([Op, R])))], M).
+    color(Flags, Err, Color, New),
+    ml(New, [L, color(Color, roundedbox(phantom([Op, R])))], M).
 
-ml(Flags, right_elsewhere(Err, _Color, quote(Expr)), M) :-
+ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     Comp =.. [Err, show],
     option(Comp, Flags),
     compound_name_arguments(Expr, _Op, [L, _R]),
-    ml(Flags, L, M).
+    color(Flags, Err, _, New),
+    ml(New, L, M).
 
-ml(Flags, right_elsewhere(Err, Color, quote(Expr)), M) :-
+ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     Comp =.. [Err, fix],
     option(Comp, Flags, fix),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Color, C, _),
-    ml(Flags, [L, color(C, [Op, R])], M).
+    color(Flags, Err, Color, New),
+    ml(New, [L, color(Color, [Op, R])], M).
 
-paren(Flags, right_elsewhere(_Err, _, quote(Expr)), P) :-
+paren(Flags, right_elsewhere(_Err, quote(Expr)), P) :-
         paren(Flags, Expr, P).
 
 math(_, expert(A = B), A -> B).
