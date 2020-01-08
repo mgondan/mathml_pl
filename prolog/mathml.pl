@@ -532,7 +532,7 @@ ml(Flags, left_landed(Err, Color, quote(Expr)), M) :-
     option(Comp, Flags),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Color, C, _),
-    ml(Flags, [color(C, roundedbox(black([L, Op]))), R], M).
+    ml(Flags, [color(C, [L, Op]), R], M).
 
 ml(Flags, left_landed(Err, _Color, quote(Expr)), M) :-
     Comp =.. [Err, fix],
