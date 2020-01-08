@@ -450,7 +450,7 @@ prec(Flags, instead_of(Err, A, _, _), P) :-
 ml(Flags, instead_of(Err, A, _, _), M) :-
     C =.. [Err, show],
     option(C, Flags),
-    ml(Flags, red(A), M).
+    ml(Flags, A, M).
 
 paren(Flags, instead_of(Err, A, _, _), P) :-
     C =.. [Err, show],
