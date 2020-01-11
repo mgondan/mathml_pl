@@ -427,6 +427,17 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 %
 % Mistakes
 %
+math(_, expert(Step, Feedback, A), A).
+math(_, buggy(Step, Feedback, A), A).
+
+paren(Flags, error(Err, Mode, A), P) :-
+    C =.. [Err, Mode],
+    paren([C | Flags], A, P).
+
+prec(Flags, error(Err, Mode, A), P) :-
+    C =.. [Err, Mode],
+    precedence([C | Flags], A, P).
+
 ml(Flags, error(Err, Mode, A), M) :-
     C =.. [Err, Mode],
     ml([C | Flags], A, M).
