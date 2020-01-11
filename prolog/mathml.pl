@@ -427,8 +427,8 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 %
 % Mistakes
 %
-math(_, expert(Step, Feedback, A), A).
-math(_, buggy(Step, Feedback, A), A).
+math(_, expert(_Step, _Feedback, A), A).
+math(_, buggy(_Step, _Feedback, A), A).
 
 paren(Flags, error(Err, Mode, A), P) :-
     C =.. [Err, Mode],
