@@ -534,8 +534,7 @@ ml(Flags, omit_right(Err, quote(Expr)), M) :-
     ml(Flags, [L, underbrace([Op, R], "omitted")], M).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
-    C =.. [Err, show],
-    option(C, Flags),
+    show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [L, cancel([Op, R])], M).
 
@@ -596,8 +595,7 @@ ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     ml(New, [color(Color, roundedbox(phantom([L, Op]))), R], M).
 
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
-    Comp =.. [Err, show],
-    option(Comp, Flags),
+    show(Flags, Err),
     compound_name_arguments(Expr, _Op, [_L, R]),
     color(Flags, Err, _, New),
     ml(New, R, M).
