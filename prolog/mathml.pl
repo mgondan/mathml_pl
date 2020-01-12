@@ -28,14 +28,14 @@
 % Interface
 %
 mml(A) -->
-    mml([highlight(_)], A).
+    mml([highlight(all)], A).
 
 mml(Flags, A) -->
     { mathml(Flags, A, M) },
     html(math(M)).
 
 mathml(A, M) :-
-    mathml([highlight(_)], A, M).
+    mathml([highlight(all)], A, M).
 
 mathml(Flags, A, math(X)) :-
     denoting(Flags, A, []),
@@ -456,6 +456,12 @@ highlight(Flags, Err) :-
 highlight(Flags, _) :-
     member(highlight(all), Flags).
 
+show(Flags, Err) :-
+    member(show(Err), Flags).
+
+show(Flags, _) :-
+    member(show(all), Flags).
+
 % A instead of B
 ml(Flags, instead_of(Err, Instead, Instead, Of), M) :-
     highlight(Flags, Err),
@@ -474,18 +480,15 @@ prec(Flags, instead_of(Err, A, _, _), P) :-
     precedence(Flags, A, P).
 
 ml(Flags, instead_of(Err, A, _, _), M) :-
-    C =.. [Err, show],
-    option(C, Flags),
+    show(Flags, Err),
     ml(Flags, A, M).
 
 paren(Flags, instead_of(Err, A, _, _), P) :-
-    C =.. [Err, show],
-    option(C, Flags),
+    show(Flags, Err),
     paren(Flags, A, P).
 
 prec(Flags, instead_of(Err, A, _, _), P) :-
-    C =.. [Err, show],
-    option(C, Flags),
+    show(Flags, Err),
     precedence(Flags, A, P).
 
 ml(Flags, instead_of(Err, _, _, Of), M) :-
@@ -510,8 +513,7 @@ ml(Flags, omit_left(Err, quote(Expr)), M) :-
     ml(Flags, [underbrace([L, Op], "omitted"), R], M).
 
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
-    C =.. [Err, show],
-    option(C, Flags),
+    show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [cancel([L, Op]), R], M).
 
@@ -551,8 +553,7 @@ ml(Flags, left_landed(Err, quote(Expr)), M) :-
     ml(New, [color(Color, roundedbox(black([L, Op]))), R], M).
 
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
-    Comp =.. [Err, show],
-    option(Comp, Flags),
+    show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
     ml(New, [color(Color, [L, Op]), R], M).
@@ -574,8 +575,7 @@ ml(Flags, right_landed(Err, quote(Expr)), M) :-
     ml(New, [L, color(Color, roundedbox(black([Op, R])))], M).
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
-    Comp =.. [Err, show],
-    option(Comp, Flags),
+    show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
     ml(New, [L, color(Color, [Op, R])], M).
@@ -620,8 +620,7 @@ ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     ml(New, [L, color(Color, roundedbox(phantom([Op, R])))], M).
 
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
-    Comp =.. [Err, show],
-    option(Comp, Flags),
+    show(Flags, Err),
     compound_name_arguments(Expr, _Op, [L, _R]),
     color(Flags, Err, _, New),
     ml(New, L, M).
@@ -641,7 +640,7 @@ math(_, buggy(A \= B, _), A ~> B).
 
 example :- example([highlight(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([err1(fix)], instead_of(err1, sigma, sigma, s)).
-example :- example([err1(show)], instead_of(err1, sigma, sigma, s)).
+example :- example([show(err1)], instead_of(err1, sigma, sigma, s)).
 
 %
 % Abbreviations
@@ -673,8 +672,7 @@ denot(Flags, denoting(Abbrev, Expr, Desc), W) :-
 %     append([X, Y, Z], W).
 
 denot(Flags, instead_of(Err, A, _, _), W) :-
-    C =.. [Err, show],
-    option(C, Flags),
+    show(Flags, Err),
     !, denot(Flags, A, W).
 
 denot(Flags, instead_of(Err, _, _, Of), W) :-
