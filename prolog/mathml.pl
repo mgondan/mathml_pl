@@ -427,8 +427,26 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 %
 % Mistakes
 %
-math(_, expert(_Step, _Feedback, A), A).
-math(_, buggy(_Step, _Feedback, A), A).
+highlight(Flags, Err) :-
+    member(highlight(Err), Flags).
+
+highlight(Flags, _) :-
+    member(highlight(all), Flags).
+
+show(Flags, Err) :-
+    member(show(Err), Flags).
+
+show(Flags, _) :-
+    member(show(all), Flags).
+
+fix(Flags, Err) :-
+    member(fix(Err), Flags).
+
+fix(Flags, _) :-
+    member(fix(all), Flags).
+
+math(_, step(expert, _Step, _Feedback, A), A).
+math(_, step(buggy, _Step, _Feedback, A), A).
 
 paren(Flags, error(Err, Mode, A), P) :-
     C =.. [Err, Mode],
@@ -449,18 +467,6 @@ paren(Flags, error(Err, Mode, A), P) :-
 prec(Flags, error(Err, Mode, A), P) :-
     C =.. [Err, Mode],
     precedence([C | Flags], A, P).
-
-highlight(Flags, Err) :-
-    member(highlight(Err), Flags).
-
-highlight(Flags, _) :-
-    member(highlight(all), Flags).
-
-show(Flags, Err) :-
-    member(show(Err), Flags).
-
-show(Flags, _) :-
-    member(show(all), Flags).
 
 % A instead of B
 ml(Flags, instead_of(Err, Instead, Instead, Of), M) :-
@@ -492,18 +498,15 @@ prec(Flags, instead_of(Err, A, _, _), P) :-
     precedence(Flags, A, P).
 
 ml(Flags, instead_of(Err, _, _, Of), M) :-
-    C =.. [Err, fix],
-    option(C, Flags, fix),
+    fix(Flags, Err),
     ml(Flags, green(Of), M).
 
 paren(Flags, instead_of(Err, _, _, Of), P) :-
-    C =.. [Err, fix],
-    option(C, Flags, fix),
+    fix(Flags, Err),
     paren(Flags, Of, P).
 
 prec(Flags, instead_of(Err, _, _, Of), P) :-
-    C =.. [Err, fix],
-    option(C, Flags, fix),
+    fix(Flags, Err),
     precedence(Flags, Of, P).
 
 % Left part omitted
@@ -518,8 +521,7 @@ ml(Flags, omit_left(Err, quote(Expr)), M) :-
     ml(Flags, [cancel([L, Op]), R], M).
 
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
-    C =.. [Err, fix],
-    option(C, Flags, fix),
+    fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [green([L, Op]), R], M).
 
@@ -538,8 +540,7 @@ ml(Flags, omit_right(Err, quote(Expr)), M) :-
     ml(Flags, [L, cancel([Op, R])], M).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
-    C =.. [Err, fix],
-    option(C, Flags, fix),
+    fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [L, green([Op, R])], M).
 
@@ -559,8 +560,7 @@ ml(Flags, left_landed(Err, quote(Expr)), M) :-
     ml(New, [color(Color, [L, Op]), R], M).
 
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
-    Comp =.. [Err, fix],
-    option(Comp, Flags, fix),
+    fix(Flags, Err),
     compound_name_arguments(Expr, _, [_, R]),
     color(Flags, Err, _, New),
     ml(New, R, M).
@@ -581,8 +581,7 @@ ml(Flags, right_landed(Err, quote(Expr)), M) :-
     ml(New, [L, color(Color, [Op, R])], M).
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
-    Comp =.. [Err, fix],
-    option(Comp, Flags, fix),
+    fix(Flags, Err),
     compound_name_arguments(Expr, _Op, [L, _R]),
     color(Flags, Err, _, New),
     ml(New, L, M).
@@ -604,8 +603,7 @@ ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     ml(New, R, M).
 
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
-    Comp =.. [Err, fix],
-    option(Comp, Flags, fix),
+    fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
     ml(New, [color(Color, [L, Op]), R], M).
@@ -626,8 +624,7 @@ ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     ml(New, L, M).
 
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
-    Comp =.. [Err, fix],
-    option(Comp, Flags, fix),
+    fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
     ml(New, [L, color(Color, [Op, R])], M).
@@ -639,7 +636,7 @@ math(_, expert(A = B), A -> B).
 math(_, buggy(A \= B, _), A ~> B).
 
 example :- example([highlight(err1)], instead_of(err1, sigma, sigma, s)).
-example :- example([err1(fix)], instead_of(err1, sigma, sigma, s)).
+example :- example([fix(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([show(err1)], instead_of(err1, sigma, sigma, s)).
 
 %
@@ -676,8 +673,7 @@ denot(Flags, instead_of(Err, A, _, _), W) :-
     !, denot(Flags, A, W).
 
 denot(Flags, instead_of(Err, _, _, Of), W) :-
-    C =.. [Err, fix],
-    option(C, Flags, fix),
+    fix(Flags, Err),
     !, denot(Flags, Of, W).
 
 denot(Flags, Comp, With) :-
