@@ -450,25 +450,27 @@ prec(Flags, error(Err, Mode, A), P) :-
     C =.. [Err, Mode],
     precedence([C | Flags], A, P).
 
+highlight(Flags, Err) :-
+    member(highlight(Err), Flags).
+
+highlight(Flags, _) :-
+    member(highlight(all), Flags).
+
 % A instead of B
 ml(Flags, instead_of(Err, Instead, Instead, Of), M) :-
-    C =.. [Err, highlight],
-    option(C, Flags),
+    highlight(Flags, Err),
     !, ml(Flags, underbrace(Instead, ["instead of", ' ', Of]), M).
 
 ml(Flags, instead_of(Err, A, Instead, Of), M) :-
-    C =.. [Err, highlight],
-    option(C, Flags),
+    highlight(Flags, Err),
     ml(Flags, underbrace(A, [Instead, ' ', "instead of", ' ', Of]), M).
 
 paren(Flags, instead_of(Err, A, _, _), P) :-
-    C =.. [Err, highlight],
-    option(C, Flags),
+    highlight(Flags, Err),
     paren(Flags, A, P).
 
 prec(Flags, instead_of(Err, A, _, _), P) :-
-    C =.. [Err, highlight],
-    option(C, Flags),
+    highlight(Flags, Err),
     precedence(Flags, A, P).
 
 ml(Flags, instead_of(Err, A, _, _), M) :-
@@ -503,8 +505,7 @@ prec(Flags, instead_of(Err, _, _, Of), P) :-
 
 % Left part omitted
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
-    C =.. [Err, highlight],
-    option(C, Flags),
+    highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [underbrace([L, Op], "omitted"), R], M).
 
@@ -524,8 +525,7 @@ paren(Flags, omit_left(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
-    C =.. [Err, highlight],
-    option(C, Flags),
+    highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [L, underbrace([Op, R], "omitted")], M).
 
@@ -545,8 +545,7 @@ paren(Flags, omit_right(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
-    Comp =.. [Err, highlight],
-    option(Comp, Flags),
+    highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
     ml(New, [color(Color, roundedbox(black([L, Op]))), R], M).
@@ -569,8 +568,7 @@ paren(Flags, left_landed(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
-    Comp =.. [Err, highlight],
-    option(Comp, Flags),
+    highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
     ml(New, [L, color(Color, roundedbox(black([Op, R])))], M).
@@ -593,8 +591,7 @@ paren(Flags, right_landed(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
-    Comp =.. [Err, highlight],
-    option(Comp, Flags),
+    highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
     ml(New, [color(Color, roundedbox(phantom([L, Op]))), R], M).
@@ -617,8 +614,7 @@ paren(Flags, left_elsewhere(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
-    Comp =.. [Err, highlight],
-    option(Comp, Flags),
+    highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
     ml(New, [L, color(Color, roundedbox(phantom([Op, R])))], M).
@@ -643,7 +639,7 @@ paren(Flags, right_elsewhere(_Err, quote(Expr)), P) :-
 math(_, expert(A = B), A -> B).
 math(_, buggy(A \= B, _), A ~> B).
 
-example :- example([err1(highlight)], instead_of(err1, sigma, sigma, s)).
+example :- example([highlight(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([err1(fix)], instead_of(err1, sigma, sigma, s)).
 example :- example([err1(show)], instead_of(err1, sigma, sigma, s)).
 
@@ -1360,8 +1356,3 @@ example :- example(dbinom(k, n, pi) =
 example :- example(pbinom(k, 'N', pi) =
                    sum(i, k, 'N', choose('N', k) * dbinom(i, 'N', k))).
 example :- example(sum(i, k, 'N', i) + sum(i, k, 'N', i)).
-
-
-
-
-
