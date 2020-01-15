@@ -445,8 +445,8 @@ fix(Flags, Err) :-
 fix(Flags, _) :-
     member(fix(all), Flags).
 
-math(_, expert(quote(_Step), quote(_Feedback), A), A).
-math(_, buggy(quote(_Step), quote(_Feedback), A), A).
+math(_, expert(quote(_Feedback), A), A).
+math(_, buggy(quote(_Feedback), A), A).
 
 paren(Flags, error(Err, Mode, A), P) :-
     C =.. [Err, Mode],
