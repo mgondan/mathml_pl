@@ -31,7 +31,7 @@ mml(A) -->
     mml([highlight(all)], A).
 
 mml(Flags, A) -->
-    { mathml(Flags, A, M) },
+    { ml(Flags, A, M) },
     html(math(M)).
 
 mathml(A, M) :-
