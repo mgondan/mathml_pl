@@ -405,7 +405,7 @@ paren(Flags, roundedbox(A), P) :-
 
 % Colored or Box, depending on nested error
 ml(Flags, color_or_box(Col, A), X) :-
-    erroneous(A),
+    erroneous(Flags, A, [_ | _]),
     !, ml(Flags, color(Col, roundedbox(color(black, A))), X).
     
 ml(Flags, color_or_box(Col, A), X) :-
@@ -438,16 +438,22 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 %
 % Mistakes
 %
-erroneous(buggy(_, _)) :-
-    !.
+erroneous(buggy(Err, A), Errors) :-
+    !, erroneous(A, T),
+    Errors = [Err | T].
 
-erroneous(instead_of(_, _, _, _)) :-
-    !.
+erroneous(instead_of(Err, _A, Instead, Of), Errors) :-
+    !, erroneous(Instead, I),
+    erroneous(Of, I),
+    append([[Err], Instead, Of], Errors).
 
-erroneous(A) :-
+erroneous(A, Errors) :-
     compound(A),
-    compound_name_arguments(A, _, Args),
-    include(erroneous, Args, [_ | _]).
+    !, compound_name_arguments(A, _, Args),
+    maplist(erroneous, Args, Errs),
+    append(Errs, Errors).
+
+erroneous(_, []).
 
 highlight(Flags, Err) :-
     member(highlight(Err), Flags).
