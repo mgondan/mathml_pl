@@ -441,6 +441,9 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 erroneous(buggy(_, _)) :-
     !.
 
+erroneous(instead_of(_, _, _, _)) :-
+    !.
+
 erroneous(A) :-
     compound(A),
     compound_name_arguments(A, _, Args),
