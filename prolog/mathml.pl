@@ -646,7 +646,7 @@ ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
-    ml(New, [L, color(Color, [Op, R])], M).
+    ml(New, [L, color_or_box(Color, [Op, R])], M).
 
 paren(Flags, right_elsewhere(_Err, quote(Expr)), P) :-
         paren(Flags, Expr, P).
