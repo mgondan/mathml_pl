@@ -438,8 +438,9 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 %
 % Mistakes
 %
-erroneous(buggy(Err, A), Errors) :-
-    !, erroneous(A, T),
+erroneous(buggy(A, Fb), Errors) :-
+    !, compound_name_arguments(Fb, Err, _),
+    erroneous(A, T),
     Errors = [Err | T].
 
 erroneous(instead_of(Err, _A, Instead, Of), Errors) :-
