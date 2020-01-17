@@ -581,7 +581,7 @@ ml(Flags, left_landed(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
-    ml(New, [color(Color, [L, Op]), R], M).
+    ml(New, [color_or_box(Color, [L, Op]), R], M).
 
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
     fix(Flags, Err),
@@ -629,7 +629,7 @@ ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
-    ml(New, [color(Color, [L, Op]), R], M).
+    ml(New, [color_or_box(Color, [L, Op]), R], M).
 
 paren(Flags, left_elsewhere(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
