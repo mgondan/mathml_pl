@@ -326,9 +326,6 @@ example :- example(paren([paren(x), paren(y)])).
 %
 % Colors
 %
-%
-% Colors
-%
 color(1, red, '#FFA0A0').
 color(2, blue, '#A0A0FF').
 color(3, green, '#A0FFA0').
@@ -406,6 +403,20 @@ ml(Flags, roundedbox(A), menclose(notation(roundedbox), X)) :-
 paren(Flags, roundedbox(A), P) :-
     paren(Flags, A, P).
 
+% Colored or Box, depending on nested error
+ml(Flags, color_or_box(Col, A), X) :-
+    erroneous(A),
+    !, color(Col, roundedbox(color(black, A))), X).
+    
+ml(Flags, color_or_box(Col, A), X) :-
+    color(Col, A), X).
+    
+paren(Flags, color_or_box(_, A), P) :-
+    paren(Flags, A, P).
+
+prec(Flags, color_or_box(_, A), P) :-
+    precedence(Flags, A, P).
+
 % invisible
 ml(Flags, phantom(A), mphantom(X)) :-
     ml(Flags, A, X).
@@ -427,6 +438,14 @@ example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 %
 % Mistakes
 %
+erroneous(buggy(_, _)) :-
+    !.
+
+erroneous(A) :-
+    compound(A),
+    compound_name_arguments(A, _, Args),
+    include(erroneous, Args, [_ | _]).
+
 highlight(Flags, Err) :-
     member(highlight(Err), Flags).
 
@@ -488,7 +507,7 @@ prec(Flags, instead_of(Err, A, _, _), P) :-
 ml(Flags, instead_of(Err, A, _, _), M) :-
     show(Flags, Err),
     color(Flags, Err, Color, New),
-    ml(New, color(Color, A), M).
+    ml(New, color_or_box(Color, A), M).
 
 paren(Flags, instead_of(Err, A, _, _), P) :-
     show(Flags, Err),
