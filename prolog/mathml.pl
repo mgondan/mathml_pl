@@ -598,7 +598,7 @@ ml(Flags, right_landed(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
-    ml(New, [L, color(Color, [Op, R])], M).
+    ml(New, [L, color_or_box(Color, [Op, R])], M).
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
     fix(Flags, Err),
