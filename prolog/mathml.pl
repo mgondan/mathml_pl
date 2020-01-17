@@ -405,7 +405,7 @@ paren(Flags, roundedbox(A), P) :-
 
 % Colored or Box, depending on nested error
 ml(Flags, color_or_box(Col, A), X) :-
-    erroneous(Flags, A, [_ | _]),
+    erroneous(A, [_ | _]),
     !, ml(Flags, color(Col, roundedbox(color(black, A))), X).
     
 ml(Flags, color_or_box(Col, A), X) :-
