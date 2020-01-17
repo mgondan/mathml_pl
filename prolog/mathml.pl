@@ -406,10 +406,10 @@ paren(Flags, roundedbox(A), P) :-
 % Colored or Box, depending on nested error
 ml(Flags, color_or_box(Col, A), X) :-
     erroneous(A),
-    !, color(Col, roundedbox(color(black, A))), X).
+    !, ml(Flags, color(Col, roundedbox(color(black, A))), X).
     
 ml(Flags, color_or_box(Col, A), X) :-
-    color(Col, A), X).
+    ml(Flags, color(Col, A), X).
     
 paren(Flags, color_or_box(_, A), P) :-
     paren(Flags, A, P).
