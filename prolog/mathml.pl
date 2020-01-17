@@ -387,8 +387,8 @@ paren(Flags, underbrace(A, _), P) :-
 prec(Flags, underbrace(A, _), P) :-
     precedence(Flags, A, P).
 
-% red strike through
-math(_, cancel(A), red(strike(black(A)))).
+% Strike through
+math(_, cancel(Color, A), color(Color, strike(black(A)))).
 
 ml(Flags, strike(A), menclose(notation(updiagonalstrike), X)) :-
     ml(Flags, A, X).
@@ -557,12 +557,14 @@ ml(Flags, omit_right(Err, quote(Expr)), M) :-
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [L, cancel([Op, R])], M).
+    color(Flags, Err, Color, New),
+    ml(Flags, [L, cancel(Color, [Op, R])], M).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [L, green([Op, R])], M).
+    color(Flags, Err, Color, New),
+    ml(Flags, [L, color(Color, [Op, R])], M).
 
 paren(Flags, omit_right(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
