@@ -431,7 +431,7 @@ math(_, format_pvalue(A), round2(A)).
 
 math(_, quote(A), A).
 
-example :- example(cancel('X')).
+example :- example(cancel(red, 'X')).
 example :- example(paren([paren(red(x)), green(paren(y))])).
 example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
 
@@ -539,12 +539,14 @@ ml(Flags, omit_left(Err, quote(Expr)), M) :-
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [cancel([L, Op]), R], M).
+    color(Flags, Err, Color, New),
+    ml(New, [cancel(Color, [L, Op]), R], M).
 
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [green([L, Op]), R], M).
+    color(Flags, Err, Color, New),
+    ml(New, [color(Color, [L, Op]), R], M).
 
 paren(Flags, omit_left(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
@@ -558,13 +560,13 @@ ml(Flags, omit_right(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
-    ml(Flags, [L, cancel(Color, [Op, R])], M).
+    ml(New, [L, cancel(Color, [Op, R])], M).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     color(Flags, Err, Color, New),
-    ml(Flags, [L, color(Color, [Op, R])], M).
+    ml(New, [L, color(Color, [Op, R])], M).
 
 paren(Flags, omit_right(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
