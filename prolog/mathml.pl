@@ -3,6 +3,7 @@
     mathml/3,
     mml//1,
     mml//2,
+    palette/2,
     op(400, yfx, invisible_times),
     op(180, xf, !),
     op(170, xf, '%'),
@@ -28,14 +29,16 @@
 % Interface
 %
 mml(A) -->
-    mml([highlight(all)], A).
+    { palette(A, P) },
+    mml([highlight(all) | P], A).
 
 mml(Flags, A) -->
     { ml(Flags, A, M) },
     html(math(M)).
 
 mathml(A, M) :-
-    mathml([highlight(all)], A, M).
+    palette(A, P),
+    mathml([highlight(all) | P], A, M).
 
 mathml(Flags, A, math(X)) :-
     denoting(Flags, A, []),
