@@ -329,38 +329,42 @@ example :- example(paren([paren(x), paren(y)])).
 %
 % Colors
 %
-color(1, red, '#FFA0A0').
-color(2, blue, '#A0A0FF').
-color(3, green, '#A0FFA0').
-color(4, '#FFFF00', '#DFDF80').
-color(5, '#FF00FF', '#DF80DF').
-color(6, '#00FFFF', '#DFDF80').
+color(1, "red").
+color(2, "blue").
+color(3, "green").
+color(4, "#FFFF00").
+color(5, "#FF00FF").
+color(6, "#00FFFF").
 
-color(Flags, Error, Color, Flags) :-
-    member(color(Error, Color), Flags),
-    !.
-
-color(Flags, Error, Color, [color(Error, Color) | Flags]) :-
-    findall(C, member(color(_, C), Flags), List),
-    length(List, Len),
-    Index is Len mod 6 + 1,
-    color(Index, Color, _).
+color(Flags, Code, Color) :-
+    member(color(Code, Color), Flags).
 
 palette(A, Flags) :-
     erroneous(A, Errs),
     sort(Errs, Errors),
-    findall(color(E, C), (nth1(N, Errors, E), N6 is N mod 6 + 1, color(N6, C, _)), Flags).
+    findall(color(E, C), (nth1(N, Errors, E), N6 is N mod 6 + 1, color(N6, C)), Flags).
     
-math(_, red(A), color(red, A)).
-math(_, green(A), color(green, A)).
-math(_, blue(A), color(blue, A)).
-math(_, black(A), color(black, A)).
-math(_, grey(A), color(grey, A)).
-math(_, lightred(A), color('#FFA0A0', A)).
+math(_, red(A), color("red", A)).
+math(_, green(A), color("green", A)).
+math(_, blue(A), color("blue", A)).
+math(_, black(A), color("black", A)).
+math(_, grey(A), color("grey", A)).
+math(_, lightred(A), color("#FFA0A0", A)).
 
-ml(Flags, color(Col, A), mstyle(mathcolor(Col), X)) :-
+ml(Flags, color(String, A), mstyle(mathcolor(String), X)) :-
+    string(String),
     ml(Flags, A, X).
 
+ml(Flags, color(Num, A), X) :-
+    number(Col),
+    color(Num, String)
+    ml(Flags, color(String, A), X).
+    
+ml(Flags, color(Atom, A), X) :-
+    atom(Atom),
+    member(color(Atom, String), Flags),
+    ml(Flags, color(String, A), X).
+    
 paren(Flags, color(_, A), P) :-
     paren(Flags, A, P).
 
@@ -524,8 +528,7 @@ prec(Flags, instead_of(Err, A, _, _), P) :-
 
 ml(Flags, instead_of(Err, A, _, _), M) :-
     show(Flags, Err),
-    color(Flags, Err, Color, New),
-    ml(New, color_or_box(Color, A), M).
+    ml(Flags, color_or_box(Err, A), M).
 
 paren(Flags, instead_of(Err, A, _, _), P) :-
     show(Flags, Err),
@@ -537,8 +540,7 @@ prec(Flags, instead_of(Err, A, _, _), P) :-
 
 ml(Flags, instead_of(Err, _, _, Of), M) :-
     fix(Flags, Err),
-    color(Flags, Err, Color, New),
-    ml(New, color(Color, Of), M).
+    ml(Flags, color(Err, Of), M).
 
 paren(Flags, instead_of(Err, _, _, Of), P) :-
     fix(Flags, Err),
@@ -557,14 +559,12 @@ ml(Flags, omit_left(Err, quote(Expr)), M) :-
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [cancel(Color, [L, Op]), R], M).
+    ml(Flags, [cancel(Err, [L, Op]), R], M).
 
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [color(Color, [L, Op]), R], M).
+    ml(Flags, [color(Err, [L, Op]), R], M).
 
 paren(Flags, omit_left(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
@@ -577,14 +577,12 @@ ml(Flags, omit_right(Err, quote(Expr)), M) :-
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [L, cancel(Color, [Op, R])], M).
+    ml(Flags, [L, cancel(Err, [Op, R])], M).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [L, color(Color, [Op, R])], M).
+    ml(Flags, [L, color(Err, [Op, R])], M).
 
 paren(Flags, omit_right(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
@@ -592,20 +590,17 @@ paren(Flags, omit_right(_Err, quote(Expr)), P) :-
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [color(Color, roundedbox(black([L, Op]))), R], M).
+    ml(Flags, [color(Err, roundedbox(black([L, Op]))), R], M).
 
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [color_or_box(Color, [L, Op]), R], M).
+    ml(Flags, [color_or_box(Err, [L, Op]), R], M).
 
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, _, [_, R]),
-    color(Flags, Err, _, New),
-    ml(New, R, M).
+    ml(Flags, R, M).
 
 paren(Flags, left_landed(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
@@ -613,20 +608,17 @@ paren(Flags, left_landed(_Err, quote(Expr)), P) :-
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [L, color(Color, roundedbox(black([Op, R])))], M).
+    ml(Flags, [L, color(Err, roundedbox(black([Op, R])))], M).
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [L, color_or_box(Color, [Op, R])], M).
+    ml(Flags, [L, color_or_box(Err, [Op, R])], M).
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, _Op, [L, _R]),
-    color(Flags, Err, _, New),
-    ml(New, L, M).
+    ml(Flags, L, M).
 
 paren(Flags, right_landed(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
@@ -634,20 +626,17 @@ paren(Flags, right_landed(_Err, quote(Expr)), P) :-
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [color(Color, roundedbox(phantom([L, Op]))), R], M).
+    ml(Flags, [color(Err, roundedbox(phantom([L, Op]))), R], M).
 
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, _Op, [_L, R]),
-    color(Flags, Err, _, New),
-    ml(New, R, M).
+    ml(Flags, R, M).
 
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [color_or_box(Color, [L, Op]), R], M).
+    ml(Flags, [color_or_box(Err, [L, Op]), R], M).
 
 paren(Flags, left_elsewhere(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
@@ -655,20 +644,17 @@ paren(Flags, left_elsewhere(_Err, quote(Expr)), P) :-
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [L, color(Color, roundedbox(phantom([Op, R])))], M).
+    ml(Flags, [L, color(Err, roundedbox(phantom([Op, R])))], M).
 
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, _Op, [L, _R]),
-    color(Flags, Err, _, New),
-    ml(New, L, M).
+    ml(Flags, L, M).
 
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    color(Flags, Err, Color, New),
-    ml(New, [L, color_or_box(Color, [Op, R])], M).
+    ml(Flags, [L, color_or_box(Err, [Op, R])], M).
 
 paren(Flags, right_elsewhere(_Err, quote(Expr)), P) :-
         paren(Flags, Expr, P).
