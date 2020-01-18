@@ -82,7 +82,7 @@ math(Flags, A, M) :-
     !.
 
 %
-% Macros (e.g., red(X) for color(red, X)
+% Macros (e.g., red(X) for color("red", X)
 %
 ml(Flags, A, M) :-
     math(Flags, A, X),
@@ -418,7 +418,7 @@ paren(Flags, roundedbox(A), P) :-
 % Colored or Box, depending on nested error
 ml(Flags, color_or_box(Col, A), X) :-
     erroneous(A, [_ | _]),
-    !, ml(Flags, color(Col, roundedbox(color(black, A))), X).
+    !, ml(Flags, color(Col, roundedbox(black(A))), X).
     
 ml(Flags, color_or_box(Col, A), X) :-
     ml(Flags, color(Col, A), X).
