@@ -342,7 +342,7 @@ color(Flags, Code, Color) :-
 palette(A, Flags) :-
     erroneous(A, Errs),
     sort(Errs, Errors),
-    findall(color(E, C), (nth1(N, Errors, E), N6 is N mod 6, color(N6, C)), Flags).
+    findall(color(E, C), (nth0(N, Errors, E), N6 is N mod 6, color(N6, C)), Flags).
     
 math(_, red(A), color("red", A)).
 math(_, green(A), color("green", A)).
