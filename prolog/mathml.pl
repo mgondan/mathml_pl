@@ -486,6 +486,12 @@ fix(Flags, Err) :-
 fix(Flags, _) :-
     member(fix(all), Flags).
 
+correct(Flags, Err) :-
+    member(correct(Err), Flags).
+
+correct(Flags, _) :-
+    member(correct(all), Flags).
+
 math(_, expert(quote(_Feedback), A), A).
 math(_, buggy(quote(_Feedback), A), A).
 
@@ -550,6 +556,18 @@ prec(Flags, instead_of(Err, _, _, Of), P) :-
     fix(Flags, Err),
     precedence(Flags, Of, P).
 
+ml(Flags, instead_of(Err, _, _, Of), M) :-
+    correct(Flags, Err),
+    ml(Flags, Of, M).
+
+paren(Flags, instead_of(Err, _, _, Of), P) :-
+    correct(Flags, Err),
+    paren(Flags, Of, P).
+
+prec(Flags, instead_of(Err, _, _, Of), P) :-
+    correct(Flags, Err),
+    precedence(Flags, Of, P).
+
 % Left part omitted
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
@@ -565,6 +583,10 @@ ml(Flags, omit_left(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [color(Err, [L, Op]), R], M).
+
+ml(Flags, omit_left(Err, quote(Expr)), M) :-
+    correct(Flags, Err),
+    ml(Flags, Expr, M).
 
 paren(Flags, omit_left(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
@@ -584,6 +606,10 @@ ml(Flags, omit_right(Err, quote(Expr)), M) :-
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [L, color(Err, [Op, R])], M).
 
+ml(Flags, omit_right(Err, quote(Expr)), M) :-
+    correct(Flags, Err),
+    ml(Flags, Expr, M).
+
 paren(Flags, omit_right(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
@@ -599,6 +625,11 @@ ml(Flags, left_landed(Err, quote(Expr)), M) :-
 
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
     fix(Flags, Err),
+    compound_name_arguments(Expr, _, [_, R]),
+    ml(Flags, R, M).
+
+ml(Flags, left_landed(Err, quote(Expr)), M) :-
+    correct(Flags, Err),
     compound_name_arguments(Expr, _, [_, R]),
     ml(Flags, R, M).
 
@@ -620,6 +651,11 @@ ml(Flags, right_landed(Err, quote(Expr)), M) :-
     compound_name_arguments(Expr, _Op, [L, _R]),
     ml(Flags, L, M).
 
+ml(Flags, right_landed(Err, quote(Expr)), M) :-
+    correct(Flags, Err),
+    compound_name_arguments(Expr, _Op, [L, _R]),
+    ml(Flags, L, M).
+
 paren(Flags, right_landed(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
@@ -637,6 +673,10 @@ ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [color_or_box(Err, [L, Op]), R], M).
+
+ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
+    correct(Flags, Err),
+    ml(Flags, Expr, M).
 
 paren(Flags, left_elsewhere(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
@@ -656,6 +696,10 @@ ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, [L, color_or_box(Err, [Op, R])], M).
 
+ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
+    correct(Flags, Err),
+    ml(Flags, Expr, M).
+
 paren(Flags, right_elsewhere(_Err, quote(Expr)), P) :-
         paren(Flags, Expr, P).
 
@@ -665,6 +709,7 @@ math(_, buggy(A \= B, _), A ~> B).
 example :- example([highlight(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([fix(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([show(err1)], instead_of(err1, sigma, sigma, s)).
+example :- example([correct(err1)], instead_of(err1, sigma, sigma, s)).
 
 %
 % Abbreviations
@@ -701,6 +746,10 @@ denot(Flags, instead_of(Err, A, _, _), W) :-
 
 denot(Flags, instead_of(Err, _, _, Of), W) :-
     fix(Flags, Err),
+    !, denot(Flags, Of, W).
+
+denot(Flags, instead_of(Err, _, _, Of), W) :-
+    correct(Flags, Err),
     !, denot(Flags, Of, W).
 
 denot(Flags, Comp, With) :-
