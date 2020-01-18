@@ -332,7 +332,7 @@ example :- example(paren([paren(x), paren(y)])).
 color(0, "red").
 color(1, "blue").
 color(2, "green").
-color(3, "#7F7F00").
+color(3, "#9F5F00").
 color(4, "#7F007F").
 color(5, "#007F7F").
 
