@@ -329,12 +329,12 @@ example :- example(paren([paren(x), paren(y)])).
 %
 % Colors
 %
-color(1, "red").
-color(2, "blue").
-color(3, "green").
-color(4, "#FFFF00").
-color(5, "#FF00FF").
-color(6, "#00FFFF").
+color(0, "red").
+color(1, "blue").
+color(2, "green").
+color(3, "#FFFF00").
+color(4, "#FF00FF").
+color(5, "#00FFFF").
 
 color(Flags, Code, Color) :-
     member(color(Code, Color), Flags).
@@ -342,7 +342,7 @@ color(Flags, Code, Color) :-
 palette(A, Flags) :-
     erroneous(A, Errs),
     sort(Errs, Errors),
-    findall(color(E, C), (nth1(N, Errors, E), N6 is N mod 6 + 1, color(N6, C)), Flags).
+    findall(color(E, C), (nth1(N, Errors, E), N6 is N mod 6, color(N6, C)), Flags).
     
 math(_, red(A), color("red", A)).
 math(_, green(A), color("green", A)).
