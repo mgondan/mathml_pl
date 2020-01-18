@@ -343,6 +343,11 @@ color(Flags, Error, Color, [color(Error, Color) | Flags]) :-
     Index is Len mod 6 + 1,
     color(Index, Color, _).
 
+palette(A, Flags) :-
+    erroneous(A, Errs),
+    sort(Errs, Errors),
+    findall(color(E, C), (nth0(N, Errors, E), N6 is N mod 6, nth0(N, Colors, C)), Flags).
+    
 math(_, red(A), color(red, A)).
 math(_, green(A), color(green, A)).
 math(_, blue(A), color(blue, A)).
