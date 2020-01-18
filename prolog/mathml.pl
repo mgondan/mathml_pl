@@ -357,7 +357,7 @@ ml(Flags, color(String, A), mstyle(mathcolor(String), X)) :-
 
 ml(Flags, color(Num, A), X) :-
     number(Col),
-    color(Num, String)
+    color(Num, String),
     ml(Flags, color(String, A), X).
     
 ml(Flags, color(Atom, A), X) :-
