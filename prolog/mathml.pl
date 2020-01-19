@@ -455,8 +455,8 @@ erroneous(buggy(quote(Fb), A), Errors) :-
     erroneous(A, T),
     Errors = [Err | T].
 
-erroneous(instead_of(Err, _A, Instead, Of), Errors) :-
-    !, erroneous(Instead, I),
+erroneous(instead_of(Err, A, _Instead, Of), Errors) :-
+    !, erroneous(A, I),
     erroneous(Of, O),
     append([[Err], I, O], Errors).
 
