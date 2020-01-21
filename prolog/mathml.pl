@@ -636,6 +636,9 @@ ml(Flags, left_landed(Err, quote(Expr)), M) :-
 paren(Flags, left_landed(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
+prec(Flags, left_landed(Err, quote(Expr)), Prec) :-
+    precedence(Flags, Expr, Prec).
+
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
@@ -659,6 +662,9 @@ ml(Flags, right_landed(Err, quote(Expr)), M) :-
 paren(Flags, right_landed(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
+prec(Flags, right_landed(Err, quote(Expr)), Prec) :-
+    precedence(Flags, Expr, Prec).
+
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
@@ -681,6 +687,11 @@ ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
 paren(Flags, left_elsewhere(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
+prec(Flags, left_elsewhere(Err, quote(Expr)), Prec) :-
+    show(Flags, Err),
+    compound_name_arguments(Expr, _Op, [_L, R]),
+    precedence(Flags, R, Prec).
+
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
@@ -702,6 +713,11 @@ ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
 
 paren(Flags, right_elsewhere(_Err, quote(Expr)), P) :-
         paren(Flags, Expr, P).
+
+prec(Flags, right_elsewhere(Err, quote(Expr)), Prec) :-
+    show(Flags, Err),
+    compound_name_arguments(Expr, _Op, [L, _R]),
+    precedence(Flags, L, Prec).
 
 math(_, expert(A = B), A -> B).
 math(_, buggy(A \= B, _), A ~> B).
