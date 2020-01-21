@@ -636,7 +636,7 @@ ml(Flags, left_landed(Err, quote(Expr)), M) :-
 paren(Flags, left_landed(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
-prec(Flags, left_landed(Err, quote(Expr)), Prec) :-
+prec(Flags, left_landed(_Err, quote(Expr)), Prec) :-
     precedence(Flags, Expr, Prec).
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
@@ -662,7 +662,7 @@ ml(Flags, right_landed(Err, quote(Expr)), M) :-
 paren(Flags, right_landed(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
-prec(Flags, right_landed(Err, quote(Expr)), Prec) :-
+prec(Flags, right_landed(_Err, quote(Expr)), Prec) :-
     precedence(Flags, Expr, Prec).
 
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
