@@ -685,6 +685,11 @@ ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     ml(Flags, Expr, M).
 
 paren(Flags, left_elsewhere(_Err, quote(Expr)), P) :-
+    show(Flags, Err),
+    !, compound_name_arguments(Expr, _Op, [_L, R]),
+    paren(Flags, R, P).
+
+paren(Flags, left_elsewhere(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
 prec(Flags, left_elsewhere(Err, quote(Expr)), Prec) :-
@@ -710,6 +715,11 @@ ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     correct(Flags, Err),
     ml(Flags, Expr, M).
+
+paren(Flags, right_elsewhere(_Err, quote(Expr)), P) :-
+    show(Flags, Err),
+    !, compound_name_arguments(Expr, _Op, [L, _R]),
+    paren(Flags, L, P).
 
 paren(Flags, right_elsewhere(_Err, quote(Expr)), P) :-
         paren(Flags, Expr, P).
