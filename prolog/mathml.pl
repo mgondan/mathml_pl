@@ -1361,7 +1361,7 @@ math(_, tratio(X, Mu, S, N), fun("paired t-test", (X, S; Mu, N))).
 math(_, tgroups_tratio(M_A, S_A, N_A, M_B, S_B, N_B, Mu),
      fun("independent t-test", (M_A, S_A, M_B, S_B; Mu, N_A, N_B))).
 
-math(_, var_pool(V_A, N, V_B, N), dfrac(V_A + V_B, 2)).
+% math(_, var_pool(V_A, N, V_B, N), dfrac(V_A + V_B, 2)).
 
 math(_, var_pool(V_A, N_A, V_B, N_B), dfrac((N_A-1)*V_A + (N_B-1)*V_B, N_A + N_B - 2)).
 
