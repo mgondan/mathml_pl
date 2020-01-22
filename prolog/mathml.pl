@@ -615,8 +615,9 @@ paren(Flags, omit_right(_Err, quote(Expr)), P) :-
 
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
+    precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [color(Err, roundedbox(black([L, Op]))), R], M).
+    ml(Flags, [color(Err, roundedbox(black([L, Op]))), operator(Prec, fy, '', R)], M).
 
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
     show(Flags, Err),
@@ -642,8 +643,9 @@ prec(Flags, left_landed(_Err, quote(Expr)), Prec) :-
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
+    precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [L, color(Err, roundedbox(black([Op, R])))], M).
+    ml(Flags, [operator(Prec, yf, '', L), color(Err, roundedbox(black([Op, R])))], M).
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
     show(Flags, Err),
