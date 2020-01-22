@@ -437,7 +437,7 @@ paren(Flags, phantom(A), P) :-
     paren(Flags, A, P).
 
 % formatting numbers
-math(_, format_tratio(A), round2(A)).
+math(_, format_tratio(A), A).
 
 math(_, format_pvalue(A), round2(A)).
 
