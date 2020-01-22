@@ -1413,15 +1413,15 @@ prec(Flags, sqrt(_), P) :-
     precedence(Flags, x^y, P).
 
 % t-distribution
-math(_, tt(T, DF), fun('P', (abs('T') >= T ; "df" = DF))).
-math(_, ut(T, DF), fun('P', ('T' >= T ; "df" = DF))).
-math(_, pt(T, DF), fun('P', ('T' =< T ; "df" = DF))).
+math(_, tt(T, DF), fun('P', (abs('T') >= T ; [DF, " df"]))).
+math(_, ut(T, DF), fun('P', ('T' >= T ; [DF, " df"]))).
+math(_, pt(T, DF), fun('P', ('T' =< T ; [DF, " df"]))).
 
 math(_, instead_of(Err, pt(PT, PT, DF), tt(TT, TT, DF)),
-    fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; "df" = DF))).
+    fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, " df"]))).
 
 math(_, instead_of(Err, ut(UT, UT, DF), tt(TT, TT, DF)),
-    fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= TT) ; "df" = DF))).
+    fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= TT) ; [DF, " df"]))).
 
 math(_, dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])).
 math(_, pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])).
