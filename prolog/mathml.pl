@@ -1420,8 +1420,14 @@ math(_, pt(T, DF), fun('P', ('T' =< T ; [DF, '_', "df"]))).
 math(_, instead_of(Err, pt(PT, DF), pt(PT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
+math(_, instead_of(Err, pt(denoting(PT, _, _), DF), pt(PT, DF), tt(TT, DF)),
+    fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
+
 math(_, instead_of(Err, ut(UT, DF), ut(UT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= TT) ; [DF, '_', "df"]))).
+
+math(_, instead_of(Err, ut(denoting(PT, _, _), DF), ut(PT, DF), tt(TT, DF)),
+    fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
 math(_, dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])).
 math(_, pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])).
