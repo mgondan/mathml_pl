@@ -812,10 +812,6 @@ and(Flags, [denoting(X, Exp, Des) | T], [M | MT]) :-
     and(Flags, T, MT).
 
 % t-distribution
-math(_, tdist(T, DF, tail="both"), tt(T, DF)).
-math(_, tdist(T, DF, tail="lower"), ut(T, DF)).
-math(_, tdist(T, DF, tail="upper"), pt(T, DF)).
-
 math(_, tt(T, DF), fun('P', (abs('T') >= T ; [DF, '_', "df"]))).
 math(_, ut(T, DF), fun('P', ('T' >= T ; [DF, '_', "df"]))).
 math(_, 2 * pt(T, DF, 'lower.tail'='FALSE'), tt(T, DF)).
@@ -1423,16 +1419,16 @@ paren(_, sqrt(_), 0).
 prec(Flags, sqrt(_), P) :-
     precedence(Flags, x^y, P).
 
-math(_, instead_of(Err, pt(PT, DF), pt(PT, DF), tt(TT, DF)),
+math(_, instead_of(Err, pt(PT, DF), pt(TT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
-math(_, instead_of(Err, pt(denoting(PT, _, _), DF), pt(PT, DF), tt(TT, DF)),
+math(_, instead_of(Err, pt(denoting(PT, _, _), DF), pt(TT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
-math(_, instead_of(Err, ut(UT, DF), ut(UT, DF), tt(TT, DF)),
+math(_, instead_of(Err, ut(UT, DF), ut(TT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
-math(_, instead_of(Err, ut(denoting(PT, _, _), DF), ut(PT, DF), tt(TT, DF)),
+math(_, instead_of(Err, ut(denoting(PT, _, _), DF), ut(TT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' >= PT, 'T' >= PT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
 math(_, dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])).
