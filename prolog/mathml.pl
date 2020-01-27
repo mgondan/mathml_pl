@@ -460,6 +460,11 @@ erroneous(instead_of(Err, A, _Instead, Of), Errors) :-
     erroneous(Of, O),
     append([[Err], I, O], Errors).
 
+erroneous(wrong_fn(Err, A, _Instead, Of), Errors) :-
+    !, erroneous(A, I),
+    erroneous(Of, O),
+    append([[Err], I, O], Errors).
+
 erroneous(A, Errors) :-
     compound(A),
     !, compound_name_arguments(A, _, Args),
@@ -567,6 +572,9 @@ paren(Flags, instead_of(Err, _, _, Of), P) :-
 prec(Flags, instead_of(Err, _, _, Of), P) :-
     correct(Flags, Err),
     precedence(Flags, Of, P).
+
+% Same, but not nested
+math(_, wrong_fn(Err, A, Instead, Of), instead_of(Err, A, Instead, Of)).
 
 % Left part omitted
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
@@ -781,6 +789,9 @@ denot(Flags, instead_of(Err, _, _, Of), W) :-
 denot(Flags, instead_of(Err, _, _, Of), W) :-
     correct(Flags, Err),
     !, denot(Flags, Of, W).
+
+denot(Flags, wrong_fn(Err, A, Instead, Of), W) :-
+    denot(Flags, instead_of(Err, A, Instead, Of), W).
 
 denot(Flags, Comp, With) :-
     compound(Comp),
@@ -1419,16 +1430,16 @@ paren(_, sqrt(_), 0).
 prec(Flags, sqrt(_), P) :-
     precedence(Flags, x^y, P).
 
-math(_, instead_of(Err, pt(PT, DF), pt(TT, DF), tt(TT, DF)),
+math(_, wrong_fn(Err, pt(PT, DF), pt(TT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
-math(_, instead_of(Err, pt(denoting(PT, _, _), DF), pt(TT, DF), tt(TT, DF)),
+math(_, wrong_fn(Err, pt(denoting(PT, _, _), DF), pt(TT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
-math(_, instead_of(Err, ut(UT, DF), ut(TT, DF), tt(TT, DF)),
+math(_, wrong_fn(Err, ut(UT, DF), ut(TT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
-math(_, instead_of(Err, ut(denoting(PT, _, _), DF), ut(TT, DF), tt(TT, DF)),
+math(_, wrong_fn(Err, ut(denoting(PT, _, _), DF), ut(TT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' >= PT, 'T' >= PT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
 math(_, dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])).
