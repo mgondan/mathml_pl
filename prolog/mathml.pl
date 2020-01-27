@@ -811,6 +811,13 @@ and(Flags, [denoting(X, Exp, Des) | T], [M | MT]) :-
     ml(Flags, ["and", ' ', X = Exp, ' ', "denoting", ' ', Des], M),
     and(Flags, T, MT).
 
+% t-distribution
+math(_, tt(T, DF), fun('P', (abs('T') >= T ; [DF, '_', "df"]))).
+math(_, ut(T, DF), fun('P', ('T' >= T ; [DF, '_', "df"]))).
+math(_, 2 * pt(T, DF, 'lower.tail'='FALSE'), tt(T, DF)).
+math(_, pt(T, DF), fun('P', ('T' =< T ; [DF, '_', "df"]))).
+math(_, pt(T, DF, 'lower.tail'='FALSE'), ut(T, DF)).
+
 %
 % Operators
 %
@@ -1411,12 +1418,6 @@ paren(_, sqrt(_), 0).
 
 prec(Flags, sqrt(_), P) :-
     precedence(Flags, x^y, P).
-
-% t-distribution
-math(_, tt(T, DF), fun('P', (abs('T') >= T ; [DF, '_', "df"]))).
-math(_, ut(T, DF), fun('P', ('T' >= T ; [DF, '_', "df"]))).
-math(_, pt(T, DF), fun('P', ('T' =< T ; [DF, '_', "df"]))).
-math(_, pt(T, DF, 'lower.tail'='FALSE'), ut(T, DF)).
 
 math(_, instead_of(Err, pt(PT, DF), pt(PT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
