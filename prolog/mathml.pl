@@ -1416,6 +1416,7 @@ prec(Flags, sqrt(_), P) :-
 math(_, tt(T, DF), fun('P', (abs('T') >= T ; [DF, '_', "df"]))).
 math(_, ut(T, DF), fun('P', ('T' >= T ; [DF, '_', "df"]))).
 math(_, pt(T, DF), fun('P', ('T' =< T ; [DF, '_', "df"]))).
+math(_, pt(T, DF, 'lower.tail'='FALSE'), ut(T, DF)).
 
 math(_, instead_of(Err, pt(PT, DF), pt(PT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
