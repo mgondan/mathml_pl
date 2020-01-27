@@ -812,9 +812,9 @@ and(Flags, [denoting(X, Exp, Des) | T], [M | MT]) :-
     and(Flags, T, MT).
 
 % t-distribution
-math(_, tdist(T, DF, tail=both), tt(T, DF)).
-math(_, tdist(T, DF, tail=lower), ut(T, DF)).
-math(_, tdist(T, DF, tail=upper), pt(T, DF)).
+math(_, tdist(T, DF, tail="both"), tt(T, DF)).
+math(_, tdist(T, DF, tail="lower"), ut(T, DF)).
+math(_, tdist(T, DF, tail="upper"), pt(T, DF)).
 
 math(_, tt(T, DF), fun('P', (abs('T') >= T ; [DF, '_', "df"]))).
 math(_, ut(T, DF), fun('P', ('T' >= T ; [DF, '_', "df"]))).
