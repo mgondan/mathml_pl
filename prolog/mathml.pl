@@ -1436,11 +1436,8 @@ math(_, wrong_fn(Err, pt(PT, DF), pt(TT, DF), tt(TT, DF)),
 math(_, wrong_fn(Err, pt(denoting(PT, _, _), DF), pt(TT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
-math(_, wrong_fn(Err, ut(UT, DF), ut(TT, DF), tt(TT, DF)),
-    fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= TT) ; [DF, '_', "df"]))).
-
-math(_, wrong_fn(Err, ut(denoting(PT, _, _), DF), ut(TT, DF), tt(TT, DF)),
-    fun('P', (instead_of(Err, 'T' >= PT, 'T' >= PT, abs('T') >= TT) ; [DF, '_', "df"]))).
+math(_, wrong_fn(Err, ut(T, DF), ut(T, DF), tt(T, DF)),
+    fun('P', (instead_of(Err, 'T' >= T, 'T' >= T, abs('T') >= T) ; [DF, '_', "df"]))).
 
 math(_, dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])).
 math(_, pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])).
