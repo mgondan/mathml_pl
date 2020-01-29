@@ -1430,14 +1430,14 @@ paren(_, sqrt(_), 0).
 prec(Flags, sqrt(_), P) :-
     precedence(Flags, x^y, P).
 
-math(_, instead_of(Err, pt(PT, DF), pt(TT, DF), tt(TT, DF)),
-    fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
+math(_, instead_of(Err, pt(PT, DF), pt(T, DF), tt(T, DF)),
+    fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= T) ; [DF, '_', "df"]))).
 
 math(_, instead_of(Err, pt(denoting(PT, _, _), DF), pt(TT, DF), tt(TT, DF)),
     fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
 math(_, instead_of(Err, ut(UT, DF), ut(T, DF), tt(T, DF)),
-    fun('P', (instead_of(Err, 'T' >= UT, 'T' >= T, abs('T') >= T) ; [DF, '_', "df"]))).
+    fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= T) ; [DF, '_', "df"]))).
 
 math(_, dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])).
 math(_, pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])).
