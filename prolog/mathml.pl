@@ -40,14 +40,19 @@ mathml(A, M) :-
     palette(A, P),
     mathml([highlight(all) | P], A, M).
 
-mathml(Flags, A, math(X)) :-
+mathml(Flags, A, Math) :-
     denoting(Flags, A, []),
-    ml(Flags, A, X).
+    ml(Flags, A, M).
+    !, Math = math(M).
 
-mathml(Flags, A, math([M, H | T])) :-
+mathml(Flags, A, Math) :-
     denoting(Flags, A, [H | T]),
-    ml(Flags, [A, ',', ' '], M).
+    ml(Flags, [A, ',', ' '], M),
+    !, Math = math([M, H | T]).
 
+mathml(Flags, A, Err) :-
+    format(string(Err), "Conversion failed: ~w", [A]).
+    
 %
 % Show example
 %
