@@ -51,7 +51,7 @@ mathml(Flags, A, Math) :-
     !, Math = math([M, H | T]).
 
 mathml(Flags, A, Err) :-
-    format(string(Err), "Conversion failed: ~w", [A]).
+    format(string(Err), "Conversion failed: ~w", mathml(Flags, A)).
     
 %
 % Show example
