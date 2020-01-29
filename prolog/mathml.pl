@@ -752,11 +752,12 @@ example :- example([correct(err1)], instead_of(err1, sigma, sigma, s)).
 %
 % Abbreviations
 %
-math(_, denoting(A, _, _), color_or_box(Err, A)) :-
-    erroneous(A, [Err | _]).
+%math(_, denoting(A, _, _), color_or_box(Err, A)) :-
+%    erroneous(A, [Err | _]).
 
-math(_, denoting(A, _, _), A) :-
-    erroneous(A, []).
+math(_, denoting(A, _, _), red(A)).
+%:-
+%    erroneous(A, []).
 
 example :- example(denoting(s, t + u, "something")).
 example :- example(a + denoting(s, t + u, "something")).
