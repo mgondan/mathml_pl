@@ -465,6 +465,10 @@ erroneous(wrong_fn(Err, A, _Instead, Of), Errors) :-
     erroneous(Of, O),
     append([[Err], I, O], Errors).
 
+% Ignore nested errors in abbreviations
+erroneous(denoting(_, _, _), []) :-
+    !, fail.
+
 erroneous(A, Errors) :-
     compound(A),
     !, compound_name_arguments(A, _, Args),
