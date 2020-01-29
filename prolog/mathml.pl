@@ -42,7 +42,7 @@ mathml(A, M) :-
 
 mathml(Flags, A, Math) :-
     denoting(Flags, A, []),
-    ml(Flags, A, M).
+    ml(Flags, A, M),
     !, Math = math(M).
 
 mathml(Flags, A, Math) :-
