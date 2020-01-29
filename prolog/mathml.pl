@@ -1382,7 +1382,7 @@ math(_, 'TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
 
 math(_, tratio(X, Mu, S, N), fun("paired t-test", (X, S; Mu, N))).
 
-math(_, tgroups_tratio(M_A, S_A, N_A, M_B, S_B, N_B, Mu),
+math(_, tratio_groups(M_A, S_A, N_A, M_B, S_B, N_B, Mu, _Tails, _Alpha),
      fun("independent t-test", (M_A, S_A, M_B, S_B; Mu, N_A, N_B))).
 
 math(_, var_pool(V_A, N, V_B, N), dfrac(V_A + V_B, 2)).
