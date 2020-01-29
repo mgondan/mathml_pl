@@ -467,7 +467,7 @@ erroneous(wrong_fn(Err, A, _Instead, Of), Errors) :-
 
 % Ignore nested errors in abbreviations
 erroneous(denoting(_, _, _), []) :-
-    !, fail.
+    !.
 
 erroneous(A, Errors) :-
     compound(A),
