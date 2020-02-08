@@ -1382,6 +1382,8 @@ example :- example(sin(a!)^2).
 %
 % Special functions
 %
+math(_, baseline_fratio(_), 'F').
+
 math(_, 'TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
      fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))).
 
