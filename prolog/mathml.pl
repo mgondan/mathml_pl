@@ -1389,9 +1389,9 @@ example :- example(sin(a!)^2).
 %
 % Special functions
 %
-math(_, baseline_fratio(_, _Primary, _Covariates, _Strata, _Therapy), 'F').
+math(_, baseline_fratio(_, _Primary, _Covariates, _Strata, _Therapy), sub('F', Therapy)).
 
-math(_, ancova_f(_, _Primary, _Covariates, _Strata, _Therapy), 'F').
+math(_, ancova_f(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therapy)).
 
 math(_, 'TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
      fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))).
