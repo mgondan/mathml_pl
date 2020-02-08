@@ -1209,6 +1209,7 @@ prec(Flags, A, P) :-
 
 % Force rendering string as number
 ml(_, number(A), M) :-
+    string(A),
     number_string(N, A),
     N >= 0,
     !, M = mn(A).
