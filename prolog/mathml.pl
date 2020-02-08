@@ -446,6 +446,8 @@ math(_, format_tratio(A), A).
 
 math(_, format_pvalue(A), A).
 
+math(_, fratio(A), A).
+
 math(_, quote(A), A).
 
 example :- example(cancel(red, 'X')).
