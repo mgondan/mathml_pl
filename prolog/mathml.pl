@@ -1208,7 +1208,7 @@ prec(Flags, A, P) :-
     precedence(Flags, -A, P).
 
 % Force rendering string as number
-ml(Flags, number(A), M) :-
+ml(_, number(A), M) :-
     number(A),
     !, M = mn(A).
 
