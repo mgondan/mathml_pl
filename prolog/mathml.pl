@@ -8,13 +8,15 @@
     op(180, xf, !),
     op(170, xf, '%'),
     op(200, xfy, '_'),
-    op(1050, xfy, '~>')]).
+    op(1050, xfy, '~>'),
+    op(600, xfx, '~')]).
 
 :- op(180, xf, !).
 :- op(170, xf, '%').
 :- op(200, xfy, '_').
 :- op(400, yfx, invisible_times).
 :- op(1050, xfy, '~>').
+:- op(600, xfx, ~).
 
 :- discontiguous ml/3.
 :- discontiguous paren/3.
