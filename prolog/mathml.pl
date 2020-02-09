@@ -301,6 +301,9 @@ example :- example(paren(abs(x))).
 %
 % Lists (e.g., function arguments)
 %
+math(_, Plus, list(+, Arguments)) :-
+    compound_name_arguments(Plus, plus, Arguments).
+    
 math(_, [H | T], list('', [H | T])).
 math(_, (H, T), list(',', [H, T])).
 math(_, (H; T), list(';', [H, T])).
@@ -1394,6 +1397,8 @@ example :- example(sin(a!)^2).
 math(_, baseline_fratio(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therapy)).
 
 math(_, ancova_f(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therapy)).
+
+math(_, tilde(Dependent, Predictors), Dependent ~ sub('F', Therapy)).
 
 math(_, 'TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
      fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))).
