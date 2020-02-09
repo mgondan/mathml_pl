@@ -1401,6 +1401,8 @@ math(_, ancova_f(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therapy))
 
 math(_, tilde(Dependent, Predictors), Dependent ~ Predictors).
 
+math(_, lm(Model, _Data), Model).
+
 math(_, 'TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
      fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))).
 
