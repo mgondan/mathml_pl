@@ -771,7 +771,7 @@ math(_, denoting(A, X, _), color_or_box(Err, A)) :-
 
 math(_, denoting(A, _, _), A).
 
-math(_, denoting(X, _), '').
+math(_, denoting(_, _), '').
 
 %
 %    erroneous(A, []).
