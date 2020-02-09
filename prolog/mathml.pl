@@ -171,6 +171,7 @@ op('|', '|').
 op(invisible_times, &('#x2062')).
 op(->, &(rArr)).
 op(~>, &(zigrarr)).
+op(~, ~).
 
 ml(Flags, A, M) :-
     is_operator(Flags, A),
