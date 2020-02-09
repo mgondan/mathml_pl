@@ -1398,7 +1398,9 @@ math(_, baseline_fratio(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Th
 
 math(_, ancova_f(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therapy)).
 
-math(_, tilde(Dependent, Predictors), Dependent ~ sub('F', Therapy)).
+math(_, tilde(Dependent, Predictors), Dependent ~ sub('F', Therapy)) :-
+    compound_name_arguments(Predictors, plus, Arguments),
+    last(Arguments, Therapy).
 
 math(_, 'TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
      fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))).
