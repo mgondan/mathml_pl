@@ -302,6 +302,7 @@ example :- example(paren(abs(x))).
 % Lists (e.g., function arguments)
 %
 math(_, Plus, list(+, Arguments)) :-
+    compound(Plus),
     compound_name_arguments(Plus, plus, Arguments).
     
 math(_, [H | T], list('', [H | T])).
