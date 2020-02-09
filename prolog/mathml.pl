@@ -771,6 +771,8 @@ math(_, denoting(A, X, _), color_or_box(Err, A)) :-
 
 math(_, denoting(A, _, _), A).
 
+math(_, denoting(X, _), '').
+
 %
 %    erroneous(A, []).
 
@@ -787,7 +789,11 @@ denot(_, A, []) :-
 
 denot(Flags, denoting(Abbrev, Expr, Desc), W) :-
     !, denot(Flags, Expr, T),
-    W = [denoting(Abbrev, Expr, Desc) | T].
+    W = [denoting(Abbrev = Expr, Desc) | T].
+
+denot(Flags, denoting(Expr, Desc), W) :-
+    !, denot(Flags, Expr, T),
+    W = [denoting(Expr, Desc) | T].
 
 % See compound below
 %
@@ -825,21 +831,21 @@ denoting(Flags, A, Empty) :-
     !, Empty = [].
 
 denoting(Flags, A, [M]) :-
-    abbreviations(Flags, A, [denoting(X, Exp, Des)]),
+    abbreviations(Flags, A, [denoting(Expr, Des)]),
     !,
-    ml(Flags, [' ', "with", ' ', X = Exp, ' ', "denoting", ' ', Des, "."], M).
+    ml(Flags, [' ', "with", ' ', Expr, ' ', "denoting", ' ', Des, "."], M).
 
 denoting(Flags, A, [M | MT]) :-
-    abbreviations(Flags, A, [denoting(X, Exp, Des) | T]),
+    abbreviations(Flags, A, [denoting(Expr, Des) | T]),
     !,
-    ml(Flags, ["with", ' ', X = Exp, ' ', "denoting", ' ', Des, ",", ' '], M),
+    ml(Flags, ["with", ' ', Expr, ' ', "denoting", ' ', Des, ",", ' '], M),
     and(Flags, T, MT).
 
 and(Flags, [], [X]) :-
     ml(Flags, ".", X).
 
-and(Flags, [denoting(X, Exp, Des) | T], [M | MT]) :-
-    ml(Flags, ["and", ' ', X = Exp, ' ', "denoting", ' ', Des], M),
+and(Flags, [denoting(Expr, Des) | T], [M | MT]) :-
+    ml(Flags, ["and", ' ', Expr, ' ', "denoting", ' ', Des], M),
     and(Flags, T, MT).
 
 % t-distribution
