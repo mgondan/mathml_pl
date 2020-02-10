@@ -590,6 +590,26 @@ prec(Flags, instead_of(Err, _, _, Of), P) :-
 % Same, but not nested
 math(_, wrong_fn(Err, A, Instead, Of), instead_of(Err, A, Instead, Of)).
 
+% Omit element in list
+ml(Flags, omit(Err, Elem), M) :-
+    highlight(Flags, Err),
+    ml(Flags, underbrace(Elem, "omitted"), M).
+
+ml(Flags, omit(Err, Elem), M) :-
+    show(Flags, Err),
+    ml(Flags, cancel(Err, Elem), M).
+
+ml(Flags, omit(Err, Elem), M) :-
+    fix(Flags, Err),
+    ml(Flags, color(Err, Elem), M).
+
+ml(Flags, omit(Err, Elem), M) :-
+    correct(Flags, Err),
+    ml(Flags, Elem, M).
+
+paren(Flags, omit(_Err, Elem), P) :-
+    paren(Flags, Elem, P).
+
 % Left part omitted
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
