@@ -305,7 +305,9 @@ example :- example(paren(abs(x))).
 math(_, Plus, list(+, Arguments)) :-
     compound(Plus),
     compound_name_arguments(Plus, plus, Arguments).
-    
+
+math(_, plusl(List), list(+, List)).
+
 math(_, [H | T], list('', [H | T])).
 math(_, (H, T), list(',', [H, T])).
 math(_, (H; T), list(';', [H, T])).
