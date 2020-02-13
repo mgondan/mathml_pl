@@ -1427,7 +1427,7 @@ example :- example(sin(a!)^2).
 math(_, baseline_fratio(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therapy)).
 
 math(_, ancova_f(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therapy)).
-math(_, ancova_ff(_, _Primary, _Covariates, Therapy), sub('F', Therapy)).
+math(_, ancova_ff(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therapy)).
 
 math(_, tilde(Dependent, Predictors), Dependent ~ Predictors).
 
