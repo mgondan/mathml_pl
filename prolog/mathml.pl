@@ -1430,7 +1430,7 @@ math(_, baseline_fratio(_, _Primary, _Covariates, _Strata, Therapy, _Other), sub
 math(_, ancova_f(_, _Primary, _Covariates, _Strata, Therapy, _Other), sub('F', Therapy)).
 math(_, ancova_ff(_, _Primary, _Covariates, _Strata, Therapy, _Other), sub('F', Therapy)).
 math(_, ancova_fff(_, _Primary, _Covariates, _Strata, Therapy, _Other), sub('F', Therapy)).
-math(_, ancova_ffff(_, _Primary, _Covariates, _Strata, Therapy, _Other), sub('F', Therapy)).
+math(_, ancova_ffff(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therapy)).
 
 math(_, tilde(Dependent, Predictors), Dependent ~ Predictors).
 
