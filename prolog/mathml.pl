@@ -315,7 +315,7 @@ math(_, (H; T), list(';', [H, T])).
 math(_, (H| T), list('|', [H, T])).
 
 ml(Flags, list(Sep, List), M) :-
-    correct(Flags, Err),
+    fix(Flags, Err),
     !, delete(List, add(Err, _), New),
     ml(Flags, list_(Sep, New), M).
 
