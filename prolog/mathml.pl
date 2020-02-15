@@ -28,6 +28,15 @@
 :- use_module(library(http/html_write)).
 
 %
+% Error highlighting
+%
+flags(Flags, M, New) :-
+    member(fix(all), Flags),
+    !, erroneous(M, Err),
+    maplist([X, fix(X)] >> true, Err, Fix),
+    append(Flags, Fix, New).
+
+%
 % Interface
 %
 mml(A) -->
@@ -35,21 +44,24 @@ mml(A) -->
     mml([highlight(all) | P], A).
 
 mml(Flags, A) -->
-    { ml(Flags, A, M) },
-    html(math(M)).
+    { flags(Flags, A, F),
+      ml(F, A, M) 
+    }, html(math(M)).
 
 mathml(A, M) :-
     palette(A, P),
     mathml([highlight(all) | P], A, M).
 
 mathml(Flags, A, Math) :-
-    denoting(Flags, A, []),
-    ml(Flags, A, M),
+    flags(Flags, A, F),
+    denoting(F, A, []),
+    ml(F, A, M),
     !, Math = math(M).
 
 mathml(Flags, A, Math) :-
-    denoting(Flags, A, [H | T]),
-    ml(Flags, [A, ',', ' '], M),
+    flags(Flags, A, F),
+    denoting(F, A, [H | T]),
+    ml(F, [A, ',', ' '], M),
     !, Math = math([M, H | T]).
 
 mathml(Flags, A, Err) :-
