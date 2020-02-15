@@ -327,13 +327,9 @@ math(_, (H; T), list(';', [H, T])).
 math(_, (H| T), list('|', [H, T])).
 
 ml(Flags, list(Sep, List), M) :-
-    fix(Flags, Err),
-    !, delete(List, add(Err, _), New),
+    exclude({Flags}/[add(Err, _)] >> fix(Flags, Err), List, New),
     ml(Flags, list_(Sep, New), M).
 
-ml(Flags, list(Sep, List), M) :-
-    ml(Flags, list_(Sep, List), M).
-    
 ml(Flags, list_(Sep, [H | T]), mrow([HX | TX])) :-
     ml(Flags, H, HX),
     ml(Flags, tail(Sep, T), TX).
