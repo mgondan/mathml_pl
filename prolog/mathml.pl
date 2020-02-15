@@ -613,6 +613,26 @@ ml(Flags, omit(Err, Elem), M) :-
 paren(Flags, omit(_Err, Elem), P) :-
     paren(Flags, Elem, P).
 
+% Add element to list
+ml(Flags, add(Err, Elem), M) :-
+    highlight(Flags, Err),
+    ml(Flags, underbrace(Elem, "added"), M).
+
+ml(Flags, add(Err, Elem), M) :-
+    show(Flags, Err),
+    ml(Flags, color(Err, Elem), M).
+
+ml(Flags, add(Err, Elem), M) :-
+    fix(Flags, Err),
+    ml(Flags, cancel(Err, Elem), M).
+
+ml(Flags, add(Err, Elem), M) :-
+    correct(Flags, Err),
+    ml(Flags, cancel(Err, Elem), M).
+
+paren(Flags, add(_Err, Elem), P) :-
+    paren(Flags, Elem, P).
+
 % Left part omitted
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
