@@ -485,6 +485,10 @@ erroneous(instead_of(Err, A, _Instead, Of), Errors) :-
     erroneous(Of, O),
     append([[Err], I, O], Errors).
 
+erroneous(add(Err, A), Errors) :-
+    !, erroneous(A, E),
+    Errors = [Err | E].
+    
 erroneous(wrong_fn(Err, A, _Instead, Of), Errors) :-
     !, erroneous(A, I),
     erroneous(Of, O),
