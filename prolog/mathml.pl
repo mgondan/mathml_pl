@@ -305,7 +305,7 @@ example :- example(paren(abs(x))).
 math(_, Plus, list(+, Arguments)) :-
     compound(Plus),
     compound_name_arguments(Plus, plus, Args),
-    delete(Args, 'NULL', Arguments).
+    delete(Args, [], Arguments).
 
 math(_, plusl(List), list(+, List)).
 
