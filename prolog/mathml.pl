@@ -1106,7 +1106,7 @@ prec(_, operator(P, _, _, _), op-P).
 
 % Avoid unnecessary parentheses right to + in 1 + (2 - 3)
 math(Flags, A + B, operator(P, yfy, +, A, B)) :-
-    precedence(Flags, a+b, _-P).
+    current_op(P, yfx, +).
 
 % General binary operators
 math(_, Comp, operator(Prec, Fix, Op, A, B)) :-
