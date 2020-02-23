@@ -887,19 +887,19 @@ denoting(Flags, A, Empty) :-
 denoting(Flags, A, [M]) :-
     abbreviations(Flags, A, [denoting(Expr, Des)]),
     !,
-    ml(Flags, [' ', "with", ' ', Expr, ' ', "denoting", ' ', Des, "."], M).
+    ml(Flags, (' ', "with", ' ', Expr, ' ', "denoting", ' ', Des, "."), M).
 
 denoting(Flags, A, [M | MT]) :-
     abbreviations(Flags, A, [denoting(Expr, Des) | T]),
     !,
-    ml(Flags, ["with", ' ', Expr, ' ', "denoting", ' ', Des, ",", ' '], M),
+    ml(Flags, ("with", ' ', Expr, ' ', "denoting", ' ', Des, ",", ' '), M),
     and(Flags, T, MT).
 
 and(Flags, [], [X]) :-
     ml(Flags, ".", X).
 
 and(Flags, [denoting(Expr, Des) | T], [M | MT]) :-
-    ml(Flags, ["and", ' ', Expr, ' ', "denoting", ' ', Des], M),
+    ml(Flags, ("and", ' ', Expr, ' ', "denoting", ' ', Des), M),
     and(Flags, T, MT).
 
 % t-distribution
