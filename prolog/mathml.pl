@@ -641,6 +641,9 @@ ml(Flags, add(Err, Elem), M) :-
 paren(Flags, add(_Err, Elem), P) :-
     paren(Flags, Elem, P).
 
+prec(Flags, add(_Err, Elem), P) :-
+    precedence(Flags, Elem, P).
+
 % Left part omitted
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
