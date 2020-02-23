@@ -309,7 +309,11 @@ math(_, Plus, list(+, Arguments)) :-
 
 math(_, plusl(List), list(+, List)).
 
-math(_, [H | T], list(',', [H | T])).
+math(Flags, [H | T], list(Sep, [H | T])) :-
+    member(sep-Sep, Flags).
+
+math(Flags, [H | T], list(',', [H | T])).
+    
 math(_, (H, T), list('', [H, T])).
 math(_, (H; T), list(';', [H, T])).
 math(_, (H| T), list('|', [H, T])).
