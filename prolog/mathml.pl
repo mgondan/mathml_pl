@@ -1104,6 +1104,11 @@ paren(Flags, operator(Prec, Fix, _, A), Paren) :-
 
 prec(_, operator(P, _, _, _), op-P).
 
+% Avoid unnecessary parentheses right to + in 1 + (2 - 3)
+math(Flags, A + B, operator(P, yfy, +, A, B)) :-
+    precedence(Flags, a+b, _-P).
+
+% General binary operators
 math(_, Comp, operator(Prec, Fix, Op, A, B)) :-
     compound(Comp),
     compound_name_arguments(Comp, Op, [A, B]),
@@ -1130,6 +1135,18 @@ ml(Flags, operator(P, xfy, Op, A, B), mrow([X, F, Y])) :-
     ( P < PrecB
       -> ml(Flags, paren(B), Y)
       ; ml(Flags, B, Y)
+    ), ml(Flags, Op, F).
+
+% yfy avoids parentheses around 1 + (2 + 3)
+ml(Flags, operator(P, yfy, Op, A, B), mrow([Y, F, X])) :-
+    precedence(Flags, A, _-PrecA),
+    ( P < PrecA
+      -> ml(Flags, paren(A), Y)
+      ; ml(Flags, A, Y)
+    ), precedence(Flags, B, _-PrecB),
+    ( P < PrecB
+      -> ml(Flags, paren(B), X)
+      ; ml(Flags, B, X)
     ), ml(Flags, Op, F).
 
 ml(Flags, operator(P, yfx, Op, A, B), mrow([Y, F, X])) :-
