@@ -1105,7 +1105,7 @@ paren(Flags, operator(Prec, Fix, _, A), Paren) :-
 prec(_, operator(P, _, _, _), op-P).
 
 % Avoid unnecessary parentheses right to + in 1 + (2 - 3)
-math(Flags, A + B, operator(P, yfy, +, A, B)) :-
+math(_, A + B, operator(P, yfy, +, A, B)) :-
     current_op(P, yfx, +).
 
 % General binary operators
