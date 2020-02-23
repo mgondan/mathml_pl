@@ -309,8 +309,8 @@ math(_, Plus, list(+, Arguments)) :-
 
 math(_, plusl(List), list(+, List)).
 
-math(_, [H | T], list('', [H | T])).
-math(_, (H, T), list(',', [H, T])).
+math(_, [H | T], list(',', [H | T])).
+math(_, (H, T), list('', [H, T])).
 math(_, (H; T), list(';', [H, T])).
 math(_, (H| T), list('|', [H, T])).
 
