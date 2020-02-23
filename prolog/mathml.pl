@@ -1480,10 +1480,16 @@ math(_, ancova_ff(_, _Primary, _Covariates, _Strata, Therapy, _Other), sub('F', 
 math(_, ancova_fff(_, _Primary, _Covariates, _Strata, Therapy, _Other), sub('F', Therapy)).
 math(_, ancova_ffff(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therapy)).
 
-math(_, Tilde, Dependent ~ [Predictors]) :-
+ml(Flags, Tilde, M) :-
     compound(Tilde),
-    compound_name_arguments(Tilde, tilde, [Dependent | Predictors]).
+    compound_name_arguments(Tilde, tilde, [Dependent | Predictors]),
+    !, ml(Flags, Dependent ~ list(+, Predictors), M).
 
+paren(Flags, Tilde, P) :-
+    compound(Tilde),
+    compound_name_arguments(Tilde, tilde, [Dependent | Predictors]),
+    !, paren(Flags, Dependent ~ list(+, Predictors), M).
+    
 math(_, lm(Model, _Data), Model).
 
 math(_, anova_f(_, Therapy), sub('F', Therapy)).
