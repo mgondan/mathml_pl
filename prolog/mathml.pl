@@ -1488,7 +1488,7 @@ ml(Flags, Tilde, M) :-
 paren(Flags, Tilde, P) :-
     compound(Tilde),
     compound_name_arguments(Tilde, tilde, [Dependent | Predictors]),
-    !, paren(Flags, Dependent ~ list(+, Predictors), M).
+    !, paren(Flags, Dependent ~ list(+, Predictors), P).
     
 math(_, lm(Model, _Data), Model).
 
