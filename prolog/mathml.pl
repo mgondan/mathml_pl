@@ -21,7 +21,7 @@
 :- discontiguous ml/3.
 :- discontiguous paren/3.
 :- discontiguous prec/3.
-:- discontiguous math/3.
+:- discontiguous math/4.
 :- discontiguous example/0.
 
 :- use_module(library(quantity)).
@@ -78,34 +78,34 @@ example(Flags, A) :-
 % e.g., to replace s_D by sub(s, 'D'), use math_hook(_, s_D, sub(s, 'D')).
 %
 :- multifile ml_hook/3.
-:- multifile math_hook/3.
+:- multifile math_hook/4.
 
 ml(Flags, A, M) :-
     ml_hook(Flags, A, M),
     !.
 
-math(Flags, A, M) :-
-    math_hook(Flags, A, M),
+math(Flags, A, New, M) :-
+    math_hook(Flags, A, New, M),
     !.
 
 %
 % Macros (e.g., red(X) for color("red", X)
 %
 ml(Flags, A, M) :-
-    math(Flags, A, X),
-    !, ml(Flags, X, M).
+    math(Flags, A, New, X),
+    !, ml(New, X, M).
 
 paren(Flags, A, P) :-
-    math(Flags, A, X),
-    !, paren(Flags, X, P).
+    math(Flags, A, New, X),
+    !, paren(New, X, P).
 
 %
 % Precedence
 %
 % Macros
 precedence(Flags, A, P) :-
-    math(Flags, A, X),
-    !, precedence(Flags, X, P).
+    math(Flags, A, New, X),
+    !, precedence(New, X, P).
 
 % Explicit definitions
 precedence(Flags, A, P) :-
@@ -302,22 +302,15 @@ example :- example(paren(abs(x))).
 %
 % Lists (e.g., function arguments)
 %
-math(_, Plus, list(+, Arguments)) :-
-    compound(Plus),
-    compound_name_arguments(Plus, plus, Args),
-    delete(Args, [], Arguments).
-
-math(_, plusl(List), list(+, List)).
-
-math(_, [], '').
-math(Flags, [H | T], list(Sep, [H | T])) :-
+math(Flags, [], Flags, '').
+math(Flags, [H | T], Flags, list(Sep, [H | T])) :-
     member(sep-Sep, Flags).
 
-math(_, [H | T], list(',', [H | T])).
+math(Flags, [H | T], Flags, list(',', [H | T])).
     
-math(_, (H, T), list('', [H, T])).
-math(_, (H; T), list(';', [H, T])).
-math(_, (H| T), list('|', [H, T])).
+math(Flags, (H, T), Flags, list('', [H, T])).
+math(Flags, (H; T), Flags, list(';', [H, T])).
+math(Flags, (H| T), Flags, list('|', [H, T])).
 
 ml(Flags, list(Sep, List), M) :-
     exclude({Flags}/[add(Err, _)] >> correct(Flags, Err), List, New),
@@ -368,12 +361,12 @@ palette(A, Flags) :-
     sort(Errs, Errors),
     findall(color(E, C), (nth0(N, Errors, E), N6 is N mod 6, color(N6, C)), Flags).
     
-math(_, red(A), color("red", A)).
-math(_, green(A), color("green", A)).
-math(_, blue(A), color("blue", A)).
-math(_, black(A), color("black", A)).
-math(_, grey(A), color("grey", A)).
-math(_, lightred(A), color("#FFA0A0", A)).
+math(Flags, red(A), Flags, color("red", A)).
+math(Flags, green(A), Flags, color("green", A)).
+math(Flags, blue(A), Flags, color("blue", A)).
+math(Flags, black(A), Flags, color("black", A)).
+math(Flags, grey(A), Flags, color("grey", A)).
+math(Flags, lightred(A), Flags, color("#FFA0A0", A)).
 
 ml(Flags, color(String, A), mstyle(mathcolor(String), X)) :-
     string(String),
@@ -409,7 +402,7 @@ prec(Flags, overline(A), accent-P) :-
     precedence(Flags, a*A, _-P).
 
 % Proper average
-math(_, mean(A), overline(A)).
+math(Flags, mean(A), Flags, overline(A)).
 
 % Underbrace with text
 ml(Flags, underbrace(A, Under),
@@ -424,7 +417,7 @@ prec(Flags, underbrace(A, _), P) :-
     precedence(Flags, A, P).
 
 % Strike through
-math(_, cancel(Color, A), color(Color, strike(black(A)))).
+math(Flags, cancel(Color, A), Flags, color(Color, strike(black(A)))).
 
 ml(Flags, strike(A), menclose(notation(updiagonalstrike), X)) :-
     ml(Flags, A, X).
@@ -461,13 +454,13 @@ paren(Flags, phantom(A), P) :-
     paren(Flags, A, P).
 
 % formatting numbers
-math(_, format_tratio(A), A).
+math(Flags, format_tratio(A), Flags, A).
 
-math(_, format_pvalue(A), A).
+math(Flags, format_pvalue(A), Flags, A).
 
-math(_, fratio(A), A).
+math(Flags, fratio(A), Flags, A).
 
-math(_, quote(A), A).
+math(Flags, quote(A), Flags, A).
 
 example :- example(cancel(red, 'X')).
 example :- example(paren([paren(red(x)), green(paren(y))])).
@@ -527,8 +520,8 @@ correct(Flags, Err) :-
 correct(Flags, _) :-
     member(correct(all), Flags).
 
-math(_, expert(quote(_Feedback), A), A).
-math(_, buggy(quote(_Feedback), A), A).
+math(Flags, expert(quote(_Feedback), A), Flags, A).
+math(Flags, buggy(quote(_Feedback), A), Flags, A).
 
 paren(Flags, error(Err, Mode, A), P) :-
     C =.. [Err, Mode],
@@ -604,7 +597,7 @@ prec(Flags, instead_of(Err, _, _, Of), P) :-
     precedence(Flags, Of, P).
 
 % Same, but not nested
-math(_, wrong_fn(Err, A, Instead, Of), instead_of(Err, A, Instead, Of)).
+math(Flags, wrong_fn(Err, A, Instead, Of), Flags, instead_of(Err, A, Instead, Of)).
 
 % Omit element in list
 ml(Flags, omit(Err, Elem), M) :-
@@ -814,9 +807,6 @@ prec(Flags, right_elsewhere(Err, quote(Expr)), Prec) :-
     compound_name_arguments(Expr, _Op, [L, _R]),
     precedence(Flags, L, Prec).
 
-math(_, expert(A = B), A -> B).
-math(_, buggy(A \= B, _), A ~> B).
-
 example :- example([highlight(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([fix(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([show(err1)], instead_of(err1, sigma, sigma, s)).
@@ -825,18 +815,12 @@ example :- example([correct(err1)], instead_of(err1, sigma, sigma, s)).
 %
 % Abbreviations
 %
-math(_, denoting(A, X, _), color_or_box(Err, A)) :-
+math(Flags, denoting(A, X, _), Flags, color_or_box(Err, A)) :-
     erroneous(X, [Err | _]).
 
-math(_, denoting(A, _, _), A).
+math(Flags, denoting(A, _, _), Flags, A).
 
-math(_, denoting(_, _), '').
-
-%
-%    erroneous(A, []).
-
-example :- example(denoting(s, t + u, "something")).
-example :- example(a + denoting(s, t + u, "something")).
+math(Flags, denoting(_, _), Flags, '').
 
 % Collect abbreviations
 abbreviations(Flags, A, W) :-
@@ -908,11 +892,11 @@ and(Flags, [denoting(Expr, Des) | T], [M | MT]) :-
     and(Flags, T, MT).
 
 % t-distribution
-math(_, tt(T, DF), fun('P', (abs('T') >= T ; [DF, '_', "df"]))).
-math(_, ut(T, DF), fun('P', ('T' >= T ; [DF, '_', "df"]))).
-math(_, 2 * pt(T, DF, 'lower.tail'='FALSE'), tt(T, DF)).
-math(_, pt(T, DF), fun('P', ('T' =< T ; [DF, '_', "df"]))).
-math(_, pt(T, DF, 'lower.tail'='FALSE'), ut(T, DF)).
+math(Flags, tt(T, DF), Flags, fun('P', (abs('T') >= T ; [DF, '_', "df"]))).
+math(Flags, ut(T, DF), Flags, fun('P', ('T' >= T ; [DF, '_', "df"]))).
+math(Flags, 2 * pt(T, DF, 'lower.tail'='FALSE'), Flags, tt(T, DF)).
+math(Flags, pt(T, DF), Flags, fun('P', ('T' =< T ; [DF, '_', "df"]))).
+math(Flags, pt(T, DF, 'lower.tail'='FALSE'), Flags, ut(T, DF)).
 
 %
 % Operators
@@ -981,7 +965,7 @@ paren(Flags, subsup(A, _, _), P) :-
 prec(Flags, subsup(X, _, Z), P) :-
     precedence(Flags, X^Z, P).
 
-math(_, A '_' B, sub(A, B)).
+math(Flags, A '_' B, Flags, sub(A, B)).
 
 ml(Flags, sub(A, B), M) :-
     select_option(replace(sub(A, B), subsup(A, B, C)), Flags, New),
@@ -1009,7 +993,7 @@ paren(Flags, sub(A, _), P) :-
 prec(Flags, sub(A, _), sub-P) :-
     precedence(Flags, A, _-P).
 
-math(_, A^B, sup(A, B)).
+math(Flags, A^B, Flags, sup(A, B)).
 
 % experimental: sin^2 x for "simple" x
 ml(Flags, sup(Sin, X), M) :-
@@ -1046,22 +1030,22 @@ prec(_, sup(_, _), sup-P) :-
     P = Prec.
 
 % Omit multiplication sign in "simple" products
-math(Flags, A * B, M) :-
+math(Flags, A * B, Flags, M) :-
     paren(Flags, A / x, 0),
     !, M = A invisible_times B.
 
 % Use plus as default separator for lists right to ~
-math(Flags, Dependent ~ Predictors, operator(Prec, xfy, ~, Dependent, list(+, Predictors))) :-
+math(Flags, Dependent ~ Predictors, [sep-(+) | Flags], operator(Prec, xfy, ~, Dependent, Predictors)) :-
     current_op(P, xfy, ','),
     precedence(Flags, Predictors, list-P),
     current_op(Prec, xfy, ~).
 
 % Negative sign has same precedence as binary minus
-math(Flags, -A, operator(P, fx, -, A)) :-
+math(Flags, -A, Flags, operator(P, fx, -, A)) :-
     precedence(Flags, a-b, _-P).
 
 % Prefix and postfix operators (e.g., factorial)
-math(_, Comp, operator(Prec, Fix, Op, A)) :-
+math(Flags, Comp, Flags, operator(Prec, Fix, Op, A)) :-
     compound(Comp),
     compound_name_arguments(Comp, Op, [A]),
     current_op(P, Fix, Op), Prec = P,
@@ -1116,11 +1100,11 @@ paren(Flags, operator(Prec, Fix, _, A), Paren) :-
 prec(_, operator(P, _, _, _), op-P).
 
 % Avoid unnecessary parentheses right to + in 1 + (2 - 3)
-math(_, A + B, operator(P, yfy, +, A, B)) :-
+math(Flags, A + B, Flags, operator(P, yfy, +, A, B)) :-
     current_op(P, yfx, +).
 
 % General binary operators
-math(_, Comp, operator(Prec, Fix, Op, A, B)) :-
+math(Flags, Comp, Flags, operator(Prec, Fix, Op, A, B)) :-
     compound(Comp),
     compound_name_arguments(Comp, Op, [A, B]),
     current_op(P, Fix, Op), Prec = P,
@@ -1443,9 +1427,9 @@ example :- example(frac(small, small) = dfrac(large, large)).
 %
 % Trigonometric functions
 %
-math(_, sin(A), trig(sin, A)).
-math(_, cos(A), trig(cos, A)).
-math(_, tan(A), trig(tan, A)).
+math(Flags, sin(A), Flags, trig(sin, A)).
+math(Flags, cos(A), Flags, trig(cos, A)).
+math(Flags, tan(A), Flags, trig(tan, A)).
 
 ml(Flags, trig(Fun, Arg), M) :-
     paren(Flags, Arg, 0),
@@ -1484,12 +1468,12 @@ example :- example(sin(a!)^2).
 %
 % Special functions
 %
-math(_, baseline_fratio(_, _Primary, _Covariates, _Strata, Therapy, _Other), sub('F', Therapy)).
+math(Flags, baseline_fratio(_, _Primary, _Covariates, _Strata, _Other, Therapy), Flags, sub('F', Therapy)).
 
-math(_, ancova_f(_, _Primary, _Covariates, _Strata, Therapy, _Other), sub('F', Therapy)).
-math(_, ancova_ff(_, _Primary, _Covariates, _Strata, Therapy, _Other), sub('F', Therapy)).
-math(_, ancova_fff(_, _Primary, _Covariates, _Strata, Therapy, _Other), sub('F', Therapy)).
-math(_, ancova_ffff(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therapy)).
+math(Flags, ancova_f(_, _Primary, _Covariates, _Strata, _Other, Therapy), Flags, sub('F', Therapy)).
+math(Flags, ancova_ff(_, _Primary, _Covariates, _Strata, _Other, Therapy), Flags, sub('F', Therapy)).
+math(Flags, ancova_fff(_, _Primary, _Covariates, _Strata, _Other, Therapy), Flags, sub('F', Therapy)).
+math(Flags, ancova_ffff(_, _Primary, _Covariates, _Strata, _Other, Therapy), Flags, sub('F', Therapy)).
 
 ml(Flags, Tilde, M) :-
     compound(Tilde),
@@ -1503,24 +1487,24 @@ paren(Flags, Tilde, P) :-
     subtract(Predictors, [[]], NonEmpty),
     !, paren(Flags, Dependent ~ NonEmpty, P).
     
-math(_, lm(Model, _Data), Model).
+math(Flags, lm(Model, _Data), Flags, Model).
 
-math(_, anova_f(_, Therapy), sub('F', Therapy)).
+math(Flags, anova_f(_, Therapy), Flags, sub('F', Therapy)).
 
-math(_, 'TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
-     fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))).
+math(Flags, 'TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
+     Flags, fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))).
 
-math(_, tratio(X, Mu, S, N), fun("paired t-test", (X, S; Mu, N))).
+math(Flags, tratio(X, Mu, S, N), Flags, fun("paired t-test", (X, S; Mu, N))).
 
-math(_, tratio_groups(M_A, S_A, N_A, M_B, S_B, N_B, Mu, _Tails, _Alpha),
-     fun("independent t-test", (M_A, S_A, M_B, S_B; Mu, N_A, N_B))).
+math(Flags, tratio_groups(M_A, S_A, N_A, M_B, S_B, N_B, Mu, _Tails, _Alpha),
+     Flags, fun("independent t-test", (M_A, S_A, M_B, S_B; Mu, N_A, N_B))).
 
-math(_, tratio_paired(D, _T0, _EOT, Mu, S_D, _S_T0, _S_EOT, N, _Tails, _Alpha),
-     fun("paired t-test", (D, S_D; Mu, N))).
+math(Flags, tratio_paired(D, _T0, _EOT, Mu, S_D, _S_T0, _S_EOT, N, _Tails, _Alpha),
+     Flags, fun("paired t-test", (D, S_D; Mu, N))).
 
-math(_, var_pool(V_A, N, V_B, N), dfrac(V_A + V_B, 2)).
+math(Flags, var_pool(V_A, N, V_B, N), Flags, dfrac(V_A + V_B, 2)).
 
-math(_, var_pool(V_A, N_A, V_B, N_B), dfrac((N_A-1)*V_A + (N_B-1)*V_B, N_A + N_B - 2)).
+math(Flags, var_pool(V_A, N_A, V_B, N_B), Flags, dfrac((N_A-1)*V_A + (N_B-1)*V_B, N_A + N_B - 2)).
 
 ml(Flags, sum(I, From, To, A), mrow([munderover([\['&sum;'], XFrom, XTo]), X])) :-
     ml(Flags, I = From, XFrom),
@@ -1569,25 +1553,25 @@ paren(_, sqrt(_), 0).
 prec(Flags, sqrt(_), P) :-
     precedence(Flags, x^y, P).
 
-math(_, instead_of(Err, pt(PT, DF), pt(T, DF), tt(T, DF)),
-    fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= T) ; [DF, '_', "df"]))).
+math(Flags, instead_of(Err, pt(PT, DF), pt(T, DF), tt(T, DF)),
+    Flags, fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= T) ; [DF, '_', "df"]))).
 
-math(_, instead_of(Err, pt(denoting(PT, _, _), DF), pt(TT, DF), tt(TT, DF)),
-    fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
+math(Flags, instead_of(Err, pt(denoting(PT, _, _), DF), pt(TT, DF), tt(TT, DF)),
+    Flags, fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', "df"]))).
 
-math(_, instead_of(Err, ut(UT, DF), ut(T, DF), tt(T, DF)),
-    fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= T) ; [DF, '_', "df"]))).
+math(Flags, instead_of(Err, ut(UT, DF), ut(T, DF), tt(T, DF)),
+    Flags, fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= T) ; [DF, '_', "df"]))).
 
-math(_, dbinom(K, N, P), fun('P' '_' "Bi", ['X' = K ; (N, P)])).
-math(_, pbinom(K, N, P), fun('P' '_' "Bi", ['X' =< K ; (N, P)])).
-math(_, ubinom(K, N, P), fun('P' '_' "Bi", ['X' >= K ; (N, P)])).
-math(_, qbinom(Alpha, N, P), fun('Q' '_' "Bi", [Alpha ; (N, P)])).
-math(_, uqbinom(Alpha, N, P), fun('Q' '_' "Bi", [1 - Alpha ; (N, P)])).
+math(Flags, dbinom(K, N, P), Flags, fun('P' '_' "Bi", ['X' = K ; (N, P)])).
+math(Flags, pbinom(K, N, P), Flags, fun('P' '_' "Bi", ['X' =< K ; (N, P)])).
+math(Flags, ubinom(K, N, P), Flags, fun('P' '_' "Bi", ['X' >= K ; (N, P)])).
+math(Flags, qbinom(Alpha, N, P), Flags, fun('Q' '_' "Bi", [Alpha ; (N, P)])).
+math(Flags, uqbinom(Alpha, N, P), Flags, fun('Q' '_' "Bi", [1 - Alpha ; (N, P)])).
 
 % Bit unusual terminology
-math(_, bernoulli(Succ, N, Pi), successes(Succ, Pi) * failures(N-Succ, Pi)).
-math(_, successes(Succ, Pi), Pi^Succ).
-math(_, failures(Fail, Pi), (1-Pi)^Fail).
+math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
+math(Flags, successes(Succ, Pi), Flags, Pi^Succ).
+math(Flags, failures(Fail, Pi), Flags, (1-Pi)^Fail).
 
 % General functions
 ml(Flags, fun(Name, Args), mrow([N, &(af), A])) :-
