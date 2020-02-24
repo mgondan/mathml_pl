@@ -1487,13 +1487,13 @@ math(_, ancova_ffff(_, _Primary, _Covariates, _Strata, Therapy), sub('F', Therap
 ml(Flags, Tilde, M) :-
     compound(Tilde),
     compound_name_arguments(Tilde, tilde, [Dependent | Predictors]),
-    select([], Predictors, NonEmpty),
+    subtract(Predictors, [[]], NonEmpty),
     !, ml([sep-(+) | Flags], Dependent ~ NonEmpty, M).
 
 paren(Flags, Tilde, P) :-
     compound(Tilde),
     compound_name_arguments(Tilde, tilde, [Dependent | Predictors]),
-    select([], Predictors, NonEmpty),
+    subtract(Predictors, [[]], NonEmpty),
     !, paren(Flags, Dependent ~ NonEmpty, P).
     
 math(_, lm(Model, _Data), Model).
