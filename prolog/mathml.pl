@@ -1052,7 +1052,7 @@ math(Flags, A * B, M) :-
 
 % Use plus as default separator for lists right to ~
 math(Flags, Dep ~ Predictors, Dep ~ list(+, Predictors)) :-
-    current_op(Prec, xfy, ',').
+    current_op(Prec, xfy, ','),
     precedence(Flags, Predictors, list-Prec).
 
 % Negative sign has same precedence as binary minus
