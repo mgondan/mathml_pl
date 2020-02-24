@@ -1050,6 +1050,10 @@ math(Flags, A * B, M) :-
     paren(Flags, A / x, 0),
     !, M = A invisible_times B.
 
+% Use plus as default separator for lists right to ~
+math(Flags, Dep ~ Predictors, Dep ~ list(+, Predictors)) :-
+    prec(Flags, Predictors, list-',').
+
 % Negative sign has same precedence as binary minus
 math(Flags, -A, operator(P, fx, -, A)) :-
     precedence(Flags, a-b, _-P).
