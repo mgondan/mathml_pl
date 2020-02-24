@@ -16,7 +16,7 @@
 :- op(200, xfy, '_').
 :- op(400, yfx, invisible_times).
 :- op(1050, xfy, '~>').
-:- op(600, xfx, ~).
+:- op(600, xfy, ~).
 
 :- discontiguous ml/3.
 :- discontiguous paren/3.
@@ -1051,10 +1051,10 @@ math(Flags, A * B, M) :-
     !, M = A invisible_times B.
 
 % Use plus as default separator for lists right to ~
-math(Flags, Dependent ~ Predictors, operator(Prec, xfx, ~, Dependent, list(+, Predictors))) :-
+math(Flags, Dependent ~ Predictors, operator(Prec, xfy, ~, Dependent, list(+, Predictors))) :-
     current_op(P, xfy, ','),
     precedence(Flags, Predictors, list-P),
-    current_op(Prec, xfx, ~).
+    current_op(Prec, xfy, ~).
 
 % Negative sign has same precedence as binary minus
 math(Flags, -A, operator(P, fx, -, A)) :-
