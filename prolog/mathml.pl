@@ -1498,7 +1498,7 @@ math(Flags, 'TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
 math(Flags, tratio(X, Mu, S, N), Flags, fun("paired t-test", (X, S; Mu, N))).
 
 math(Flags, tratio_groups(M_A, S_A, N_A, M_B, S_B, N_B, Mu, _Tails, _Alpha),
-     Flags, fun("independent t-test", (M_A, S_A, M_B, S_B; Mu, N_A, N_B))).
+     Flags, fun("independent t-test", [M_A, S_A, M_B, S_B; Mu, N_A, N_B])).
 
 math(Flags, tratio_paired(D, _T0, _EOT, Mu, S_D, _S_T0, _S_EOT, N, _Tails, _Alpha),
      Flags, fun("paired t-test", (D, S_D; Mu, N))).
