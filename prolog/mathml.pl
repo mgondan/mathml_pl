@@ -465,7 +465,7 @@ math(Flags, quote(A), Flags, A).
 
 example :- example(cancel(red, 'X')).
 example :- example(paren([paren(red(x)), green(paren(y))])).
-example :- example(underbrace(s, list('', ["instead of", ' ', sigma]))).
+example :- example(underbrace(s, list('', ("instead of", ' ', sigma)))).
 
 %
 % Mistakes
@@ -547,11 +547,11 @@ prec(Flags, error(Err, Mode, A), P) :-
 % A instead of B
 ml(Flags, instead_of(Err, Instead, Instead, Of), M) :-
     highlight(Flags, Err),
-    !, ml(Flags, underbrace(Instead, ["instead of", ' ', Of]), M).
+    !, ml(Flags, underbrace(Instead, ("instead of", ' ', Of)), M).
 
 ml(Flags, instead_of(Err, A, Instead, Of), M) :-
     highlight(Flags, Err),
-    ml(Flags, underbrace(A, [Instead, ' ', "instead of", ' ', Of]), M).
+    ml(Flags, underbrace(A, (Instead, ' ', "instead of", ' ', Of)), M).
 
 paren(Flags, instead_of(Err, A, _, _), P) :-
     highlight(Flags, Err),
