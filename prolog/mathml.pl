@@ -692,13 +692,13 @@ ml(Flags, left_landed(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [color(Err, roundedbox(black([L, Op]))), operator(Prec, fy, '', R)], M).
+    ml(Flags, (color(Err, roundedbox(black((L, Op)))), operator(Prec, fy, '', R)), M).
 
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
     show(Flags, Err),
     precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [color_or_box(Err, [L, Op]), operator(Prec, fy, '', R)], M).
+    ml(Flags, (color_or_box(Err, (L, Op)), operator(Prec, fy, '', R)), M).
 
 ml(Flags, left_landed(Err, quote(Expr)), M) :-
     fix(Flags, Err),
@@ -720,13 +720,13 @@ ml(Flags, right_landed(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [operator(Prec, yf, '', L), color(Err, roundedbox(black([Op, R])))], M).
+    ml(Flags, (operator(Prec, yf, '', L), color(Err, roundedbox(black((Op, R))))), M).
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
     show(Flags, Err),
     precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [operator(Prec, yf, '', L), color_or_box(Err, [Op, R])], M).
+    ml(Flags, (operator(Prec, yf, '', L), color_or_box(Err, (Op, R))), M).
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
     fix(Flags, Err),
@@ -747,7 +747,7 @@ prec(Flags, right_landed(_Err, quote(Expr)), Prec) :-
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [color(Err, roundedbox(phantom([L, Op]))), R], M).
+    ml(Flags, (color(Err, roundedbox(phantom((L, Op)))), R), M).
 
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     show(Flags, Err),
@@ -757,7 +757,7 @@ ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [color_or_box(Err, [L, Op]), R], M).
+    ml(Flags, (color_or_box(Err, (L, Op)), R), M).
 
 ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
     correct(Flags, Err),
@@ -779,7 +779,7 @@ prec(Flags, left_elsewhere(Err, quote(Expr)), Prec) :-
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [L, color(Err, roundedbox(phantom([Op, R])))], M).
+    ml(Flags, (L, color(Err, roundedbox(phantom((Op, R))))), M).
 
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     show(Flags, Err),
@@ -789,7 +789,7 @@ ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [L, color_or_box(Err, [Op, R])], M).
+    ml(Flags, (L, color_or_box(Err, (Op, R))), M).
 
 ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
     correct(Flags, Err),
