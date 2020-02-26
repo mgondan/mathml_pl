@@ -647,17 +647,17 @@ prec(Flags, add(_Err, Elem), P) :-
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [underbrace([L, Op], "omitted"), R], M).
+    ml(Flags, (underbrace((L, Op), "omitted"), R), M).
 
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [cancel(Err, [L, Op]), R], M).
+    ml(Flags, (cancel(Err, (L, Op)), R), M).
 
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [color(Err, [L, Op]), R], M).
+    ml(Flags, (color(Err, (L, Op)), R), M).
 
 ml(Flags, omit_left(Err, quote(Expr)), M) :-
     correct(Flags, Err),
@@ -669,17 +669,17 @@ paren(Flags, omit_left(_Err, quote(Expr)), P) :-
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [L, underbrace([Op, R], "omitted")], M).
+    ml(Flags, (L, underbrace((Op, R), "omitted")), M).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [L, cancel(Err, [Op, R])], M).
+    ml(Flags, (L, cancel(Err, (Op, R))), M).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, [L, color(Err, [Op, R])], M).
+    ml(Flags, (L, color(Err, (Op, R))), M).
 
 ml(Flags, omit_right(Err, quote(Expr)), M) :-
     correct(Flags, Err),
