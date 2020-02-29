@@ -179,15 +179,21 @@ color(4, "#9F5F00").
 color(5, "#7F007F").
 color(6, "#007F7F").
 
-pl2m(color(C, A), mstyle(mathcolor(Col), M)) :-
+pl2m(color(num(C), A), mstyle(mathcolor(Col), M)) :-
    color(C, Col),
+   pl2m(A, M).
+
+pl2m(color(name(C), A), mstyle(mathcolor(C), M)) :-
    pl2m(A, M).
 
 paren(color(_, A), Paren) :-
     paren(A, Paren).
 
+pl2m(black(A), M) :-
+   pl2m(color("black", M)).
+
 example :-
-    example(color(1, paren(color(0, id(x))))).
+    example(color(name("red"), paren(black(id(x))))).
 
 %
 % Decorations
@@ -244,7 +250,8 @@ paren(phantom(A), Paren) :-
     paren(A, Paren).
 
 example :- 
-    example(strike(1, id(x))).
+    example(strike(num(1), id(x))).
+    
 example :- 
     example(underbrace(id(s), list(op(''), [string("instead of"), punct(' '), greek(sigma)]))).
 
