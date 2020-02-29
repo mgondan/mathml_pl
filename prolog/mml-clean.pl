@@ -163,7 +163,7 @@ paren(list(_, L), Paren) :-
 %prec(_, list(_, _), list-0).
 
 example :- 
-    example(paren(list([id(x), id(y), paren(id(z))])).
+    example(paren(list([id(x), id(y), paren(id(z))]))).
 
 % Linear model
 pl2m(linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), M) :-
