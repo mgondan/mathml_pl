@@ -45,6 +45,7 @@ pl2m(op(invisible_times), mo(&('#x2062'))).
 pl2m(op(->), mo(&(rArr))).
 pl2m(op(~>), mo(&(zigrarr))).
 pl2m(op(~), mo(~)).
+pl2m(op(''), '').
 
 paren(op(_), 0).
 
