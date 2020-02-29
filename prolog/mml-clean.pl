@@ -5,6 +5,7 @@
 :- use_module(library(http/html_write)).
 
 :- discontiguous pl2m/2.
+:- discontiguous paren/2.
 :- discontiguous precedence/2.
 :- discontiguous example/0.
 
@@ -15,6 +16,8 @@ pl2m(punct('_'), &(nbsp)).
 pl2m(punct(' '), mspace(width(thickmathspace), [])).
 pl2m(punct(ldots), mi(&(hellip))).
 pl2m(punct(cdots), mi(&(ctdot))).
+
+paren(punct(_), 0).
 
 example :-
     example(punct('_')).
@@ -43,20 +46,32 @@ pl2m(op(->), mo(&(rArr))).
 pl2m(op(~>), mo(&(zigrarr))).
 pl2m(op(~), mo(~)).
 
+paren(op(_), 0).
+
 example :-
     example(op(invisible_times)).
 
 %
-% Identifiers
+% Greek letters
 %
 pl2m(greek(alpha), mi(&(alpha))).
 pl2m(greek(mu), mi(&(mu))).
 pl2m(greek(pi), mi(&(pi))).
 pl2m(greek(sigma), mi(&(sigma))).
-pl2m(id(X), mi(X)).
+
+paren(greek(_), 0).
 
 example :-
-    example(greek(alpha)),
+    example(greek(alpha)).
+
+%
+% Identifiers
+%
+pl2m(id(X), mi(X)).
+
+paren(id(_), 0).
+
+example :-
     example(id(x)).
 
 %
@@ -64,8 +79,54 @@ example :-
 %
 pl2m(string(X), mtext(X)).
 
+paren(string(_), 0).
+
 example :-
     example(string("text")).
+
+%
+% Parentheses
+%
+pl2m(parentheses(A), mrow([mo('('), M, mo(')')])) :-
+    pl2m(A, M).
+
+paren(parentheses(_), 1).
+
+pl2m(bracket(A), mrow([mo('['), M, mo(']')])) :-
+    pl2m(A, M).
+
+paren(bracket(_), 2).
+
+pl2m(curly(A), mrow([mo('{'), M, mo('}')])) :-
+    pl2m(A, M).
+
+paren(curly(_), 3).
+
+pl2m(abs(A), mrow([mo('|'), M, mo('|')])) :-
+    pl2m(A, M).
+
+paren(abs(_), 0).
+
+% Auto-determine level of parentheses
+pl2m(paren(A), M) :-
+    paren(A, 0),
+    pl2m(parentheses(A), M).
+
+pl2m(paren(A), M) :-
+    paren(A, 1),
+    pl2m(bracket(A), M).
+
+pl2m(paren(A), M) :-
+    paren(A, 2),
+    pl2m(curly(A), M).
+
+pl2m(paren(A), M) :-
+    paren(A, Paren),
+    Paren > 2,
+    pl2m(parentheses(A), M).
+
+example :-
+    example(paren(paren(paren(abs(alpha))))).
 
 % Linear model
 pl2m(linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), M) :-
@@ -124,37 +185,6 @@ pl2m(operator(Op, Left, Right), mrow([L, F, R])) :-
     ->  pl2m(paren(Right), R)
     ;   pl2m(Right, R)).
 
-% Parentheses
-pl2m(parentheses(A), mrow([mo('('), M, mo(')')])) :-
-    pl2m(A, M).
-
-pl2m(bracket(A), mrow([mo('['), M, mo(']')])) :-
-    pl2m(A, M).
-
-pl2m(curly(A), mrow([mo('{'), M, mo('}')])) :-
-    pl2m(A, M).
-
-pl2m(abs(A), mrow([mo('|'), M, mo('|')])) :-
-    pl2m(A, M).
-
-% Determine level of parentheses
-pl2m(paren(A), M) :-
-    paren(A, 0),
-    pl2m(parentheses(A), M).
-
-pl2m(paren(A), M) :-
-    paren(A, 1),
-    pl2m(bracket(A), M).
-
-pl2m(paren(A), M) :-
-    paren(A, 2),
-    pl2m(curly(A), M).
-
-pl2m(paren(A), M) :-
-    paren(A, P),
-    P > 2,
-    pl2m(parentheses(A), M).
-
 % Symbols and variables
 pl2m(dependent(A), mi(A)).
 pl2m(integer(A), mn(A)).
@@ -185,10 +215,6 @@ precedence(stratum(_), 0).
 precedence(covariate(_), 0).
 precedence(predictor(_), 0).
 precedence(main(_), 0).
-
-% todo
-paren(_, 0).
-
 
 example :-
     pl2m(linear(dependent(y),
