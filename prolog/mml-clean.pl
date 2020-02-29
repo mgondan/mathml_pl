@@ -187,7 +187,7 @@ paren(color(_, A), Paren) :-
     paren(A, Paren).
 
 example :-
-    example(color(1, paren(color(0, id(x)))).
+    example(color(1, paren(color(0, id(x))))).
 
 % Linear model
 pl2m(linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), M) :-
