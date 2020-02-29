@@ -137,7 +137,7 @@ example :-
 %
 % Default separator: comma
 pl2m(list(L), M) :-
-    pl2m(list(mo(','), L), M).
+    pl2m(list(op(','), L), M).
 
 pl2m(list(_, []), '').
 
