@@ -125,6 +125,10 @@ pl2m(paren(A), M) :-
     Paren > 2,
     pl2m(parentheses(A), M).
 
+paren(paren(A), Paren) :-
+    paren(A, P),
+    Paren is P + 1.
+
 example :-
     example(paren(paren(paren(abs(alpha))))).
 
