@@ -143,7 +143,7 @@ pl2m(list(_, []), '').
 
 pl2m(list(Sep, [H | T]), mrow([HM | TM])) :-
     pl2m(H, HM),
-    pl2m(tail(Sep, T), M).
+    pl2m(tail(Sep, T), TM).
 
 pl2m(tail(_, []), []).
 
@@ -264,6 +264,7 @@ example :-
     writeln(M).
 
 example(P) :-
+    writeln(P),
     pl2m(P, M),
     html(M, Out, []),
     print_html(Out).
