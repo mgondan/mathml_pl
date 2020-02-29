@@ -130,7 +130,7 @@ paren(paren(A), Paren) :-
     Paren is P + 1.
 
 example :-
-    example(paren(paren(paren(abs(alpha))))).
+    example(paren(paren(paren(abs(greek(alpha)))))).
 
 % Linear model
 pl2m(linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), M) :-
