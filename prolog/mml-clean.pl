@@ -132,6 +132,39 @@ paren(paren(A), Paren) :-
 example :-
     example(paren(paren(paren(abs(greek(alpha)))))).
 
+%
+% Lists (e.g., function arguments)
+%
+% Default separator: comma
+pl2m(list(L), M) :-
+    pl2m(list(mo(','), L), M).
+
+pl2m(list(_, []), '').
+
+pl2m(list(Sep, [H | T]), mrow([HM | TM])) :-
+    pl2m(H, HM),
+    pl2m(tail(Sep, T), M).
+
+pl2m(tail(_, []), []).
+
+pl2m(tail(Sep, [H | T]), [SM, HM | TM]) :-
+    pl2m(Sep, SM),
+    pl2m(H, HM),
+    pl2m(tail(Sep, T), TM).
+
+paren(list(_, L), Paren) :-
+    maplist(paren, L, P),
+    max_list(P, Paren).
+
+%prec(_, list(Sep, _), P) :-
+%    current_op(Prec, _, Sep),
+%    !, P = list-Prec.
+%
+%prec(_, list(_, _), list-0).
+
+example :- 
+    example(paren(list([id(x), id(y), paren(id(z))])).
+
 % Linear model
 pl2m(linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), M) :-
     append([Icpt, Cov, Strata, Main, Other], Predictors),
