@@ -152,9 +152,12 @@ pl2m(tail(Sep, [H | T]), [SM, HM | TM]) :-
     pl2m(H, HM),
     pl2m(tail(Sep, T), TM).
 
-paren(list(_, L), Paren) :-
+paren(list(L), Paren) :-
     maplist(paren, L, P),
     max_list(P, Paren).
+
+paren(list(_, L), Paren) :-
+    paren(list(L), Paren).
 
 %prec(_, list(Sep, _), P) :-
 %    current_op(Prec, _, Sep),
