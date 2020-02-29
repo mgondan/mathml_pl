@@ -168,6 +168,27 @@ paren(list(_, L), Paren) :-
 example :- 
     example(paren(list([id(x), id(y), paren(id(z))]))).
 
+%
+% Colors
+%
+color(0, "black").
+color(1, "red").
+color(2, "blue").
+color(3, "#00BF00").
+color(4, "#9F5F00").
+color(5, "#7F007F").
+color(6, "#007F7F").
+
+pl2m(color(C, A), mstyle(mathcolor(Col), M)) :-
+   color(C, Col),
+   pl2m(A, M).
+
+paren(color(_, A), Paren) :-
+    paren(A, Paren).
+
+example :-
+    example(color(1, paren(color(0, id(x)))).
+
 % Linear model
 pl2m(linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), M) :-
     append([Icpt, Cov, Strata, Main, Other], Predictors),
