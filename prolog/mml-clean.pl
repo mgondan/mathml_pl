@@ -189,6 +189,66 @@ paren(color(_, A), Paren) :-
 example :-
     example(color(1, paren(color(0, id(x))))).
 
+%
+% Decorations
+%
+pl2m(Flags, overline(A), mover(accent(true), [M, mo(&(macr))])) :-
+    pl2m(Flags, A, M).
+
+paren(overline(A), Paren) :-
+    paren(A, Paren).
+
+% Put average(x)^2 in parentheses
+%prec(Flags, overline(A), accent-P) :-
+%    precedence(Flags, a*A, _-P).
+
+% Underbrace with text
+pl2m(underbrace(A, Under), munder([munder(accentunder(true), [M, mo(stretchy(true), &('UnderBrace'))]), MU])) :-
+    pl2m(A, M),
+    pl2m(Under, MU).
+
+paren(underbrace(A, _), Paren) :-
+    paren(A, Paren).
+
+% Strike through
+pl2m(strike(Color, A), M) :-
+   pl2m(color(Color, strike(black(A))), M).
+
+paren(strike(Color, A), Paren) :-
+    paren(A, Paren).
+
+pl2m(strike(A), menclose(notation(updiagonalstrike), M)) :-
+    pl2m(Flags, A, M).
+
+paren(strike(A), Paren) :-
+    paren(A, Paren).
+
+% Rounded box
+pl2m(roundedbox(A), menclose(notation(roundedbox), M)) :-
+    pl2m(A, M).
+
+paren(Flags, roundedbox(A), Paren) :-
+    paren(A, Paren).
+
+pl2m(roundedbox(Color, A), M) :-
+    pl2m(color(Color, roundedbox(black(A))), M).
+
+paren(Flags, roundedbox(_, A), Paren) :-
+    paren(A, Paren).
+
+% invisible
+pl2m(phantom(A), mphantom(M)) :-
+    pl2m(A, M).
+
+paren(phantom(A), Paren) :-
+    paren(A, Paren).
+
+example :- 
+    example(strike(1, id(x))).
+example :- 
+    example(underbrace(id(s), list(op(''), [string("instead of"), punct(' '), greek(sigma))))).
+
+
 % Linear model
 pl2m(linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), M) :-
     append([Icpt, Cov, Strata, Main, Other], Predictors),
