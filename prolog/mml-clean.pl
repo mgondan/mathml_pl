@@ -23,7 +23,6 @@ example :-
 % Operator signs
 %
 pl2m(op(+), mo(+)).
-pl2m(op(+), mo(+)).
 pl2m(op(-), mo(-)).
 pl2m(op(*), mo(&(sdot))).
 pl2m(op(/), mo(/)).
@@ -50,11 +49,23 @@ example :-
 %
 % Identifiers
 %
-pl2m(id(alpha), mi(&(alpha))).
-pl2m(id(mu), mi(&(mu))).
-pl2m(id(pi), mi(&(pi))).
-pl2m(id(sigma), mi(&(sigma))).
+pl2m(greek(alpha), mi(&(alpha))).
+pl2m(greek(mu), mi(&(mu))).
+pl2m(greek(pi), mi(&(pi))).
+pl2m(greek(sigma), mi(&(sigma))).
+pl2m(id(X), mi(X)).
 
+example :-
+    example(greek(alpha)),
+    example(id(x)).
+
+%
+% Strings (non-italicized)
+%
+pl2m(string(X), mtext(X)).
+
+example :-
+    example(string("text")).
 
 % Linear model
 pl2m(linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), M) :-
