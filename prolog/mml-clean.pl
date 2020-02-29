@@ -190,7 +190,7 @@ paren(color(_, A), Paren) :-
     paren(A, Paren).
 
 pl2m(black(A), M) :-
-   pl2m(color("black", M)).
+   pl2m(color(name("black"), A), M).
 
 example :-
     example(color(name("red"), paren(black(id(x))))).
