@@ -214,11 +214,11 @@ paren(underbrace(A, _), Paren) :-
 pl2m(strike(Color, A), M) :-
    pl2m(color(Color, strike(black(A))), M).
 
-paren(strike(Color, A), Paren) :-
+paren(strike(_, A), Paren) :-
     paren(A, Paren).
 
 pl2m(strike(A), menclose(notation(updiagonalstrike), M)) :-
-    pl2m(Flags, A, M).
+    pl2m(A, M).
 
 paren(strike(A), Paren) :-
     paren(A, Paren).
@@ -227,13 +227,13 @@ paren(strike(A), Paren) :-
 pl2m(roundedbox(A), menclose(notation(roundedbox), M)) :-
     pl2m(A, M).
 
-paren(Flags, roundedbox(A), Paren) :-
+paren(roundedbox(A), Paren) :-
     paren(A, Paren).
 
 pl2m(roundedbox(Color, A), M) :-
     pl2m(color(Color, roundedbox(black(A))), M).
 
-paren(Flags, roundedbox(_, A), Paren) :-
+paren(roundedbox(_, A), Paren) :-
     paren(A, Paren).
 
 % invisible
@@ -246,7 +246,7 @@ paren(phantom(A), Paren) :-
 example :- 
     example(strike(1, id(x))).
 example :- 
-    example(underbrace(id(s), list(op(''), [string("instead of"), punct(' '), greek(sigma))))).
+    example(underbrace(id(s), list(op(''), [string("instead of"), punct(' '), greek(sigma)]))).
 
 
 % Linear model
