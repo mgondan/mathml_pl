@@ -8,7 +8,9 @@
 :- discontiguous precedence/2.
 :- discontiguous example/0.
 
+%
 % Punctuation
+%
 pl2m(punct('_'), &(nbsp)).
 pl2m(punct(' '), mspace(width(thickmathspace), [])).
 pl2m(punct(ldots), mi(&(hellip))).
@@ -17,7 +19,9 @@ pl2m(punct(cdots), mi(&(ctdot))).
 example :-
     example(punct('_')).
 
+%
 % Operator signs
+%
 pl2m(op(+), mo(+)).
 pl2m(op(+), mo(+)).
 pl2m(op(-), mo(-)).
@@ -42,6 +46,15 @@ pl2m(op(~), mo(~)).
 
 example :-
     example(op(invisible_times)).
+
+%
+% Identifiers
+%
+pl2m(id(alpha), mi(&(alpha))).
+pl2m(id(mu), mi(&(mu))).
+pl2m(id(pi), mi(&(pi))).
+pl2m(id(sigma), mi(&(sigma))).
+
 
 % Linear model
 pl2m(linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), M) :-
