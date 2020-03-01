@@ -256,8 +256,8 @@ paren(Flags, overline(A), Paren) :-
     paren(Flags, A, Paren).
 
 % Put average(x)^2 in parentheses
-precedence(Flags, overline(A), Op, Prec) :-
-    precedence(Flags, op(+), Op, Prec).
+precedence(Flags, overline(_), Op, Prec) :-
+    precedence(Flags, op(*), Op, Prec).
 
 % Underbrace with text
 pl2m(Flags, underbrace(A, Under), munder([munder(accentunder(true), [M, mo(stretchy(true), &('UnderBrace'))]), MU])) :-
