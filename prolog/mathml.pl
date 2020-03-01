@@ -1104,6 +1104,9 @@ prec(_, operator(P, _, _, _), op-P).
 math(Flags, A + B, Flags, operator(P, yfy, +, A, B)) :-
     current_op(P, yfx, +).
 
+math(Flags, A : B, Flags, operator(P, yfy, :, A, B)) :-
+    current_op(P, xfy, :).
+
 % General binary operators
 math(Flags, Comp, Flags, operator(Prec, Fix, Op, A, B)) :-
     compound(Comp),
