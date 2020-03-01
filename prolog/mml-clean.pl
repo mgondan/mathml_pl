@@ -448,7 +448,7 @@ precedence(Flags, -A, Op, Prec) :-
     precedence(Flags, id(x)-A, Op, Prec).
 
 % Prefix and postfix operators (e.g., factorial)
-pl2m(Flags, Comp, M) :-
+math(Flags, Comp, M) :-
     compound(Comp),
     compound_name_arguments(Comp, Op, [A]),
     current_op(P, Fix, Op), Prec = P,
