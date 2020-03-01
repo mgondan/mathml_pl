@@ -268,7 +268,7 @@ paren(Flags, underbrace(A, _), Paren) :-
     paren(Flags, A, Paren).
 
 precedence(Flags, underbrace(A, _), Op, Prec) :-
-    precedence(Flags, A, Op, Paren).
+    precedence(Flags, A, Op, Prec).
 
 % Strike through
 pl2m(Flags, strike(Color, A), M) :-
