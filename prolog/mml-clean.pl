@@ -262,55 +262,123 @@ precedence(Flags, underbrace(A, _), Op, Prec) :-
     precedence(Flags, A, Op, Paren).
 
 % Strike through
-pl2m(strike(Color, A), M) :-
-   pl2m(color(Color, strike(black(A))), M).
+pl2m(Flags, strike(Color, A), M) :-
+   pl2m(Flags, color(Color, strike(black(A))), M).
 
-paren(strike(_, A), Paren) :-
-    paren(A, Paren).
+paren(Flags, strike(_, A), Paren) :-
+    paren(Flags, A, Paren).
 
-pl2m(strike(A), menclose(notation(updiagonalstrike), M)) :-
-    pl2m(A, M).
+precedence(Flags, strike(_, A), Op, Prec) :-
+    precedence(Flags, A, Op, Prec).
+    
+pl2m(Flags, strike(A), menclose(notation(updiagonalstrike), M)) :-
+    pl2m(Flags, A, M).
 
-paren(strike(A), Paren) :-
-    paren(A, Paren).
+paren(Flags, strike(A), Paren) :-
+    paren(Flags, A, Paren).
+
+precedence(Flags, strike(A), Op, Prec) :-
+    precedence(Flags, A, Op, Prec).
 
 % Rounded box
-pl2m(roundedbox(A), menclose(notation(roundedbox), M)) :-
-    pl2m(A, M).
+pl2m(Flags, roundedbox(A), menclose(notation(roundedbox), M)) :-
+    pl2m(Flags, A, M).
 
-paren(roundedbox(A), Paren) :-
-    paren(A, Paren).
+paren(Flags, roundedbox(A), Paren) :-
+    paren(Flags, A, Paren).
 
-pl2m(roundedbox(Color, A), M) :-
-    pl2m(color(Color, roundedbox(black(A))), M).
+precedence(Flags, roundedbox(A), Op, Prec) :-
+    precedence(Flags, A, Op, Prec).
 
-paren(roundedbox(_, A), Paren) :-
-    paren(A, Paren).
+pl2m(Flags, roundedbox(Color, A), M) :-
+    pl2m(Flags, color(Color, roundedbox(black(A))), M).
 
-% invisible
-pl2m(phantom(A), mphantom(M)) :-
-    pl2m(A, M).
+paren(Flags, roundedbox(_, A), Paren) :-
+    paren(Flags, A, Paren).
 
-paren(phantom(A), Paren) :-
-    paren(A, Paren).
+precedence(Flags, roundedbox(_, A), Op, Prec) :-
+    precedence(Flags, A, Op, Prec).
+
+% Invisible
+pl2m(Flags, phantom(A), mphantom(M)) :-
+    pl2m(Flags, A, M).
+
+paren(Flags, phantom(A), Paren) :-
+    paren(Flags, A, Paren).
+
+precedence(Flags, phantom(A), Op, Prec) :-
+    precedence(Flags, A, Op, Prec).
 
 % Superscript and subscript
-pl2m(subsup(A, B, C), msubsup([X, Y, Z])) :-
-    precedence(subsup(A, B, C), Prec),
-    precedence(A, P),
-    ( Prec =< P
-      -> pl2m(paren(A), X)
-      ; pl2m(A, X)
-    ), pl2m(B, Y),
-    pl2m(C, Z).
+pl2m(Flags, sup(Sub, C), M) :-
+    precedence(Flags, Sub, sub, _),
+    pl2m([replace(sub(A, B), subsup(A, B, C)) | Flags], Sub, M).
 
-paren(subsup(A, _, _), Paren) :-
-    precedence(subsup(A, B, C), Prec),
-    precedence(A, P),
+paren(Flags, sup(Sub, C), Paren) :-
+    precedence(Flags, Sub, sub, _),
+    paren([replace(sub(A, B), subsup(A, B, C)) | Flags], Sub, Paren).
+
+precedence(Flags, sup(Sub, C), Op, Prec) :-
+    precedence(Flags, Sub, sub, _),
+    precedence([replace(sub(A, B), subsup(A, B, C)) | Flags], Sub, Prec).
+
+pl2m(Flags, sub(Sup, C), M) :-
+    precedence(Flags, Sup, sup, _),
+    pl2m([replace(sup(A, B), subsup(A, C, B)) | Flags], Sup, M).
+
+paren(Flags, sub(Sup, C), Paren) :-
+    precedence(Flags, Sup, sup, _),
+    paren([replace(sup(A, B), subsup(A, C, B)) | Flags], Sup, Paren).
+
+precedence(Flags, sub(Sup, C), Prec) :-
+    precedence(Flags, Sup, sup, _),
+    precedence([replace(sup(A, B), subsup(A, C, B)) | Flags], Sup, Prec).
+
+pl2m(Flags, subsup(A, B, C), msubsup([X, Y, Z])) :-
+    precedence(Flags, subsup(A, B, C), _, Prec),
+    precedence(Flags, A, _, P),
     ( Prec =< P
-      -> paren(paren(A), Paren)
-      ; paren(A, Paren)
+      -> pl2m(Flags, paren(A), X)
+      ; pl2m(Flags, A, X)
+    ), pl2m(Flags, B, Y),
+    pl2m(Flags, C, Z).
+
+paren(Flags, subsup(A, B, C), Paren) :-
+    precedence(Flags, subsup(A, B, C), Op, Prec),
+    precedence(Flags, A, Op, P),
+    ( Prec =< P
+      -> paren(Flags, paren(A), Paren)
+      ; paren(Flags, A, Paren)
     ).
+
+precedence(Flags, subsup(A, _, C), Paren) :-
+    precedence(Flags, sup(A, C), Op, Prec).
+
+pl2m(Flags, sub(A, B), M) :-
+    select_option(replace(sub(A, B), subsup(A, B, C)), Flags, New),
+    pl2m(New, subsup(A, B, C), M).
+
+paren(Flags, sub(A, B), Paren) :-
+    select_option(replace(sub(A, B), subsup(A, B, C)), Flags, New),
+    paren(New, subsup(A, B, C), Paren).
+
+precedence(Flags, sub(A, B), Prec) :-
+    select_option(replace(sub(A, B), subsup(A, B, C)), Flags, New),
+    precedence(New, subsup(A, B, C), Prec).
+
+pl2m(Flags, sub(A, B), msub([X, Y])) :-
+    precedence(Flags, sub(A, B), _, Prec),
+    precedence(Flags, A, _, P),
+    ( Prec < P
+      -> pl2m(Flags, paren(A), X)
+      ; pl2m(Flags, A, X)
+    ), pl2m(Flags, B, Y).
+
+paren(Flags, sub(A, _), Paren) :-
+    paren(Flags, A, Paren).
+
+precedence(Flags, sub(A, _), sub, Prec) :-
+    precedence(Flags, A, _, Prec).
 
 example :- 
     example(strike(num(1), id(x))).
@@ -365,68 +433,6 @@ pl2m(operator(Op, Left, Right), mrow([L, F, R])) :-
 %
 % Operators
 %
-ml(Flags, sub(A, B), M) :-
-    select_option(replace(sub(A, B), subsup(A, B, C)), Flags, New),
-    !, ml(New, subsup(A, B, C), M).
-
-paren(Flags, sub(A, B), P) :-
-    select_option(replace(sub(A, B), subsup(A, B, C)), Flags, New),
-    !, paren(New, subsup(A, B, C), P).
-
-prec(Flags, sub(A, B), P) :-
-    select_option(replace(sub(A, B), subsup(A, B, C)), Flags, New),
-    !, precedence(New, subsup(A, B, C), P).
-
-ml(Flags, sub(A, B), msub([X, Y])) :-
-    precedence(Flags, sub(A, B), _-P),
-    precedence(Flags, A, _-Inner),
-    ( P < Inner
-      -> ml(Flags, paren(A), X)
-      ; ml(Flags, A, X)
-    ), ml(Flags, B, Y).
-
-paren(Flags, sub(A, _), P) :-
-    paren(Flags, A, P).
-
-prec(Flags, sub(A, _), sub-P) :-
-    precedence(Flags, A, _-P).
-
-math(Flags, A^B, Flags, sup(A, B)).
-
-% experimental: sin^2 x for "simple" x
-ml(Flags, sup(Sin, X), M) :-
-    precedence(Flags, Sin, trig-_),
-    paren(Flags, X, 0),
-    precedence(Flags, X, _-0),
-    !, ml([replace(Sin^X, Sin)], Sin, M).
-
-ml(Flags, sup(A, B), M) :-
-    select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
-    !, ml(New, subsup(A, C, B), M).
-
-paren(Flags, sup(A, B), P) :-
-    select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
-    !, paren(New, subsup(A, C, B), P).
-
-prec(Flags, sup(A, B), P) :-
-    select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
-    !, precedence(New, subsup(A, C, B), P).
-
-ml(Flags, sup(A, B), msup([X, Y])) :-
-    precedence(Flags, sup(A, B), _-P),
-    precedence(Flags, A, _-Inner),
-    ( P =< Inner
-      -> ml(Flags, paren(A), X)
-      ; ml(Flags, A, X)
-    ), ml(Flags, B, Y).
-
-paren(Flags, sup(A, _), P) :-
-    paren(Flags, A, P).
-
-prec(_, sup(_, _), sup-P) :-
-    current_op(Prec, xfy, ^),
-    P = Prec.
-
 % Omit multiplication sign in "simple" products
 math(Flags, A * B, Flags, M) :-
     paren(Flags, A / x, 0),
