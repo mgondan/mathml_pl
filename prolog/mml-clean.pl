@@ -10,6 +10,15 @@
 :- discontiguous example/0.
 
 %
+% Tests
+%
+example(P) :-
+    writeln(P),
+    pl2m([], P, M),
+    html(M, Out, []),
+    print_html(Out).
+
+%
 % Punctuation
 %
 pl2m(_, punct('_'), &(nbsp)).
@@ -52,7 +61,7 @@ pl2m(_, op(''), '').
 paren(_, op(_), 0).
 
 precedence(_, op(Op), op, Precedence) :-
-    current_op(P, Fix, Op),
+    current_op(P, _, Op),
     Precedence = P.
 
 example :-
@@ -354,6 +363,7 @@ paren(Flags, subsup(A, B, C), Paren) :-
 precedence(Flags, subsup(A, _, C), Paren) :-
     precedence(Flags, sup(A, C), Op, Prec).
 
+% Subscript
 pl2m(Flags, sub(A, B), M) :-
     select_option(replace(sub(A, B), subsup(A, B, C)), Flags, New),
     pl2m(New, subsup(A, B, C), M).
@@ -380,126 +390,124 @@ paren(Flags, sub(A, _), Paren) :-
 precedence(Flags, sub(A, _), sub, Prec) :-
     precedence(Flags, A, _, Prec).
 
+% Superscript and power
+pl2m(Flags, A^B, M) :-
+    pl2m(Flags, sup(A, B), M).
 
+paren(Flags, A^B, Paren) :-
+    paren(Flags, sup(A, B), Paren).
 
+precedence(Flags, A^B, Op, Prec) :-
+    precedence(Flags, sup(A, B), Op, Prec).
 
-math(Flags, A^B, Flags, sup(A, B)).
-
-% experimental: sin^2 x for "simple" x
-ml(Flags, sup(Sin, X), M) :-
-    precedence(Flags, Sin, trig-_),
+% sin^2 x for "simple" x
+pl2m(Flags, sup(Sin, X), M) :-
+    precedence(Flags, Sin, trig, _),
     paren(Flags, X, 0),
-    precedence(Flags, X, _-0),
-    !, ml([replace(Sin^X, Sin)], Sin, M).
+    precedence(Flags, X, _, 0),
+    pl2m([replace(Sin^X, Sin) | Flags], Sin, M).
 
-ml(Flags, sup(A, B), M) :-
+pl2m(Flags, sup(A, B), M) :-
     select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
-    !, ml(New, subsup(A, C, B), M).
+    pl2m(New, subsup(A, C, B), M).
 
-paren(Flags, sup(A, B), P) :-
+paren(Flags, sup(A, B), Paren) :-
     select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
-    !, paren(New, subsup(A, C, B), P).
+    paren(New, subsup(A, C, B), Paren).
 
-prec(Flags, sup(A, B), P) :-
+precedence(Flags, sup(A, B), Op, Prec) :-
     select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
-    !, precedence(New, subsup(A, C, B), P).
+    precedence(New, subsup(A, C, B), Op, Prec).
 
-ml(Flags, sup(A, B), msup([X, Y])) :-
-    precedence(Flags, sup(A, B), _-P),
-    precedence(Flags, A, _-Inner),
-    ( P =< Inner
-      -> ml(Flags, paren(A), X)
-      ; ml(Flags, A, X)
-    ), ml(Flags, B, Y).
+pl2m(Flags, sup(A, B), msup([X, Y])) :-
+    precedence(Flags, sup(A, B), _, Prec),
+    precedence(Flags, A, _, P),
+    ( Prec =< P
+      -> pl2m(Flags, paren(A), X)
+      ; pl2m(Flags, A, X)
+    ), pl2m(Flags, B, Y).
 
-paren(Flags, sup(A, _), P) :-
-    paren(Flags, A, P).
+paren(Flags, sup(A, _), Paren) :-
+    paren(Flags, A, Paren).
 
-prec(_, sup(_, _), sup-P) :-
-    current_op(Prec, xfy, ^),
-    P = Prec.
-
-
-
-
-
-
+precedence(_, sup(_, _), sup, Prec) :-
+    current_op(P, xfy, ^),
+    Prec = P.
+    
 example :- 
     example(strike(num(1), id(x))).
     
 example :- 
     example(underbrace(id(s), list(op(''), [string("instead of"), punct(' '), greek(sigma)]))).
 
-% Linear model
-pl2m(linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), M) :-
-    append([Icpt, Cov, Strata, Main, Other], Predictors),
-    pl2m(operator(op(~), Dep, list(+, Predictors)), M).
+%
+% Unary operators
+%
+% Negative sign has same precedence as binary minus
+precedence(Flags, -A, Op, Prec) :-
+    precedence(Flags, id(x)-A, Op, Prec).
+
+% Prefix and postfix operators (e.g., factorial)
+pl2m(Flags, Comp, M) :-
+    compound(Comp),
+    compound_name_arguments(Comp, Op, [A]),
+    current_op(P, Fix, Op), Prec = P,
+    member(Fix, [xf, yf, fx, fy]),
+    pl2m(Flags, operator(Prec, Fix, op(Op), A), M).
+
+
 
 %
-% Operators
+% Binary operators
 %
+% Omit multiplication sign in "simple" products
+pl2m(Flags, operator(op(*), A, B), M) :-
+    paren(Flags, operator(op(/), A, id(x)), 0),
+    pl2m(Flags, invisible_times(A, B), M).
+
 pl2m(operator(Op, Left, Right), mrow([L, F, R])) :-
     pl2m(Op, F),
     precedence(Op, xfx, Prec),
     precedence(Left, LPrec),
-    (   LPrec >= Prec
-    ->  pl2m(paren(Left), L)
-    ;   pl2m(Left, L)),
+    ( LPrec >= Prec
+    -> pl2m(paren(Left), L)
+    ; pl2m(Left, L)
+    ), 
     precedence(Right, RPrec),
-    (   RPrec >= Prec
-    ->  pl2m(paren(Right), R)
-    ;   pl2m(Right, R)).
+    ( RPrec >= Prec
+      -> pl2m(paren(Right), R)
+      ; pl2m(Right, R)
+    ).
 
 pl2m(operator(Op, Left, Right), mrow([L, F, R])) :-
     pl2m(Op, F),
     precedence(Op, yfx, Prec),
     precedence(Left, LPrec),
-    (   LPrec > Prec
-    ->  pl2m(paren(Left), L)
-    ;   pl2m(Left, L)),
+    ( LPrec > Prec
+      -> pl2m(paren(Left), L)
+      ; pl2m(Left, L)
+    ),
     precedence(Right, RPrec),
-    (   RPrec >= Prec
-    ->  pl2m(paren(Right), R)
-    ;   pl2m(Right, R)).
+    ( RPrec >= Prec
+      -> pl2m(paren(Right), R)
+      ; pl2m(Right, R)
+    ).
 
 pl2m(operator(Op, Left, Right), mrow([L, F, R])) :-
     pl2m(Op, F),
     precedence(Op, xfy, Prec),
     precedence(Left, LPrec),
-    (   LPrec >= Prec
-    ->  pl2m(paren(Left), L)
-    ;   pl2m(Left, L)),
+    ( LPrec >= Prec
+      -> pl2m(paren(Left), L)
+      ; pl2m(Left, L)
+    ),
     precedence(Right, RPrec),
-    (   RPrec > Prec
-    ->  pl2m(paren(Right), R)
-    ;   pl2m(Right, R)).
+    ( RPrec > Prec
+      -> pl2m(paren(Right), R)
+      ; pl2m(Right, R)
+    ).
 
-%
-% Operators
-%
-% Omit multiplication sign in "simple" products
-math(Flags, A * B, Flags, M) :-
-    paren(Flags, A / x, 0),
-    !, M = A invisible_times B.
-
-% Use plus as default separator for lists right to ~
-math(Flags, Dependent ~ Predictors, [sep-(+) | Flags], operator(Prec, xfy, ~, Dependent, Predictors)) :-
-    current_op(P, xfy, ','),
-    precedence(Flags, Predictors, list-P),
-    current_op(Prec, xfy, ~).
-
-% Negative sign has same precedence as binary minus
-math(Flags, -A, Flags, operator(P, fx, -, A)) :-
-    precedence(Flags, a-b, _-P).
-
-% Prefix and postfix operators (e.g., factorial)
-math(Flags, Comp, Flags, operator(Prec, Fix, Op, A)) :-
-    compound(Comp),
-    compound_name_arguments(Comp, Op, [A]),
-    current_op(P, Fix, Op), Prec = P,
-    member(Fix, [xf, yf, fx, fy]).
-
-ml(Flags, operator(P, fx, Op, A), mrow([F, X])) :-
+pl2m(Flags, operator(P, fx, Op, A), mrow([F, X])) :-
     precedence(Flags, A, _-Inner),
     ( P =< Inner
       -> ml(Flags, paren(A), X)
@@ -653,13 +661,20 @@ example :- example(a - b - c).
 example :- example(a - (b - c)).
 example :- example((a + b) * (a - b) = a^two - b^two).
 
+%
+% Linear model
+%
+pl2m(Flags, linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), M) :-
+    append([Icpt, Cov, Strata, Main, Other], Predictors),
+    pl2m([listsep(+) | Flags], operator(op(~), Dep, list(+, Predictors)), M).
 
+paren(Flags, linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), Paren) :-
+    append([Icpt, Cov, Strata, Main, Other], Predictors),
+    paren([listsep(+) | Flags], operator(op(~), Dep, list(+, Predictors)), Paren).
 
-
-
-
-
-
+precedence(Flags, linear(Dep, Icpt, Cov, Strata, Main, Other, _Data), Op, Prec) :-
+    append([Icpt, Cov, Strata, Main, Other], Predictors),
+    precedence([listsep(+) | Flags], operator(op(~), Dep, list(+, Predictors)), Op, Prec).
 
 % Symbols and variables
 pl2m(dependent(A), mi(A)).
@@ -693,17 +708,11 @@ precedence(predictor(_), 0).
 precedence(main(_), 0).
 
 example :-
-    pl2m(linear(dependent(y),
+    example(linear(dependent(y),
                 [intercept(1)],
                 [covariate(t0)],
                 [stratum(sex), stratum(center)],
                 [main(therapy)],
                 [],
-                data(d)), M),
-    writeln(M).
+                data(d))).
 
-example(P) :-
-    writeln(P),
-    pl2m(P, M),
-    html(M, Out, []),
-    print_html(Out).
