@@ -329,7 +329,7 @@ paren(Flags, sup(Sub, C), Paren) :-
 
 precedence(Flags, sup(Sub, C), Op, Prec) :-
     precedence(Flags, Sub, sub, _),
-    precedence([replace(sub(A, B), subsup(A, B, C)) | Flags], Sub, Prec).
+    precedence([replace(sub(A, B), subsup(A, B, C)) | Flags], Sub, Op, Prec).
 
 pl2m(Flags, sub(Sup, C), M) :-
     precedence(Flags, Sup, sup, _),
@@ -339,9 +339,9 @@ paren(Flags, sub(Sup, C), Paren) :-
     precedence(Flags, Sup, sup, _),
     paren([replace(sup(A, B), subsup(A, C, B)) | Flags], Sup, Paren).
 
-precedence(Flags, sub(Sup, C), Prec) :-
+precedence(Flags, sub(Sup, C), Op, Prec) :-
     precedence(Flags, Sup, sup, _),
-    precedence([replace(sup(A, B), subsup(A, C, B)) | Flags], Sup, Prec).
+    precedence([replace(sup(A, B), subsup(A, C, B)) | Flags], Sup, Op, Prec).
 
 pl2m(Flags, subsup(A, B, C), msubsup([X, Y, Z])) :-
     precedence(Flags, subsup(A, B, C), _, Prec),
@@ -360,7 +360,7 @@ paren(Flags, subsup(A, B, C), Paren) :-
       ; paren(Flags, A, Paren)
     ).
 
-precedence(Flags, subsup(A, _, C), Paren) :-
+precedence(Flags, subsup(A, _, C), Op, Prec) :-
     precedence(Flags, sup(A, C), Op, Prec).
 
 % Subscript
