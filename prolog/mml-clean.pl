@@ -380,6 +380,50 @@ paren(Flags, sub(A, _), Paren) :-
 precedence(Flags, sub(A, _), sub, Prec) :-
     precedence(Flags, A, _, Prec).
 
+
+
+
+math(Flags, A^B, Flags, sup(A, B)).
+
+% experimental: sin^2 x for "simple" x
+ml(Flags, sup(Sin, X), M) :-
+    precedence(Flags, Sin, trig-_),
+    paren(Flags, X, 0),
+    precedence(Flags, X, _-0),
+    !, ml([replace(Sin^X, Sin)], Sin, M).
+
+ml(Flags, sup(A, B), M) :-
+    select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
+    !, ml(New, subsup(A, C, B), M).
+
+paren(Flags, sup(A, B), P) :-
+    select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
+    !, paren(New, subsup(A, C, B), P).
+
+prec(Flags, sup(A, B), P) :-
+    select_option(replace(sup(A, B), subsup(A, C, B)), Flags, New),
+    !, precedence(New, subsup(A, C, B), P).
+
+ml(Flags, sup(A, B), msup([X, Y])) :-
+    precedence(Flags, sup(A, B), _-P),
+    precedence(Flags, A, _-Inner),
+    ( P =< Inner
+      -> ml(Flags, paren(A), X)
+      ; ml(Flags, A, X)
+    ), ml(Flags, B, Y).
+
+paren(Flags, sup(A, _), P) :-
+    paren(Flags, A, P).
+
+prec(_, sup(_, _), sup-P) :-
+    current_op(Prec, xfy, ^),
+    P = Prec.
+
+
+
+
+
+
 example :- 
     example(strike(num(1), id(x))).
     
