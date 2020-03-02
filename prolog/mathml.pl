@@ -250,7 +250,7 @@ math(Flags, A, Flags, string(A)) :-
 ml(_, string(A), mtext(A)).
 
 % Level of parentheses
-paren(_, string(A), 0).
+paren(_, string(_), 0).
 
 example :- 
     example("text").
