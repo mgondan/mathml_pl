@@ -563,11 +563,11 @@ prec(Flags, error(Err, Mode, A), P) :-
 % A instead of B
 ml(Flags, instead_of(Err, Instead, Instead, Of), M) :-
     highlight(Flags, Err),
-    !, ml(Flags, underbrace(Instead, (string("instead of"), ' ', Of)), M).
+    !, ml(Flags, underbrace(Instead, (string("instead of "), Of)), M).
 
 ml(Flags, instead_of(Err, A, Instead, Of), M) :-
     highlight(Flags, Err),
-    ml(Flags, underbrace(A, (Instead, ' ', string("instead of"), ' ', Of)), M).
+    ml(Flags, underbrace(A, (Instead, string(" instead of "), Of)), M).
 
 paren(Flags, instead_of(Err, A, _, _), P) :-
     highlight(Flags, Err),
@@ -893,19 +893,19 @@ denoting(Flags, A, Empty) :-
 denoting(Flags, A, [M]) :-
     abbreviations(Flags, A, [denoting(Expr, Des)]),
     !,
-    ml(Flags, (' ', string("with"), ' ', Expr, ' ', string("denoting"), ' ', Des, string(".")), M).
+    ml(Flags, (string(" with "), Expr, string(" denoting "), Des, string(".")), M).
 
 denoting(Flags, A, [M | MT]) :-
     abbreviations(Flags, A, [denoting(Expr, Des) | T]),
     !,
-    ml(Flags, (string("with"), ' ', Expr, ' ', string("denoting"), ' ', Des, string(","), ' '), M),
+    ml(Flags, (string("with "), Expr, string(" denoting "), Des, string(", ")), M),
     and(Flags, T, MT).
 
 and(Flags, [], [X]) :-
     ml(Flags, string("."), X).
 
 and(Flags, [denoting(Expr, Des) | T], [M | MT]) :-
-    ml(Flags, (string("and"), ' ', Expr, ' ', string("denoting"), ' ', Des), M),
+    ml(Flags, (string("and "), Expr, string(" denoting "), Des), M),
     and(Flags, T, MT).
 
 % t-distribution
