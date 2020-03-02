@@ -229,20 +229,31 @@ example :- example(k).
 %
 % Strings (non-italicized)
 %
-is_string(Flags, A) :-
-    string(Flags, A, _).
+%is_string(Flags, A) :-
+%    string(Flags, A, _).
+%
+%string(_, A, mtext(A)) :-
+%    string(A).
+%
+%ml(Flags, A, M) :-
+%    is_string(Flags, A),
+%    string(Flags, A, M).
+%
+%paren(Flags, A, 0) :-
+%    is_string(Flags, A).
 
-string(_, A, mtext(A)) :-
+% Translate to clean representation
+math(Flags, A, Flags, string(A)) :-
     string(A).
 
-ml(Flags, A, M) :-
-    is_string(Flags, A),
-    string(Flags, A, M).
+% Translate to mathml
+ml(_, string(A), mtext(A)).
 
-paren(Flags, A, 0) :-
-    is_string(Flags, A).
+% Level of parentheses
+paren(_, string(A), 0).
 
-example :- example("text").
+example :- 
+    example("text").
 
 %
 % Parentheses: generic
