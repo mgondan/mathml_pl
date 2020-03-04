@@ -183,34 +183,31 @@ paren(Flags, A, 0) :-
 example :- example(/).
 
 %
-% Identifiers
+% Greek letters
 %
-is_identifier(Flags, A) :-
-    identifier(Flags, A, _).
+% Translate to clean representation
+math(Flags, A, Flags, greek(A)) :-
+    greek(A).
 
-identifier(_, A, mi(M)) :-
-    id(A, M).
+greek(alpha).
+greek(mu).
+greek(pi).
+greek(sigma).
 
-id(alpha, &(alpha)).
-id(mu, &(mu)).
-id(pi, &(pi)).
-id(sigma, &(sigma)).
+% Translate to mathml
+ml(_, greek(A), mi(&(A))).
 
-ml(Flags, A, M) :-
-    is_identifier(Flags, A),
-    identifier(Flags, A, M).
+% Level of parentheses
+paren(_, greek(_), 0).
 
-paren(Flags, A, 0) :-
-    is_identifier(Flags, A).
-
-example :- example(alpha).
+example :- 
+    example(alpha).
 
 %
 % General atoms
 %
 is_atom(Flags, A) :-
     atom(Flags, A, _),
-    \+ is_identifier(Flags, A),
     \+ is_punctuation(Flags, A),
     \+ is_operator(Flags, A).
 
@@ -229,19 +226,6 @@ example :- example(k).
 %
 % Strings (non-italicized)
 %
-%is_string(Flags, A) :-
-%    string(Flags, A, _).
-%
-%string(_, A, mtext(A)) :-
-%    string(A).
-%
-%ml(Flags, A, M) :-
-%    is_string(Flags, A),
-%    string(Flags, A, M).
-%
-%paren(Flags, A, 0) :-
-%    is_string(Flags, A).
-
 % Translate to clean representation
 math(Flags, A, Flags, string(A)) :-
     string(A).
