@@ -239,6 +239,9 @@ ml(_, string(A), mtext(A)).
 % Level of parentheses
 paren(_, string(_), 0).
 
+% Precedence
+prec(_, string(_), string-0).
+
 example :- 
     example("text").
 
