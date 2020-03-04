@@ -200,6 +200,9 @@ ml(_, greek(A), mi(&(A))).
 % Level of parentheses
 paren(_, greek(_), 0).
 
+% Precedence
+prec(_, greek(_), greek-0).
+
 example :- 
     example(alpha).
 
