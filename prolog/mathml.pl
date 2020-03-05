@@ -50,7 +50,7 @@ mathml(Flags, A, Math) :-
 mathml(Flags, A, Math) :-
     denoting(Flags, A, [H | T]),
     ml(Flags, A, M),
-    !, Math = p([math(M), punct(' '), H | T])).
+    !, Math = p([math(M), punct(' '), H | T]).
 
 mathml(Flags, A, Err) :-
     format(string(Err), "Conversion failed: ~w", mathml(Flags, A)).
