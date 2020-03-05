@@ -128,7 +128,7 @@ precedence(_, _, atomic-0).
 math(Flags, A, Flags, punct(A)) :-
     punctuation(A, _).
 
-punctuation(' ', " ").
+punctuation(' ', mspace(width(thickmathspace), [])).
 punctuation('_', &(nbsp)).
 punctuation(ldots, mi(&(hellip))).
 punctuation(cdots, mi(&(ctdot))).
