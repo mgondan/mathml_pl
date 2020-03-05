@@ -132,12 +132,12 @@ punctuation('_', &(nbsp)).
 punctuation(ldots, mi(&(hellip))).
 punctuation(cdots, mi(&(ctdot))).
 
-ml(Flags, punct(A), M) :-
+ml(_, punct(A), M) :-
     punctuation(A, M).
 
-paren(Flags, punct(A), 0).
+paren(_, punct(_), 0).
 
-prec(Flags, punct(A), punct-0).
+prec(_, punct(_), punct-0).
 
 example :- 
     example(' ').
