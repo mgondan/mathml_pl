@@ -892,7 +892,7 @@ denoting(Flags, A, [M | MT]) :-
     abbreviations(Flags, A, [denoting(Expr, Des) | T]),
     !, ml(Flags, Expr, MExpr),
     ml(Flags, Des, MDes),
-    M = span(["with", &(nbsp), math(MExpr), " ", "denoting", math(MDes), ", ", " "]),
+    M = span(["with", &(nbsp), math(MExpr), " ", "denoting", math(MDes), ",", " "]),
     and(Flags, T, MT).
 
 and(_, [], ["."]).
@@ -900,7 +900,8 @@ and(_, [], ["."]).
 and(Flags, [denoting(Expr, Des) | T], [M | MT]) :-
     ml(Flags, Expr, MExpr),
     ml(Flags, Des, MDes),
-    M = span(["and", &(nbsp), math(MExpr), " ", "denoting", math(MDes), ", ", " "]).
+    M = span(["and", &(nbsp), math(MExpr), " ", "denoting", math(MDes), ",", " "]),
+    and(Flags, T, MT).
 
 % t-distribution
 math(Flags, tt(T, DF), Flags, fun('P', (abs('T') >= T ; [DF, punct('_'), string("df")]))).
