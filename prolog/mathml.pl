@@ -49,7 +49,7 @@ mathml(Flags, A, Math) :-
 
 mathml(Flags, A, Math) :-
     denoting(Flags, A, [H | T]),
-    ml(Flags, [A, ' '], M),
+    ml(Flags, [A, punct(' ')], M),
     !, Math = math([M, H | T]).
 
 mathml(Flags, A, Err) :-
@@ -125,23 +125,25 @@ precedence(_, _, atomic-0).
 %
 % Punctuation
 %
-is_punctuation(Flags, A) :-
-    punctuation(Flags, A, _).
+math(Flags, A, Flags, punct(A)) :-
+    punctuation(A, _).
 
-punctuation(_, '_', &(nbsp)).
-punctuation(_, ' ', mspace(width(thickmathspace), [])).
-punctuation(_, ldots, mi(&(hellip))).
-punctuation(_, cdots, mi(&(ctdot))).
+punctuation('_', &(nbsp)).
+punctuation(ldots, mi(&(hellip))).
+punctuation(cdots, mi(&(ctdot))).
 
-ml(Flags, A, M) :-
-    is_punctuation(Flags, A),
-    punctuation(Flags, A, M).
+ml(Flags, punct(A), M) :-
+    punctuation(A, M).
 
-paren(Flags, A, 0) :-
-    is_punctuation(Flags, A).
+paren(Flags, punct(A), 0).
 
-example :- example(' ').
-example :- example('_').
+prec(Flags, punct(A), punct-0).
+
+example :- 
+    example(' ').
+    
+example :- 
+    example('_').
 
 %
 % Operators
@@ -211,7 +213,6 @@ example :-
 %
 is_atom(Flags, A) :-
     atom(Flags, A, _),
-    \+ is_punctuation(Flags, A),
     \+ is_operator(Flags, A).
 
 atom(_, A, mi(A)) :-
@@ -471,7 +472,7 @@ example :-
     example(paren([paren(red(x)), green(paren(y))])).
     
 example :- 
-    example(underbrace(s, list('', (string("instead of"), ' ', sigma)))).
+    example(underbrace(s, list('', (string("instead of"), punct(' '), sigma)))).
 
 %
 % Mistakes
@@ -553,11 +554,11 @@ prec(Flags, error(Err, Mode, A), P) :-
 % A instead of B
 ml(Flags, instead_of(Err, Instead, Instead, Of), M) :-
     highlight(Flags, Err),
-    !, ml(Flags, underbrace(Instead, (string("instead of"), ' ', Of)), M).
+    !, ml(Flags, underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
 
 ml(Flags, instead_of(Err, A, Instead, Of), M) :-
     highlight(Flags, Err),
-    ml(Flags, underbrace(A, (Instead, ' ', string("instead of"), ' ', Of)), M).
+    ml(Flags, underbrace(A, (Instead, punct(' '), string("instead of"), punct(' '), Of)), M).
 
 paren(Flags, instead_of(Err, A, _, _), P) :-
     highlight(Flags, Err),
@@ -883,26 +884,26 @@ denoting(Flags, A, Empty) :-
 denoting(Flags, A, [M]) :-
     abbreviations(Flags, A, [denoting(Expr, Des)]),
     !,
-    ml(Flags, (' ', string("with"), ' ', Expr, ' ', string("denoting"), ' ', Des, string(".")), M).
+    ml(Flags, (punct(' '), string("with"), punct(' '), Expr, punct(' '), string("denoting"), punct(' '), Des, string(".")), M).
 
 denoting(Flags, A, [M | MT]) :-
     abbreviations(Flags, A, [denoting(Expr, Des) | T]),
     !,
-    ml(Flags, (string("with"), ' ', Expr, ' ', string("denoting"), ' ', Des, string(","), ' '), M),
+    ml(Flags, (string("with"), punct(' '), Expr, punct(' '), string("denoting"), punct(' '), Des, string(","), punct(' ')), M),
     and(Flags, T, MT).
 
 and(Flags, [], [X]) :-
     ml(Flags, string("."), X).
 
 and(Flags, [denoting(Expr, Des) | T], [M | MT]) :-
-    ml(Flags, (string("and"), ' ', Expr, ' ', string("denoting"), ' ', Des), M),
+    ml(Flags, (string("and"), punct(' '), Expr, punct(' '), string("denoting"), punct(' '), Des), M),
     and(Flags, T, MT).
 
 % t-distribution
-math(Flags, tt(T, DF), Flags, fun('P', (abs('T') >= T ; [DF, '_', string("df")]))).
-math(Flags, ut(T, DF), Flags, fun('P', ('T' >= T ; [DF, '_', string("df")]))).
+math(Flags, tt(T, DF), Flags, fun('P', (abs('T') >= T ; [DF, punct('_'), string("df")]))).
+math(Flags, ut(T, DF), Flags, fun('P', ('T' >= T ; [DF, punct('_'), string("df")]))).
 math(Flags, 2 * pt(T, DF, 'lower.tail'='FALSE'), Flags, tt(T, DF)).
-math(Flags, pt(T, DF), Flags, fun('P', ('T' =< T ; [DF, '_', string("df")]))).
+math(Flags, pt(T, DF), Flags, fun('P', ('T' =< T ; [DF, punct('_'), string("df")]))).
 math(Flags, pt(T, DF, 'lower.tail'='FALSE'), Flags, ut(T, DF)).
 
 %
@@ -1381,7 +1382,7 @@ ml(Flags, A, mrow([X, Sp, Unit])) :-
     is_unit(Flags, U),
     unit(Flags, U, Unit),
     ml(Flags, Num, X),
-    ml(Flags, '_', Sp).
+    ml(Flags, punct('_'), Sp).
 
 example :- example(10 '%').
 example :- example('100%'(0.1)).
@@ -1564,13 +1565,13 @@ prec(Flags, sqrt(_), P) :-
     precedence(Flags, x^y, P).
 
 math(Flags, instead_of(Err, pt(PT, DF), pt(T, DF), tt(T, DF)),
-    Flags, fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= T) ; [DF, '_', string("df")]))).
+    Flags, fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= T) ; [DF, punct('_'), string("df")]))).
 
 math(Flags, instead_of(Err, pt(denoting(PT, _, _), DF), pt(TT, DF), tt(TT, DF)),
-    Flags, fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, '_', string("df")]))).
+    Flags, fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, punct('_'), string("df")]))).
 
 math(Flags, instead_of(Err, ut(UT, DF), ut(T, DF), tt(T, DF)),
-    Flags, fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= T) ; [DF, '_', string("df")]))).
+    Flags, fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= T) ; [DF, punct('_'), string("df")]))).
 
 math(Flags, dbinom(K, N, P), Flags, fun('P' '_' string("Bi"), ['X' = K ; (N, P)])).
 math(Flags, pbinom(K, N, P), Flags, fun('P' '_' string("Bi"), ['X' =< K ; (N, P)])).
