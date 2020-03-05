@@ -895,7 +895,7 @@ denoting(Flags, A, [M | MT]) :-
     M = span(["with", &(nbsp), math(MExpr), " ", "denoting", math(MDes), ", ", " "]),
     and(Flags, T, MT).
 
-and(Flags, [], ["."]).
+and(_, [], ["."]).
 
 and(Flags, [denoting(Expr, Des) | T], [M | MT]) :-
     ml(Flags, Expr, MExpr),
