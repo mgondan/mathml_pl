@@ -49,8 +49,8 @@ mathml(Flags, A, Math) :-
 
 mathml(Flags, A, Math) :-
     denoting(Flags, A, [H | T]),
-    ml(Flags, [A, punct(' ')], M),
-    !, Math = math([M, H | T]).
+    ml(Flags, A, M),
+    !, Math = p([math(M), punct(' '), H | T])).
 
 mathml(Flags, A, Err) :-
     format(string(Err), "Conversion failed: ~w", mathml(Flags, A)).
@@ -884,21 +884,23 @@ denoting(Flags, A, Empty) :-
 
 denoting(Flags, A, [M]) :-
     abbreviations(Flags, A, [denoting(Expr, Des)]),
-    !,
-    ml(Flags, (punct(' '), string("with"), punct(' '), Expr, punct(' '), string("denoting"), punct(' '), Des, string(".")), M).
-
+    !, ml(Flags, Expr, MExpr),
+    ml(Flags, Des, MDes),
+    M = span(["with", &(nbsp), math(MExpr), " ", "denoting", math(MDes), "."]).
+    
 denoting(Flags, A, [M | MT]) :-
     abbreviations(Flags, A, [denoting(Expr, Des) | T]),
-    !,
-    ml(Flags, (string("with"), punct(' '), Expr, punct(' '), string("denoting"), punct(' '), Des, string(","), punct(' ')), M),
+    !, ml(Flags, Expr, MExpr),
+    ml(Flags, Des, MDes),
+    M = span(["with", &(nbsp), math(MExpr), " ", "denoting", math(MDes), ", ", " "]).
     and(Flags, T, MT).
 
-and(Flags, [], [X]) :-
-    ml(Flags, string("."), X).
+and(Flags, [], ["."]).
 
 and(Flags, [denoting(Expr, Des) | T], [M | MT]) :-
-    ml(Flags, (string("and"), punct(' '), Expr, punct(' '), string("denoting"), punct(' '), Des), M),
-    and(Flags, T, MT).
+    ml(Flags, Expr, MExpr),
+    ml(Flags, Des, MDes),
+    M = span(["and", &(nbsp), math(MExpr), " ", "denoting", math(MDes), ", ", " "]).
 
 % t-distribution
 math(Flags, tt(T, DF), Flags, fun('P', (abs('T') >= T ; [DF, punct('_'), string("df")]))).
