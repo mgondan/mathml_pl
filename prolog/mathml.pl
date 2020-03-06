@@ -912,7 +912,7 @@ math(Flags, pt(T, DF, 'lower.tail'='FALSE'), Flags, ut(T, DF)).
 ml(Flags, '100%'(A), X) :-
     select_option(mult(M), Flags, New, 1),
     _100M is 100 * M,
-    ml([mult(_100M) | New], A '%', X).
+    ml([mult(_100M) | New], round(A) '%', X).
 
 paren(Flags, '100%'(A), P) :-
     paren(Flags, A, P).
