@@ -149,41 +149,39 @@ example :-
 %
 % Operators
 %
-is_operator(Flags, A) :-
-    operator(Flags, A, _).
+math(Flags, A, Flags, op(A)) :-
+    operator(A, _).
 
-operator(_, A, mo(M)) :-
-    op(A, M).
+ml(_, op(A), mo(M)) :-
+    operator(A, M).
 
-op(+, +).
-op(-, -).
-op(*, &(sdot)).
-op(/, /).
-op(=\=, &('#8203')).
-op(=, =).
-op(<, &(lt)).
-op(>, &(gt)).
-op(=<, &(le)).
-op(>=, &(ge)).
-op(\=, &(ne)).
-op(!, !).
-op('%', '%').
-op(',', &(comma)).
-op(';', &('#59')).
-op('|', '|').
-op(invisible_times, &('#x2062')).
-op(->, &(rArr)).
-op(~>, &(zigrarr)).
-op(~, ~).
+paren(_, op(_), 0).
 
-ml(Flags, A, M) :-
-    is_operator(Flags, A),
-    operator(Flags, A, M).
+prec(_, op(_), op-0).
 
-paren(Flags, A, 0) :-
-    is_operator(Flags, A).
+operator(+, +).
+operator(-, -).
+operator(*, &(sdot)).
+operator(/, /).
+operator(=\=, &('#8203')).
+operator(=, =).
+operator(<, &(lt)).
+operator(>, &(gt)).
+operator(=<, &(le)).
+operator(>=, &(ge)).
+operator(\=, &(ne)).
+operator(!, !).
+operator('%', '%').
+operator(',', &(comma)).
+operator(';', &('#59')).
+operator('|', '|').
+operator(invisible_times, &('#x2062')).
+operator(->, &(rArr)).
+operator(~>, &(zigrarr)).
+operator(~, ~).
 
-example :- example(/).
+example :- 
+    example(/).
 
 %
 % Greek letters
@@ -213,8 +211,7 @@ example :-
 % General atoms
 %
 is_atom(Flags, A) :-
-    atom(Flags, A, _),
-    \+ is_operator(Flags, A).
+    atom(Flags, A, _).
 
 atom(_, A, mi(A)) :-
     atom(A).
@@ -1065,28 +1062,28 @@ ml(Flags, operator(P, fx, Op, A), mrow([F, X])) :-
     ( P =< Inner
       -> ml(Flags, paren(A), X)
       ; ml(Flags, A, X)
-    ), ml(Flags, Op, F).
+    ), ml(Flags, op(Op), F).
 
 ml(Flags, operator(P, fy, Op, A), mrow([F, Y])) :-
     precedence(Flags, A, _-Inner),
     ( P < Inner
       -> ml(Flags, paren(A), Y)
       ; ml(Flags, A, Y)
-    ), ml(Flags, Op, F).
+    ), ml(Flags, op(Op), F).
 
 ml(Flags, operator(P, xf, Op, A), mrow([X, F])) :-
     precedence(Flags, A, _-Inner),
     ( P =< Inner
       -> ml(Flags, paren(A), X)
       ; ml(Flags, A, X)
-    ), ml(Flags, Op, F).
+    ), ml(Flags, op(Op), F).
 
 ml(Flags, operator(P, yf, Op, A), mrow([Y, F])) :-
     precedence(Flags, A, _-Inner),
     ( P < Inner
       -> ml(Flags, paren(A), Y)
       ; ml(Flags, A, Y)
-    ), ml(Flags, Op, F).
+    ), ml(Flags, op(Op), F).
 
 paren(Flags, operator(Prec, Fix, _, A), Paren) :-
     member(Fix, [xf, fx]),
@@ -1131,7 +1128,7 @@ ml(Flags, operator(P, xfx, Op, A, B), mrow([X, F, Y])) :-
     ( P =< PrecB
       -> ml(Flags, paren(B), Y)
       ; ml(Flags, B, Y)
-    ), ml(Flags, Op, F).
+    ), ml(Flags, op(Op), F).
 
 ml(Flags, operator(P, xfy, Op, A, B), mrow([X, F, Y])) :-
     precedence(Flags, A, _-PrecA),
@@ -1142,7 +1139,7 @@ ml(Flags, operator(P, xfy, Op, A, B), mrow([X, F, Y])) :-
     ( P < PrecB
       -> ml(Flags, paren(B), Y)
       ; ml(Flags, B, Y)
-    ), ml(Flags, Op, F).
+    ), ml(Flags, op(Op), F).
 
 % yfy avoids parentheses around 1 + (2 + 3)
 ml(Flags, operator(P, yfy, Op, A, B), mrow([Y, F, X])) :-
@@ -1154,7 +1151,7 @@ ml(Flags, operator(P, yfy, Op, A, B), mrow([Y, F, X])) :-
     ( P < PrecB
       -> ml(Flags, paren(B), X)
       ; ml(Flags, B, X)
-    ), ml(Flags, Op, F).
+    ), ml(Flags, op(Op), F).
 
 ml(Flags, operator(P, yfx, Op, A, B), mrow([Y, F, X])) :-
     precedence(Flags, A, _-PrecA),
@@ -1165,7 +1162,7 @@ ml(Flags, operator(P, yfx, Op, A, B), mrow([Y, F, X])) :-
     ( P =< PrecB
       -> ml(Flags, paren(B), X)
       ; ml(Flags, B, X)
-    ), ml(Flags, Op, F).
+    ), ml(Flags, op(Op), F).
 
 paren(Flags, operator(Prec, xfx, _, A, B), P) :-
     paren(Flags, A, PA),
