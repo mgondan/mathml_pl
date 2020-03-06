@@ -180,6 +180,7 @@ operator(invisible_times, &('#x2062')).
 operator(->, &(rArr)).
 operator(~>, &(zigrarr)).
 operator(~, ~).
+operator(:, :).
 
 example :- 
     example(/).
