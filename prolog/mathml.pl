@@ -171,6 +171,7 @@ operator(=<, &(le)).
 operator(>=, &(ge)).
 operator(\=, &(ne)).
 operator(!, !).
+operator('', '').
 operator('%', '%').
 operator(',', &(comma)).
 operator(';', &('#59')).
