@@ -210,22 +210,23 @@ example :-
     example(alpha).
 
 %
-% General atoms
+% General atoms ("identifiers")
 %
-is_atom(Flags, A) :-
-    atom(Flags, A, _).
-
-atom(_, A, mi(A)) :-
+% Translate to clean representation
+math(Flags, A, Flags, atom(A)) :-
     atom(A).
 
-ml(Flags, A, M) :-
-    is_atom(Flags, A),
-    atom(Flags, A, M).
+% Translate to mathml
+ml(Flags, atom(A), mi(A)).
 
-paren(Flags, A, 0) :-
-    is_atom(Flags, A).
+% Level of parentheses
+paren(_, atom(_), 0).
 
-example :- example(k).
+% Precedence
+prec(_, atom(_), atom-0).
+
+example :-
+    example(k).
 
 %
 % Strings (non-italicized)
@@ -340,7 +341,9 @@ prec(_, list(Sep, _), P) :-
 
 prec(_, list(_, _), list-0).
 
-example :- example([x, y, z]).
+example :- 
+    example([atom(x), atom(y), atom(z)]).
+
 example :- example((x, y, z)).
 example :- example((x ; y, z)).
 example :- example((x | y, z)).
@@ -402,7 +405,7 @@ paren(Flags, overline(A), P) :-
 
 % Put average(x)^2 in parentheses
 prec(Flags, overline(A), accent-P) :-
-    precedence(Flags, a*A, _-P).
+    precedence(Flags, atom(a)*A, _-P).
 
 % Proper average
 math(Flags, mean(A), Flags, overline(A)).
@@ -466,7 +469,7 @@ math(Flags, fratio(A), Flags, A).
 math(Flags, quote(A), Flags, A).
 
 example :- 
-    example(cancel(red, 'X')).
+    example(cancel(red, atom('X'))).
     
 example :- 
     example(paren([paren(red(x)), green(paren(y))])).
@@ -900,10 +903,10 @@ and(Flags, [denoting(Expr, Des) | T], [M | MT]) :-
     and(Flags, T, MT).
 
 % t-distribution
-math(Flags, tt(T, DF), Flags, fun('P', (abs('T') >= T ; [DF, punct('_'), string("df")]))).
-math(Flags, ut(T, DF), Flags, fun('P', ('T' >= T ; [DF, punct('_'), string("df")]))).
+math(Flags, tt(T, DF), Flags, fun(atom('P'), (abs(atom('T')) >= T ; [DF, punct('_'), string("df")]))).
+math(Flags, ut(T, DF), Flags, fun(atom('P'), (atom('T') >= T ; [DF, punct('_'), string("df")]))).
 math(Flags, 2 * pt(T, DF, 'lower.tail'='FALSE'), Flags, tt(T, DF)).
-math(Flags, pt(T, DF), Flags, fun('P', ('T' =< T ; [DF, punct('_'), string("df")]))).
+math(Flags, pt(T, DF), Flags, fun(atom('P'), (atom('T') =< T ; [DF, punct('_'), string("df")]))).
 math(Flags, pt(T, DF, 'lower.tail'='FALSE'), Flags, ut(T, DF)).
 
 %
@@ -1039,7 +1042,7 @@ prec(_, sup(_, _), sup-P) :-
 
 % Omit multiplication sign in simple products
 math(Flags, A * B, Flags, M) :-
-    paren(Flags, A / x, 0),
+    paren(Flags, A / atom(x), 0),
     !, M = A invisible_times B.
 
 % Use plus as default separator for lists right to ~
@@ -1479,14 +1482,14 @@ example :- example(sin(a!)^2).
 %
 % Special functions
 %
-math(Flags, baseline_fratio(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub('F', Therapy)).
+math(Flags, baseline_fratio(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
 
-math(Flags, ancova_f(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub('F', Therapy)).
-math(Flags, ancova_ff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub('F', Therapy)).
-math(Flags, ancova_fff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub('F', Therapy)).
-math(Flags, ancova_ffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub('F', Therapy)).
-math(Flags, ancova_fffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub('F', Therapy)).
-math(Flags, ancova_ffffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub('F', Therapy)).
+math(Flags, ancova_f(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, ancova_ff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, ancova_fff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, ancova_ffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, ancova_fffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, ancova_ffffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
 
 ml(Flags, Tilde, M) :-
     compound(Tilde),
@@ -1502,7 +1505,7 @@ paren(Flags, Tilde, P) :-
     
 math(Flags, lm(Model, _Data), Flags, Model).
 
-math(Flags, anova_f(_, Therapy), Flags, sub('F', Therapy)).
+math(Flags, anova_f(_, Therapy), Flags, sub(atom('F'), Therapy)).
 
 math(Flags, 'TTEST'(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
      Flags, fun('TTEST', (D, T0, EOT, Mu, S, S_T0, S_EOT, N))).
@@ -1567,19 +1570,19 @@ prec(Flags, sqrt(_), P) :-
     precedence(Flags, x^y, P).
 
 math(Flags, instead_of(Err, pt(PT, DF), pt(T, DF), tt(T, DF)),
-    Flags, fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= T) ; [DF, punct('_'), string("df")]))).
+    Flags, fun(atom('P'), (instead_of(Err, atom('T') =< PT, atom('T') =< PT, abs(atom('T')) >= T) ; [DF, punct('_'), string("df")]))).
 
 math(Flags, instead_of(Err, pt(denoting(PT, _, _), DF), pt(TT, DF), tt(TT, DF)),
-    Flags, fun('P', (instead_of(Err, 'T' =< PT, 'T' =< PT, abs('T') >= TT) ; [DF, punct('_'), string("df")]))).
+    Flags, fun(atom('P'), (instead_of(Err, atom('T') =< PT, atom('T') =< PT, abs(atom('T')) >= TT) ; [DF, punct('_'), string("df")]))).
 
 math(Flags, instead_of(Err, ut(UT, DF), ut(T, DF), tt(T, DF)),
-    Flags, fun('P', (instead_of(Err, 'T' >= UT, 'T' >= UT, abs('T') >= T) ; [DF, punct('_'), string("df")]))).
+    Flags, fun(atom('P'), (instead_of(Err, atom('T') >= UT, atom('T') >= UT, abs(atom('T')) >= T) ; [DF, punct('_'), string("df")]))).
 
-math(Flags, dbinom(K, N, P), Flags, fun('P' '_' string("Bi"), ['X' = K ; (N, P)])).
-math(Flags, pbinom(K, N, P), Flags, fun('P' '_' string("Bi"), ['X' =< K ; (N, P)])).
-math(Flags, ubinom(K, N, P), Flags, fun('P' '_' string("Bi"), ['X' >= K ; (N, P)])).
-math(Flags, qbinom(Alpha, N, P), Flags, fun('Q' '_' string("Bi"), [Alpha ; (N, P)])).
-math(Flags, uqbinom(Alpha, N, P), Flags, fun('Q' '_' string("Bi"), [1 - Alpha ; (N, P)])).
+math(Flags, dbinom(K, N, P), Flags, fun(atom('P') '_' string("Bi"), [atom('X') = K ; (N, P)])).
+math(Flags, pbinom(K, N, P), Flags, fun(atom('P') '_' string("Bi"), [atom('X') =< K ; (N, P)])).
+math(Flags, ubinom(K, N, P), Flags, fun(atom('P') '_' string("Bi"), [atom('X') >= K ; (N, P)])).
+math(Flags, qbinom(Alpha, N, P), Flags, fun(atom('Q') '_' string("Bi"), [Alpha ; (N, P)])).
+math(Flags, uqbinom(Alpha, N, P), Flags, fun(atom('Q') '_' string("Bi"), [1 - Alpha ; (N, P)])).
 
 % Bit unusual terminology
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
