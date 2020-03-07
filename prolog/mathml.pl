@@ -217,7 +217,7 @@ math(Flags, A, Flags, atom(A)) :-
     atom(A).
 
 % Translate to mathml
-ml(Flags, atom(A), mi(A)).
+ml(_, atom(A), mi(A)).
 
 % Level of parentheses
 paren(_, atom(_), 0).
