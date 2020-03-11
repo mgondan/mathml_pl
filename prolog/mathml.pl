@@ -1482,14 +1482,14 @@ example :- example(sin(a!)^2).
 %
 % Special functions
 %
-math(Flags, baseline_fratio(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, baseline_fratio(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 
-math(Flags, ancova_f(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
-math(Flags, ancova_ff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
-math(Flags, ancova_fff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
-math(Flags, ancova_ffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
-math(Flags, ancova_fffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
-math(Flags, ancova_ffffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, ancova_f(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, ancova_ff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, ancova_fff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, ancova_ffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, ancova_fffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
+math(Flags, ancova_ffffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 
 ml(Flags, Tilde, M) :-
     compound(Tilde),
