@@ -335,7 +335,7 @@ paren(Flags, list(_, List), P) :-
     maplist({Flags}/[A, X] >> paren(Flags, A, X), List, PX),
     max_list(PX, P).
 
-prec(_, list(Sep, [_ | _]), P) :-
+prec(_, list(Sep, [_, _ | _]), P) :-
     current_op(Prec, _, Sep),
     !, P = list-Prec.
 
