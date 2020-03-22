@@ -838,6 +838,10 @@ abbreviations(Flags, A, W) :-
     denot(Flags, A, X),
     list_to_set(X, W).
 
+denot(Flags, A, W) :-
+    math(Flags, A, New, B),
+    !, denot(New, B, W).
+
 denot(_, A, []) :-
     atomic(A).
 
