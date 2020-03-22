@@ -1494,7 +1494,7 @@ math(Flags, ancova_fff(_, _Primary, _Covariates, _Strata, _Other, _Interactions,
 math(Flags, ancova_ffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 math(Flags, ancova_fffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 math(Flags, ancova_ffffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, 
-    [sub(atom('F'), Therapy), denoting([], 123, "the statistical model")]).
+    [sub(atom('F'), Therapy), denoting(m, "the statistical model")]).
 
 ml(Flags, Tilde, M) :-
     compound(Tilde),
