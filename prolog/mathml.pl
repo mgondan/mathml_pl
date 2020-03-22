@@ -849,10 +849,6 @@ denot(Flags, denoting(Expr, Desc), W) :-
     !, denot(Flags, Expr, T),
     W = [denoting(Expr, Desc) | T].
 
-denot(Flags, A, W) :-
-    math(Flags, A, New, B),
-    !, denot(New, B, W).
-
 % See compound below
 %
 % denot(Flags, instead_of(Err, A, Instead, Of), W) :-
@@ -875,12 +871,20 @@ denot(Flags, instead_of(Err, _, _, Of), W) :-
     !, denot(Flags, Of, W).
 
 denot(Flags, wrong_fn(Err, A, Instead, Of), W) :-
-    denot(Flags, instead_of(Err, A, Instead, Of), W).
+    !, denot(Flags, instead_of(Err, A, Instead, Of), W).
+
+denot(Flags, [H | T], With) :-
+    !, maplist(denot(Flags), [H | T], List),
+    append(List, With).
+
+denot(Flags, A, W) :-
+    math(Flags, A, New, B),
+    !, denot(New, B, W).
 
 denot(Flags, Comp, With) :-
     compound(Comp),
     compound_name_arguments(Comp, _, Args),
-    maplist({Flags}/[A, W] >> denot(Flags, A, W), Args, List),
+    maplist(denot(Flags), Args, List),
     append(List, With).
 
 % Render abbreviations
