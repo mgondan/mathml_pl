@@ -1412,7 +1412,7 @@ math(Flags, ancova_fff(_, _Primary, _Covariates, _Strata, _Other, _Interactions,
 math(Flags, ancova_ffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 math(Flags, ancova_fffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 math(Flags, ancova_ffffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
-denot(Flags, ancova_ffffff(_, Primary, Covariates, Strata, Other, Interactions, Exclude, _Therapy), W) :-
+denot(Flags, ancova_ffffff(_, Primary, Covariates, Strata, Other, Interactions, Exclude, Therapy), W) :-
     !, denot(Flags, Primary, T1),
     denot(Flags, Covariates, T2),
     denot(Flags, Strata, T3),
