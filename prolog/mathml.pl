@@ -23,6 +23,7 @@
 :- discontiguous prec/3.
 :- discontiguous math/4.
 :- discontiguous example/0.
+:- discontiguous denot/3.
 
 :- use_module(library(quantity)).
 :- use_module(library(http/html_write)).
@@ -1497,8 +1498,11 @@ math(Flags, ancova_ff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, 
 math(Flags, ancova_fff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 math(Flags, ancova_ffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 math(Flags, ancova_fffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
-math(Flags, ancova_ffffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, 
-    [sub(atom('F'), Therapy), denoting(m, "the statistical model")]).
+math(Flags, ancova_ffffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
+denot(_, ancova_ffffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), 
+    denoting(m, 'the model').
+
+
 
 ml(Flags, Tilde, M) :-
     compound(Tilde),
