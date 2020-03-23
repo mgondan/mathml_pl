@@ -877,9 +877,9 @@ denot(Flags, [H | T], With) :-
     !, maplist(denot(Flags), [H | T], List),
     append(List, With).
 
-denot(Flags, A, W) :-
-    math(Flags, A, New, B),
-    !, denot(New, B, W).
+%denot(Flags, A, W) :-
+%    math(Flags, A, New, B),
+%    !, denot(New, B, W).
 
 denot(Flags, Comp, With) :-
     compound(Comp),
