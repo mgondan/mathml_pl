@@ -1419,8 +1419,9 @@ denot(Flags, ancova_ffffff(_, Primary, Covariates, Strata, Other, Interactions, 
     denot(Flags, Other, T4),
     denot(Flags, Interactions, T5),
     denot(Flags, Exclude, T6),
-    append([T1, T2, T3, T4, T5, T6], T),
-    W = [denoting(tilde(Primary, [Covariates, Strata, Other, Interactions, Exclude]), "the statistical model") | T].
+    denot(Flags, Therapy, T7),
+    append([T1, T2, T3, T4, T5, T6, T7], T),
+    W = [denoting(tilde(Primary, [Covariates, Strata, Other, Interactions, Exclude, Therapy]), "the statistical model") | T].
 
 ml(Flags, Tilde, M) :-
     compound(Tilde),
