@@ -824,93 +824,6 @@ example :- example([fix(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([show(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([correct(err1)], instead_of(err1, sigma, sigma, s)).
 
-%
-% Abbreviations
-%
-math(Flags, denoting(A, X, _), Flags, color_or_box(Err, A)) :-
-    erroneous(X, [Err | _]).
-
-math(Flags, denoting(A, _, _), Flags, A).
-
-math(Flags, denoting(_, _), Flags, '').
-
-% Collect abbreviations
-abbreviations(Flags, A, W) :-
-    denot(Flags, A, X),
-    list_to_set(X, W).
-
-denot(_, A, []) :-
-    atomic(A).
-
-denot(Flags, denoting(Abbrev, Expr, Desc), W) :-
-    !, denot(Flags, Expr, T),
-    W = [denoting(Abbrev = Expr, Desc) | T].
-
-denot(Flags, denoting(Expr, Desc), W) :-
-    !, denot(Flags, Expr, T),
-    W = [denoting(Expr, Desc) | T].
-
-% See compound below
-%
-% denot(Flags, instead_of(Err, A, Instead, Of), W) :-
-%     option(error(highlight), Flags, highlight),
-%     !, denot(Flags, A, X),
-%     denot(Flags, Instead, Y),
-%     denot(Flags, Of, Z),
-%     append([X, Y, Z], W).
-
-denot(Flags, instead_of(Err, A, _, _), W) :-
-    show(Flags, Err),
-    !, denot(Flags, A, W).
-
-denot(Flags, instead_of(Err, _, _, Of), W) :-
-    fix(Flags, Err),
-    !, denot(Flags, Of, W).
-
-denot(Flags, instead_of(Err, _, _, Of), W) :-
-    correct(Flags, Err),
-    !, denot(Flags, Of, W).
-
-denot(Flags, wrong_fn(Err, A, Instead, Of), W) :-
-    !, denot(Flags, instead_of(Err, A, Instead, Of), W).
-
-denot(Flags, [H | T], With) :-
-    !, maplist(denot(Flags), [H | T], List),
-    append(List, With).
-
-%denot(Flags, A, W) :-
-%    math(Flags, A, New, B),
-%    !, denot(New, B, W).
-
-denot(Flags, Comp, With) :-
-    compound(Comp),
-    compound_name_arguments(Comp, _, Args),
-    maplist(denot(Flags), Args, List),
-    append(List, With).
-
-% Render abbreviations
-denoting(Flags, A, Empty) :-
-    abbreviations(Flags, A, []),
-    !, Empty = [].
-
-denoting(Flags, A, [M]) :-
-    abbreviations(Flags, A, [denoting(Expr, Des)]),
-    !, ml(Flags, Expr, MExpr),
-    M = span(["with", &(nbsp), math(MExpr), " denoting ", Des, "."]).
-    
-denoting(Flags, A, [M | MT]) :-
-    abbreviations(Flags, A, [denoting(Expr, Des) | T]),
-    !, ml(Flags, Expr, MExpr),
-    M = span(["with", &(nbsp), math(MExpr), " denoting ", Des, ", "]),
-    and(Flags, T, MT).
-
-and(_, [], ["."]).
-
-and(Flags, [denoting(Expr, Des) | T], [M | MT]) :-
-    ml(Flags, Expr, MExpr),
-    M = span(["and", &(nbsp), math(MExpr), " denoting ", Des, ", "]),
-    and(Flags, T, MT).
-
 % t-distribution
 math(Flags, tt(T, DF), Flags, fun(atom('P'), (abs(atom('T')) >= T ; [DF, punct('_'), string("df")]))).
 math(Flags, ut(T, DF), Flags, fun(atom('P'), (atom('T') >= T ; [DF, punct('_'), string("df")]))).
@@ -1625,3 +1538,91 @@ example :- example(dbinom(k, n, pi) =
 example :- example(pbinom(k, 'N', pi) =
                    sum(i, k, 'N', choose('N', k) * dbinom(i, 'N', k))).
 example :- example(sum(i, k, 'N', i) + sum(i, k, 'N', i)).
+
+%
+% Abbreviations
+%
+math(Flags, denoting(A, X, _), Flags, color_or_box(Err, A)) :-
+    erroneous(X, [Err | _]).
+
+math(Flags, denoting(A, _, _), Flags, A).
+
+math(Flags, denoting(_, _), Flags, '').
+
+% Collect abbreviations
+abbreviations(Flags, A, W) :-
+    denot(Flags, A, X),
+    list_to_set(X, W).
+
+denot(_, A, []) :-
+    atomic(A).
+
+denot(Flags, denoting(Abbrev, Expr, Desc), W) :-
+    !, denot(Flags, Expr, T),
+    W = [denoting(Abbrev = Expr, Desc) | T].
+
+denot(Flags, denoting(Expr, Desc), W) :-
+    !, denot(Flags, Expr, T),
+    W = [denoting(Expr, Desc) | T].
+
+% See compound below
+%
+% denot(Flags, instead_of(Err, A, Instead, Of), W) :-
+%     option(error(highlight), Flags, highlight),
+%     !, denot(Flags, A, X),
+%     denot(Flags, Instead, Y),
+%     denot(Flags, Of, Z),
+%     append([X, Y, Z], W).
+
+denot(Flags, instead_of(Err, A, _, _), W) :-
+    show(Flags, Err),
+    !, denot(Flags, A, W).
+
+denot(Flags, instead_of(Err, _, _, Of), W) :-
+    fix(Flags, Err),
+    !, denot(Flags, Of, W).
+
+denot(Flags, instead_of(Err, _, _, Of), W) :-
+    correct(Flags, Err),
+    !, denot(Flags, Of, W).
+
+denot(Flags, wrong_fn(Err, A, Instead, Of), W) :-
+    !, denot(Flags, instead_of(Err, A, Instead, Of), W).
+
+denot(Flags, [H | T], With) :-
+    !, maplist(denot(Flags), [H | T], List),
+    append(List, With).
+
+%denot(Flags, A, W) :-
+%    math(Flags, A, New, B),
+%    !, denot(New, B, W).
+
+denot(Flags, Comp, With) :-
+    compound(Comp),
+    compound_name_arguments(Comp, _, Args),
+    maplist(denot(Flags), Args, List),
+    append(List, With).
+
+% Render abbreviations
+denoting(Flags, A, Empty) :-
+    abbreviations(Flags, A, []),
+    !, Empty = [].
+
+denoting(Flags, A, [M]) :-
+    abbreviations(Flags, A, [denoting(Expr, Des)]),
+    !, ml(Flags, Expr, MExpr),
+    M = span(["with", &(nbsp), math(MExpr), " denoting ", Des, "."]).
+    
+denoting(Flags, A, [M | MT]) :-
+    abbreviations(Flags, A, [denoting(Expr, Des) | T]),
+    !, ml(Flags, Expr, MExpr),
+    M = span(["with", &(nbsp), math(MExpr), " denoting ", Des, ", "]),
+    and(Flags, T, MT).
+
+and(_, [], ["."]).
+
+and(Flags, [denoting(Expr, Des) | T], [M | MT]) :-
+    ml(Flags, Expr, MExpr),
+    M = span(["and", &(nbsp), math(MExpr), " denoting ", Des, ", "]),
+    and(Flags, T, MT).
+
