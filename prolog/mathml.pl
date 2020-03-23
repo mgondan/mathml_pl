@@ -1413,7 +1413,13 @@ math(Flags, ancova_ffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions
 math(Flags, ancova_fffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 math(Flags, ancova_ffffff(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 denot(Flags, ancova_ffffff(_, Primary, Covariates, Strata, Other, Interactions, Exclude, _Therapy), W) :-
-    !, W = [denoting(tilde(Primary, [Covariates, Strata, Other, Interactions, Exclude]), "the statistical model")].
+    !, denot(Primary, T1),
+    denot(Covariates, T2),
+    denot(Strata, T3),
+    denot(Other, T4),
+    denot(Interactions, T5),
+    denot(Exclude, T6),
+    W = [denoting(tilde(Primary, [Covariates, Strata, Other, Interactions, Exclude]), "the statistical model"), T1, T2, T3, T4, T5, T6].
 
 ml(Flags, Tilde, M) :-
     compound(Tilde),
