@@ -699,32 +699,32 @@ ml(Flags, omit_right(Err, quote(Expr)), M) :-
 paren(Flags, omit_right(_Err, quote(Expr)), P) :-
     paren(Flags, Expr, P).
 
-ml(Flags, left_landed(Err, quote(Expr)), M) :-
+ml(Flags, left_landed(Err, Expr), M) :-
     highlight(Flags, Err),
     precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (color(Err, roundedbox(black((L, Op)))), operator(Prec, fy, '', R)), M).
 
-ml(Flags, left_landed(Err, quote(Expr)), M) :-
+ml(Flags, left_landed(Err, Expr), M) :-
     show(Flags, Err),
     precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (color_or_box(Err, (L, Op)), operator(Prec, fy, '', R)), M).
 
-ml(Flags, left_landed(Err, quote(Expr)), M) :-
+ml(Flags, left_landed(Err, Expr), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, _, [_, R]),
     ml(Flags, R, M).
 
-ml(Flags, left_landed(Err, quote(Expr)), M) :-
+ml(Flags, left_landed(Err, Expr), M) :-
     correct(Flags, Err),
     compound_name_arguments(Expr, _, [_, R]),
     ml(Flags, R, M).
 
-paren(Flags, left_landed(_Err, quote(Expr)), P) :-
+paren(Flags, left_landed(_Err, Expr), P) :-
     paren(Flags, Expr, P).
 
-prec(Flags, left_landed(_Err, quote(Expr)), Prec) :-
+prec(Flags, left_landed(_Err, Expr), Prec) :-
     precedence(Flags, Expr, Prec).
 
 ml(Flags, right_landed(Err, quote(Expr)), M) :-
