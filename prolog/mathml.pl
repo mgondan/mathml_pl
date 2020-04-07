@@ -680,17 +680,17 @@ paren(Flags, omit_left(_Err, Expr), P) :-
 ml(Flags, omit_right(Err, Expr), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, (L, ' ', underbrace((Op, ' ', R), string("omitted"))), M).
+    ml(Flags, (L, underbrace((Op, ' ', R), string("omitted"))), M).
 
 ml(Flags, omit_right(Err, Expr), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, (L, ' ', cancel(Err, (Op, ' ', R))), M).
+    ml(Flags, (L, cancel(Err, (Op, ' ', R))), M).
 
 ml(Flags, omit_right(Err, Expr), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, (L, ' ', color(Err, (Op, ' ', R))), M).
+    ml(Flags, (L, color(Err, (Op, ' ', R))), M).
 
 ml(Flags, omit_right(Err, Expr), M) :-
     correct(Flags, Err),
