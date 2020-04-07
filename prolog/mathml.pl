@@ -481,7 +481,7 @@ example :-
 %
 % Mistakes
 %
-erroneous(buggy(quote(Fb), A), Errors) :-
+erroneous(buggy(Fb, A), Errors) :-
     !, compound_name_arguments(Fb, Err, _),
     erroneous(A, T),
     Errors = [Err | T].
@@ -532,8 +532,8 @@ correct(Flags, Err) :-
 correct(Flags, _) :-
     member(correct(all), Flags).
 
-math(Flags, expert(quote(_Feedback), A), Flags, A).
-math(Flags, buggy(quote(_Feedback), A), Flags, A).
+math(Flags, expert(_Feedback, A), Flags, A).
+math(Flags, buggy(_Feedback, A), Flags, A).
 
 paren(Flags, error(Err, Mode, A), P) :-
     C =.. [Err, Mode],
@@ -655,48 +655,48 @@ prec(Flags, add(_Err, Elem), P) :-
     precedence(Flags, Elem, P).
 
 % Left part omitted
-ml(Flags, omit_left(Err, quote(Expr)), M) :-
+ml(Flags, omit_left(Err, Expr), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (underbrace((L, Op), string("omitted")), R), M).
 
-ml(Flags, omit_left(Err, quote(Expr)), M) :-
+ml(Flags, omit_left(Err, Expr), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (cancel(Err, (L, Op)), R), M).
 
-ml(Flags, omit_left(Err, quote(Expr)), M) :-
+ml(Flags, omit_left(Err, Expr), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (color(Err, (L, Op)), R), M).
 
-ml(Flags, omit_left(Err, quote(Expr)), M) :-
+ml(Flags, omit_left(Err, Expr), M) :-
     correct(Flags, Err),
     ml(Flags, Expr, M).
 
-paren(Flags, omit_left(_Err, quote(Expr)), P) :-
+paren(Flags, omit_left(_Err, Expr), P) :-
     paren(Flags, Expr, P).
 
-ml(Flags, omit_right(Err, quote(Expr)), M) :-
+ml(Flags, omit_right(Err, Expr), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (L, underbrace((Op, R), string("omitted"))), M).
 
-ml(Flags, omit_right(Err, quote(Expr)), M) :-
+ml(Flags, omit_right(Err, Expr), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (L, cancel(Err, (Op, R))), M).
 
-ml(Flags, omit_right(Err, quote(Expr)), M) :-
+ml(Flags, omit_right(Err, Expr), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (L, color(Err, (Op, R))), M).
 
-ml(Flags, omit_right(Err, quote(Expr)), M) :-
+ml(Flags, omit_right(Err, Expr), M) :-
     correct(Flags, Err),
     ml(Flags, Expr, M).
 
-paren(Flags, omit_right(_Err, quote(Expr)), P) :-
+paren(Flags, omit_right(_Err, Expr), P) :-
     paren(Flags, Expr, P).
 
 ml(Flags, left_landed(Err, Expr), M) :-
@@ -727,94 +727,94 @@ paren(Flags, left_landed(_Err, Expr), P) :-
 prec(Flags, left_landed(_Err, Expr), Prec) :-
     precedence(Flags, Expr, Prec).
 
-ml(Flags, right_landed(Err, quote(Expr)), M) :-
+ml(Flags, right_landed(Err, Expr), M) :-
     highlight(Flags, Err),
     precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (operator(Prec, yf, '', L), color(Err, roundedbox(black((Op, R))))), M).
 
-ml(Flags, right_landed(Err, quote(Expr)), M) :-
+ml(Flags, right_landed(Err, Expr), M) :-
     show(Flags, Err),
     precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (operator(Prec, yf, '', L), color_or_box(Err, (Op, R))), M).
 
-ml(Flags, right_landed(Err, quote(Expr)), M) :-
+ml(Flags, right_landed(Err, Expr), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, _Op, [L, _R]),
     ml(Flags, L, M).
 
-ml(Flags, right_landed(Err, quote(Expr)), M) :-
+ml(Flags, right_landed(Err, Expr), M) :-
     correct(Flags, Err),
     compound_name_arguments(Expr, _Op, [L, _R]),
     ml(Flags, L, M).
 
-paren(Flags, right_landed(_Err, quote(Expr)), P) :-
+paren(Flags, right_landed(_Err, Expr), P) :-
     paren(Flags, Expr, P).
 
-prec(Flags, right_landed(_Err, quote(Expr)), Prec) :-
+prec(Flags, right_landed(_Err, Expr), Prec) :-
     precedence(Flags, Expr, Prec).
 
-ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
+ml(Flags, left_elsewhere(Err, Expr), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (color(Err, roundedbox(phantom((L, Op)))), R), M).
 
-ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
+ml(Flags, left_elsewhere(Err, Expr), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, _Op, [_L, R]),
     ml(Flags, R, M).
 
-ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
+ml(Flags, left_elsewhere(Err, Expr), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (color_or_box(Err, (L, Op)), R), M).
 
-ml(Flags, left_elsewhere(Err, quote(Expr)), M) :-
+ml(Flags, left_elsewhere(Err, Expr), M) :-
     correct(Flags, Err),
     ml(Flags, Expr, M).
 
-paren(Flags, left_elsewhere(Err, quote(Expr)), P) :-
+paren(Flags, left_elsewhere(Err, Expr), P) :-
     show(Flags, Err),
     !, compound_name_arguments(Expr, _Op, [_L, R]),
     paren(Flags, R, P).
 
-paren(Flags, left_elsewhere(_Err, quote(Expr)), P) :-
+paren(Flags, left_elsewhere(_Err, Expr), P) :-
     paren(Flags, Expr, P).
 
-prec(Flags, left_elsewhere(Err, quote(Expr)), Prec) :-
+prec(Flags, left_elsewhere(Err, Expr), Prec) :-
     show(Flags, Err),
     compound_name_arguments(Expr, _Op, [_L, R]),
     precedence(Flags, R, Prec).
 
-ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
+ml(Flags, right_elsewhere(Err, Expr), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (L, color(Err, roundedbox(phantom((Op, R))))), M).
 
-ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
+ml(Flags, right_elsewhere(Err, Expr), M) :-
     show(Flags, Err),
     compound_name_arguments(Expr, _Op, [L, _R]),
     ml(Flags, L, M).
 
-ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
+ml(Flags, right_elsewhere(Err, Expr), M) :-
     fix(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (L, color_or_box(Err, (Op, R))), M).
 
-ml(Flags, right_elsewhere(Err, quote(Expr)), M) :-
+ml(Flags, right_elsewhere(Err, Expr), M) :-
     correct(Flags, Err),
     ml(Flags, Expr, M).
 
-paren(Flags, right_elsewhere(Err, quote(Expr)), P) :-
+paren(Flags, right_elsewhere(Err, Expr), P) :-
     show(Flags, Err),
     !, compound_name_arguments(Expr, _Op, [L, _R]),
     paren(Flags, L, P).
 
-paren(Flags, right_elsewhere(_Err, quote(Expr)), P) :-
+paren(Flags, right_elsewhere(_Err, Expr), P) :-
         paren(Flags, Expr, P).
 
-prec(Flags, right_elsewhere(Err, quote(Expr)), Prec) :-
+prec(Flags, right_elsewhere(Err, Expr), Prec) :-
     show(Flags, Err),
     compound_name_arguments(Expr, _Op, [L, _R]),
     precedence(Flags, L, Prec).
