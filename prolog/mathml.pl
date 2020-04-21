@@ -481,6 +481,22 @@ example :-
 %
 % Mistakes
 %
+erroneous(left_landed(Err, A), Errors) :-
+    !, erroneous(A, T),
+    Errors = [Err | T].
+
+erroneous(right_landed(Err, A), Errors) :-
+    !, erroneous(A, T),
+    Errors = [Err | T].
+
+erroneous(omit_left(Err, A), Errors) :-
+    !, erroneous(A, T),
+    Errors = [Err | T].
+
+erroneous(omit_right(Err, A), Errors) :-
+    !, erroneous(A, T),
+    Errors = [Err | T].
+
 erroneous(buggy(Fb, A), Errors) :-
     !, compound_name_arguments(Fb, Err, _),
     erroneous(A, T),
