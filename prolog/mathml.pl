@@ -1460,11 +1460,11 @@ math(Flags, tpaired_tratio(D, T0, EOT, Mu, S, S_T0, S_EOT, N),
 
 math(Flags, tratio(X, Mu, S, N), Flags, fun(string("paired t-test"), [X, S; Mu, N])).
 
-math(Flags, paired_tx(D, _Other, S, _S_Other, N, Mu, _Tails, _Alpha),
+math(Flags, paired_t(D, Mu, S, N),
      Flags, fun(string("paired t-test"), [D, S; Mu, N])).
 
-math(Flags, groups_t(M_A, S_A, N_A, M_B, S_B, N_B, Mu, _Tails, _Alpha),
-     Flags, fun(string("independent t-test"), [M_A, S_A, M_B, S_B; Mu, N_A, N_B])).
+math(Flags, groups_t(M_A, S_A, N_A, M_B, S_B, N_B),
+     Flags, fun(string("independent t-test"), [M_A, S_A, M_B, S_B; N_A, N_B])).
 
 math(Flags, tpaired_tratio(D, _T0, _EOT, Mu, S_D, _S_T0, _S_EOT, N, _Tails, _Alpha),
      Flags, fun(string("paired t-test"), [D, S_D; Mu, N])).
