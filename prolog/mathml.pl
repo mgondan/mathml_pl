@@ -1050,7 +1050,7 @@ paren(Flags, operator(Prec, Fix, _, A), Paren) :-
       ; Paren = P
     ).
 
-prec(_, operator(P, _, _, _), op-P).
+prec(_, operator(P, _, Op, _), Op-P).
 
 % Avoid unnecessary parentheses right to + in 1 + (2 - 3)
 math(Flags, A + B, Flags, operator(P, yfy, +, A, B)) :-
@@ -1150,7 +1150,7 @@ paren(Flags, operator(Prec, xfy, _, A, B), P) :-
       ; ParenB = PB
     ), P is max(ParenA, ParenB).
 
-prec(_, operator(P, _, _, _, _), op-P).
+prec(_, operator(P, _, Op, _, _), Op-P).
 
 example :- example(a^3 + 3*a^2*b + 3*a*b^2 + b^3).
 example :- example(a^b).
