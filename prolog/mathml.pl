@@ -1456,7 +1456,7 @@ math(Flags, lm(Model, _Data), Flags, Model).
 math(Flags, anova_f(_, Therapy), Flags, sub(atom('F'), Therapy)).
 
 math(Flags, paired_t(D, Mu, S, N),
-     Flags, fun(string("paired t-test"), [D, S; N, Mu])).
+     Flags, fun(string(["paired", ' ', t, "-test"]), [D, S; N, Mu])).
 
 math(Flags, groups_t(M_A, S_A, N_A, M_B, S_B, N_B),
      Flags, fun(string("independent t-test"), [M_A, S_A, M_B, S_B; N_A, N_B])).
