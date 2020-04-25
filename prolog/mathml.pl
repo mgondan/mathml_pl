@@ -1456,10 +1456,10 @@ math(Flags, lm(Model, _Data), Flags, Model).
 math(Flags, anova_f(_, Therapy), Flags, sub(atom('F'), Therapy)).
 
 math(Flags, paired_t(D, Mu, S, N),
-     Flags, fun([string("paired"), punct('_'), atom(t), string("-test")], [D, S; N, Mu])).
+     Flags, fun((string("paired"), punct('_'), atom(t), string("-test")), [D, S; N, Mu])).
 
 math(Flags, groups_t(M_A, S_A, N_A, M_B, S_B, N_B),
-     Flags, fun([string("independent"), punct('_'), atom(t), string("-test")], [M_A, S_A, M_B, S_B; N_A, N_B])).
+     Flags, fun((string("independent"), punct('_'), atom(t), string("-test")), [M_A, S_A, M_B, S_B; N_A, N_B])).
 
 math(Flags, var_pool(V_A, N, V_B, N), Flags, dfrac(V_A + V_B, 2)).
 
