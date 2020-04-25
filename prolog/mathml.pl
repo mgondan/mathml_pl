@@ -980,7 +980,7 @@ prec(_, sup(_, _), sup-P) :-
 
 % Omit multiplication sign in simple products
 math(Flags, A * B, Flags, M) :-
-    current_op(Mult, yfx, *)
+    current_op(Mult, yfx, *),
     precedence(Flags, A, Op-Prec),
     dif(Op, frac),
     dif(Op, /),
