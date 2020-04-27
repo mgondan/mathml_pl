@@ -984,7 +984,7 @@ math(Flags, A * B, Flags, M) :-
     precedence(Flags, A, Op-Prec),
     dif(Op, frac),
     dif(Op, /),
-    Prec >= Mult,
+    Prec =< Mult,
     !, M = A invisible_times B.
 
 % Use plus as default separator for lists right to ~
