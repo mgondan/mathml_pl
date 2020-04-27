@@ -35,7 +35,7 @@ mml(A) -->
     mml([color-auto], A).
     
 mml(Flags, A) -->
-    { member(color-auto, A),
+    { member(color-auto, Flags),
       palette(A, P) 
     }, !, mml([highlight(all) | P], A).
 
