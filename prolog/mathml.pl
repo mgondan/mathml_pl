@@ -32,8 +32,12 @@
 % Interface
 %
 mml(A) -->
-    { palette(A, P) },
-    mml([highlight(all) | P], A).
+    mml([color-auto], A).
+    
+mml(Flags, A) -->
+    { member(color-auto, A),
+      palette(A, P) 
+    }, !, mml([highlight(all) | P], A).
 
 mml(Flags, A) -->
     { ml(Flags, A, M) 
