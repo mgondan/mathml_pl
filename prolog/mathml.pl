@@ -69,7 +69,7 @@ example(A) :-
 example(Flags, A) :-
     mathml(Flags, A, M)
     -> writeln(math:A = ml:M)
-    ; writeln(math:A = ml:failed).
+     ; writeln(math:A = ml:failed).
 
 %
 % For SWISH
@@ -512,6 +512,11 @@ erroneous(instead_of(Err, A, _Instead, Of), Errors) :-
     append([[Err], I, O], Errors).
 
 erroneous(add(Err, A), Errors) :-
+    !, erroneous(A, E),
+    Errors = [Err | E].
+    
+erroneous(color(Err, A), Errors) :-
+    atom(Err),
     !, erroneous(A, E),
     Errors = [Err | E].
     
