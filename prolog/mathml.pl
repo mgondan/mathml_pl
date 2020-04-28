@@ -35,10 +35,10 @@ mml(A) -->
     mml([color-auto, highlight(all)], A).
     
 mml(Flags, A) -->
-    { member(color-auto, Flags),
+    { select(color-auto, Flags, Removed),
       !, 
       palette(A, P),
-      append(Flags, P, New)
+      append(Removed, P, New)
     }, 
     mml(New, A).
 
@@ -50,10 +50,10 @@ mathml(A, M) :-
     mathml([color-auto, highlight(all)], A, M).
     
 mathml(Flags, A, M) :-
-    member(color-auto, Flags),
+    select(color-auto, Flags, Removed),
     !, 
     palette(A, P),
-    append(Flags, P, New),
+    append(Removed, P, New),
     mathml(New, A, M).
 
 mathml(Flags, A, Math) :-
