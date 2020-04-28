@@ -32,20 +32,29 @@
 % Interface
 %
 mml(A) -->
-    mml([color-auto], A).
+    mml([color-auto, highlight(all)], A).
     
 mml(Flags, A) -->
     { member(color-auto, Flags),
-      palette(A, P) 
-    }, !, mml([highlight(all) | P], A).
+      !, 
+      palette(A, P),
+      append(Flags, P, New)
+    }, 
+    mml(New, A).
 
 mml(Flags, A) -->
-    { ml(Flags, A, M) 
-    }, html(math(M)).
+    { ml(Flags, A, M) },
+    html(math(M)).
 
 mathml(A, M) :-
+    mathml([color-auto, highlight(all)], A, M).
+    
+mathml(Flags, A, M) :-
+    member(color-auto, Flags),
+    !, 
     palette(A, P),
-    mathml([highlight(all) | P], A, M).
+    append(Flags, P, New),
+    mathml(New, A, M).
 
 mathml(Flags, A, Math) :-
     denoting(Flags, A, []),
