@@ -1320,7 +1320,7 @@ ml(_, number(A), M) :-
     !, M = mn(A).
 
 ml(Flags, number(A), X) :-
-    quantity(A, N, Options),
+    quantity(N, A, Options),
     N < 0,
     Abs is abs(N),
     quantity(AX, Abs, Options),
