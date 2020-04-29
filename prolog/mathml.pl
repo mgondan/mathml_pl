@@ -1320,11 +1320,13 @@ ml(_, number(A), M) :-
     !, M = mn(A).
 
 ml(Flags, number(A), X) :-
-    quantity(N, A, Options),
+    string(A),
+    quantity(N, Options, A),
     N < 0,
     Abs is abs(N),
-    quantity(AX, Abs, Options),
-    ml(Flags, [-, number(AX)], X).
+    quantity(Abs, Options, AbsX),
+    string_codes(String, AbsX)
+    ml(Flags, [-, number(String)], X).
 
 paren(Flags, number(A), P) :-
     term_string(T, A),
