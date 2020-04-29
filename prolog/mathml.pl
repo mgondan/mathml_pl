@@ -838,7 +838,7 @@ prec(Flags, right_landed(_Err, Expr), Prec) :-
 ml(Flags, left_elsewhere(Err, Expr), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, (color(Err, roundedbox(strike((L, Op)))), R), M).
+    ml(Flags, (color(Err, roundedbox(strike(black((L, Op))))), R), M).
 
 ml(Flags, left_elsewhere(Err, Expr), M) :-
     show(Flags, Err),
@@ -870,7 +870,7 @@ prec(Flags, left_elsewhere(Err, Expr), Prec) :-
 ml(Flags, right_elsewhere(Err, Expr), M) :-
     highlight(Flags, Err),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, (L, color(Err, roundedbox(strike((Op, R))))), M).
+    ml(Flags, (L, color(Err, roundedbox(strike(black((Op, R)))))), M).
 
 ml(Flags, right_elsewhere(Err, Expr), M) :-
     show(Flags, Err),
