@@ -515,15 +515,15 @@ erroneous(buggy(Fb, A), Errors) :-
     erroneous(A, T),
     Errors = [Err | T].
 
-erroneous(instead_of(Err, A, _Instead, Of), Errors) :-
-    !, erroneous(A, I),
+erroneous(instead_of(Err, Instead, Of), Errors) :-
+    !, erroneous(Instead, I),
     erroneous(Of, O),
-    append([[Err], I, O], Errors).
+    append([Err | I], O, Errors).
 
 erroneous(instead_of(Err, Instead, _Instead, Of, _Of), Errors) :-
     !, erroneous(Instead, I),
     erroneous(Of, O),
-    append([[Err], I, O], Errors).
+    append([Err | I], O, Errors).
 
 erroneous(add(Err, A), Errors) :-
     !, erroneous(A, E),
@@ -590,55 +590,51 @@ prec(Flags, error(Err, Mode, A), P) :-
     precedence([C | Flags], A, P).
 
 % A instead of B
-ml(Flags, instead_of(Err, Instead, Instead, Of), M) :-
+ml(Flags, instead_of(Err, Instead, Of), M) :-
     highlight(Flags, Err),
     !, ml(Flags, underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
 
-ml(Flags, instead_of(Err, A, Instead, Of), M) :-
+paren(Flags, instead_of(Err, Instead, _), P) :-
     highlight(Flags, Err),
-    ml(Flags, underbrace(A, (Instead, punct(' '), string("instead of"), punct(' '), Of)), M).
+    paren(Flags, Instead, P).
 
-paren(Flags, instead_of(Err, A, _, _), P) :-
+prec(Flags, instead_of(Err, Instead, _), P) :-
     highlight(Flags, Err),
-    paren(Flags, A, P).
+    precedence(Flags, Instead, P).
 
-prec(Flags, instead_of(Err, A, _, _), P) :-
-    highlight(Flags, Err),
-    precedence(Flags, A, P).
-
-ml(Flags, instead_of(Err, A, _, _), M) :-
+ml(Flags, instead_of(Err, Instead, _), M) :-
     show(Flags, Err),
-    ml(Flags, color_or_box(Err, A), M).
+    ml(Flags, color_or_box(Err, Instead), M).
 
-paren(Flags, instead_of(Err, A, _, _), P) :-
+paren(Flags, instead_of(Err, Instead, _), P) :-
     show(Flags, Err),
-    paren(Flags, A, P).
+    paren(Flags, Instead, P).
 
-prec(Flags, instead_of(Err, A, _, _), P) :-
+prec(Flags, instead_of(Err, Instead, _), P) :-
     show(Flags, Err),
-    precedence(Flags, A, P).
+    precedence(Flags, Instead, P).
 
-ml(Flags, instead_of(Err, _, _, Of), M) :-
+ml(Flags, instead_of(Err, _, Of), M) :-
     fix(Flags, Err),
     ml(Flags, color(Err, Of), M).
 
-paren(Flags, instead_of(Err, _, _, Of), P) :-
+paren(Flags, instead_of(Err, _, Of), P) :-
     fix(Flags, Err),
     paren(Flags, Of, P).
 
-prec(Flags, instead_of(Err, _, _, Of), P) :-
+prec(Flags, instead_of(Err, _, Of), P) :-
     fix(Flags, Err),
     precedence(Flags, Of, P).
 
-ml(Flags, instead_of(Err, _, _, Of), M) :-
+ml(Flags, instead_of(Err, _, Of), M) :-
     correct(Flags, Err),
     ml(Flags, Of, M).
 
-paren(Flags, instead_of(Err, _, _, Of), P) :-
+paren(Flags, instead_of(Err, _, Of), P) :-
     correct(Flags, Err),
     paren(Flags, Of, P).
 
-prec(Flags, instead_of(Err, _, _, Of), P) :-
+prec(Flags, instead_of(Err, _, Of), P) :-
     correct(Flags, Err),
     precedence(Flags, Of, P).
 
@@ -651,25 +647,25 @@ ml(Flags, instead_of(Err, I, Instead, _Of, Of), M) :-
     highlight(Flags, Err),
     ml(Flags, underbrace(I, (Instead, punct(' '), string("instead of"), punct(' '), Of)), M).
 
-paren(Flags, instead_of(Err, A, _, _, _), P) :-
+paren(Flags, instead_of(Err, Instead, _, _, _), P) :-
     highlight(Flags, Err),
-    paren(Flags, A, P).
+    paren(Flags, Instead, P).
 
-prec(Flags, instead_of(Err, A, _, _, _), P) :-
+prec(Flags, instead_of(Err, Instead, _, _, _), P) :-
     highlight(Flags, Err),
-    precedence(Flags, A, P).
+    precedence(Flags, Instead, P).
 
-ml(Flags, instead_of(Err, A, _, _, _), M) :-
+ml(Flags, instead_of(Err, Instead, _, _, _), M) :-
     show(Flags, Err),
-    ml(Flags, color_or_box(Err, A), M).
+    ml(Flags, color_or_box(Err, Instead), M).
 
-paren(Flags, instead_of(Err, A, _, _, _), P) :-
+paren(Flags, instead_of(Err, Instead, _, _, _), P) :-
     show(Flags, Err),
-    paren(Flags, A, P).
+    paren(Flags, Instead, P).
 
-prec(Flags, instead_of(Err, A, _, _, _), P) :-
+prec(Flags, instead_of(Err, Instead, _, _, _), P) :-
     show(Flags, Err),
-    precedence(Flags, A, P).
+    precedence(Flags, Instead, P).
 
 ml(Flags, instead_of(Err, _, _, Of, _), M) :-
     fix(Flags, Err),
@@ -1584,24 +1580,6 @@ paren(_, sqrt(_), 0).
 prec(Flags, sqrt(_), P) :-
     precedence(Flags, x^y, P).
 
-math(Flags, instead_of(Err, pt(PT, DF), pt(T, DF), tt(T, DF)),
-    Flags, fun(atom('P'), (instead_of(Err, atom('T') =< PT, atom('T') =< PT, abs(atom('T')) >= T) ; [DF, punct('_'), string("df")]))).
-
-math(Flags, instead_of(Err, pt(denoting(PT, _, _), DF), pt(TT, DF), tt(TT, DF)),
-    Flags, fun(atom('P'), (instead_of(Err, atom('T') =< PT, atom('T') =< PT, abs(atom('T')) >= TT) ; [DF, punct('_'), string("df")]))).
-
-math(Flags, instead_of(Err, ut(UT, DF), ut(T, DF), tt(T, DF)),
-    Flags, fun(atom('P'), (instead_of(Err, atom('T') >= UT, atom('T') >= UT, abs(atom('T')) >= T) ; [DF, punct('_'), string("df")]))).
-
-math(Flags, instead_of(Err, pt(PT, DF), pt(T, DF), tt(T, DF), Of),
-    Flags, fun(atom('P'), (instead_of(Err, atom('T') =< PT, atom('T') =< PT, abs(atom('T')) >= T, Of) ; [DF, punct('_'), string("df")]))).
-
-math(Flags, instead_of(Err, pt(denoting(PT, _, _), DF), pt(TT, DF), tt(TT, DF), Of),
-    Flags, fun(atom('P'), (instead_of(Err, atom('T') =< PT, atom('T') =< PT, abs(atom('T')) >= TT, Of) ; [DF, punct('_'), string("df")]))).
-
-math(Flags, instead_of(Err, ut(UT, DF), ut(T, DF), _, tt(T, DF), Of),
-    Flags, fun(atom('P'), (instead_of(Err, atom('T') >= UT, atom('T') >= UT, abs(atom('T')) >= T, Of) ; [DF, punct('_'), string("df")]))).
-
 math(Flags, dbinom(K, N, P), Flags, fun(atom('P') '_' string("Bi"), [atom('X') = K ; (N, P)])).
 math(Flags, pbinom(K, N, P), Flags, fun(atom('P') '_' string("Bi"), [atom('X') =< K ; (N, P)])).
 math(Flags, ubinom(K, N, P), Flags, fun(atom('P') '_' string("Bi"), [atom('X') >= K ; (N, P)])).
@@ -1672,21 +1650,21 @@ denot(Flags, denoting(Expr, Desc), W) :-
 %     denot(Flags, Of, Z),
 %     append([X, Y, Z], W).
 
-denot(Flags, instead_of(Err, A, _, _), W) :-
+denot(Flags, instead_of(Err, Instead, _), W) :-
     show(Flags, Err),
-    !, denot(Flags, A, W).
+    !, denot(Flags, Instead, W).
 
-denot(Flags, instead_of(Err, _, _, Of), W) :-
+denot(Flags, instead_of(Err, _, Of), W) :-
     fix(Flags, Err),
     !, denot(Flags, Of, W).
 
-denot(Flags, instead_of(Err, _, _, Of), W) :-
+denot(Flags, instead_of(Err, _, Of), W) :-
     correct(Flags, Err),
     !, denot(Flags, Of, W).
 
-denot(Flags, instead_of(Err, A, _, _, _), W) :-
+denot(Flags, instead_of(Err, Instead, _, _, _), W) :-
     show(Flags, Err),
-    !, denot(Flags, A, W).
+    !, denot(Flags, Instead, W).
 
 denot(Flags, instead_of(Err, _, _, Of, _), W) :-
     fix(Flags, Err),
