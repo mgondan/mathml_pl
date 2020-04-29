@@ -1325,7 +1325,7 @@ ml(Flags, number(A), X) :-
     N < 0,
     Abs is abs(N),
     quantity(Abs, Options, AbsX),
-    string_codes(String, AbsX)
+    string_codes(String, AbsX),
     ml(Flags, [-, number(String)], X).
 
 paren(Flags, number(A), P) :-
