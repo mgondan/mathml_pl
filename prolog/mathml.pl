@@ -528,7 +528,11 @@ erroneous(instead_of(Err, Instead, _Instead, Of, _Of), Errors) :-
 erroneous(add(Err, A), Errors) :-
     !, erroneous(A, E),
     Errors = [Err | E].
-    
+
+erroneous(omit(Err, A), Errors) :-
+    !, erroneous(A, E),
+    Errors = [Err | E].
+
 erroneous(color(Err, A), Errors) :-
     atom(Err),
     !, erroneous(A, E),
