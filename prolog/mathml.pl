@@ -1415,8 +1415,9 @@ ml(Flags, frac(A, B), mfrac([X, Y])) :-
 
 paren(_, frac(_, _), 0).
 
-prec(Flags, frac(A, B), frac-P) :-
-    precedence(Flags, A/B, _-P).
+prec(Flags, frac(A, B), frac-Prec) :-
+    precedence(Flags, A/B, _-P),
+    Prec is P - 1.
 
 % Large fraction
 ml(Flags, dfrac(A, B), mstyle(displaystyle(true), X)) :-
