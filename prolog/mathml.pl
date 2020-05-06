@@ -1051,6 +1051,7 @@ math(Flags, A * B, Flags, M) :-
     current_op(Mult, yfx, *),
     precedence(Flags, A, Op-Prec),
     dif(Op, frac),
+    dif(Op, dfrac),
     dif(Op, /),
     Prec =< Mult,
     !, M = A invisible_times B.
