@@ -1049,11 +1049,16 @@ prec(_, sup(_, _), sup-P) :-
 % Omit multiplication sign in simple products
 math(Flags, A * B, Flags, M) :-
     current_op(Mult, yfx, *),
-    precedence(Flags, A, Op-Prec),
-    dif(Op, frac),
-    dif(Op, dfrac),
-    dif(Op, /),
-    Prec =< Mult,
+    precedence(Flags, A, OpA-PrecA),
+    dif(OpA, frac),
+    dif(OpA, dfrac),
+    dif(OpA, /),
+    PrecA =< Mult,
+    precedence(Flags, B, OpB-PrecB),
+    dif(OpB, frac),
+    dif(OpB, dfrac),
+    dif(OpB, /),
+    PrecB =< Mult,
     !, M = A invisible_times B.
 
 % Use plus as default separator for lists right to ~
