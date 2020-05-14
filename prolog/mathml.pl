@@ -1334,9 +1334,7 @@ ml(Flags, number(A), X) :-
     quantity(N, Options, A),
     N < 0,
     Abs is abs(N),
-    nth1(Nth, Options, sign(default), Rest),
-    nth1(Nth, New, sign(pretty), Rest),
-    quantity(Abs, New, AbsX),
+    quantity(Abs, Options, AbsX),
     string_codes(String, AbsX),
     ml(Flags, (-, number(String)), X).
 
