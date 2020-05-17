@@ -1323,10 +1323,10 @@ ml(_, quantity(Q, Options), M) :-
     quantity_mathml(Q, Options, Mm),
     !, M = Mm.
 
-paren(Flags, quantity(Q, Options), P) :-
+paren(_Flags, quantity(Q, Options), P) :-
     quantity_paren(Q, Options, P).
 
-prec(Flags, quantity(Q, Options), P) :-
+prec(_Flags, quantity(Q, Options), P) :-
     quantity_prec(Q, Options, P).
 
 ml(Flags, round(A), M) :-
