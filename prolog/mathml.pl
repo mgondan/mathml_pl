@@ -1322,7 +1322,7 @@ prec(Flags, A, P) :-
 ml(_, quantity(S), M) :-
     string(S),
     quantity(Q, Options, S),
-    !, quantity_mathml(Q, Options, Mm).
+    !, quantity_mathml(Q, Options, M).
 
 paren(_Flags, quantity(S), P) :-
     string(S),
