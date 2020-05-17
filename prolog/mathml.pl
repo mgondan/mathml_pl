@@ -1319,6 +1319,21 @@ prec(Flags, A, P) :-
     precedence(Flags, -A, P).
 
 % Force rendering string as number
+ml(_, quantity(S), M) :-
+    string(S),
+    quantity(Q, Options, S),
+    !, quantity_mathml(Q, Options, Mm).
+
+paren(_Flags, quantity(S), P) :-
+    string(S),
+    quantity(Q, Options, S),
+    !, quantity_paren(Q, Options, P).
+
+prec(_Flags, quantity(S), P) :-
+    string(S),
+    quantity(Q, Options, S),
+    !, quantity_prec(Q, Options, P).
+
 ml(_, quantity(Q, Options), M) :-
     quantity_mathml(Q, Options, Mm),
     !, M = Mm.
