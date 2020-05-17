@@ -1319,21 +1319,15 @@ prec(Flags, A, P) :-
     precedence(Flags, -A, P).
 
 % Force rendering string as number
-ml(_, number(A), M) :-
-    number(A),
-    !, M = mn(A).
+ml(_, quantity(Q, Options), M) :-
+    quantity_mathml(Q, Options, Mm, []),
+    !, M = Mm.
 
-ml(_, number(A), M) :-
-    string(A),
-    !, M = mn(A).
+paren(Flags, quantity(Q, Options), P) :-
+    quantity_paren(Q, Options, P).
 
-paren(Flags, number(A), P) :-
-    term_string(T, A),
-    paren(Flags, T, P).
-
-prec(Flags, number(A), P) :-
-    term_string(T, A),
-    precedence(Flags, T, P).
+prec(Flags, quantity(Q, Options), P) :-
+    quantity_prec(Q, Options, P).
 
 ml(Flags, round(A), M) :-
     ml([round(g) | Flags], A, M).
