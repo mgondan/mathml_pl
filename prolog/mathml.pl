@@ -1320,7 +1320,7 @@ prec(Flags, A, P) :-
 
 % Force rendering string as number
 ml(_, quantity(Q, Options), M) :-
-    quantity_mathml(Q, Options, Mm, []),
+    quantity_mathml(Q, Options, Mm),
     !, M = Mm.
 
 paren(Flags, quantity(Q, Options), P) :-
