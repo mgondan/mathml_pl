@@ -935,6 +935,8 @@ ml(Flags, A, mrow([X, Sp, Unit])) :-
     ml(Flags, Num, X),
     ml(Flags, Sep, Sp).
 
+math(Flags, P '%', Flags, [P, '%']).
+
 example :- example(10 '%').
 example :- example('100%'(0.1)).
 example :- example(kg(5)).
