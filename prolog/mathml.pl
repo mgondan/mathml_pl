@@ -1390,21 +1390,21 @@ example :- example((a + b) * (a - b) = a^2 - b^2).
 % Units
 %
 is_unit(Flags, A) :-
-    unit(Flags, A, _).
+    unit(Flags, A, _, _).
 
-unit(_, A, M) :-
-    unit(A, M).
+unit(_, A, Sep, M) :-
+    unit(A, Sep, M).
 
-unit('%', "%").
-unit('kg', "kg").
+unit('%', '', "%").
+unit('kg', punct('_'), "kg").
 
 ml(Flags, A, mrow([X, Sp, Unit])) :-
     compound(A),
     compound_name_arguments(A, U, [Num]),
     is_unit(Flags, U),
-    unit(Flags, U, Unit),
+    unit(Flags, U, Sep, Unit),
     ml(Flags, Num, X),
-    ml(Flags, punct('_'), Sp).
+    ml(Flags, Sep, Sp).
 
 example :- example(10 '%').
 example :- example('100%'(0.1)).
