@@ -479,6 +479,7 @@ math(Flags, tratio(A, _Df), Flags, A).
 math(Flags, format_pvalue(A), Flags, A).
 
 math(Flags, fratio(A), Flags, A).
+math(Flags, confint(A, _Digits), Flags, A).
 
 math(Flags, quote(A), Flags, A).
 
