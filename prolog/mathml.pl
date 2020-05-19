@@ -916,6 +916,30 @@ math(Flags, pt(T, DF), Flags, fun(atom('P'), (atom('T') =< T ; [DF, punct('_'), 
 math(Flags, pt(T, DF, 'lower.tail'='FALSE'), Flags, ut(T, DF)).
 
 %
+% Units
+%
+is_unit(Flags, A) :-
+    unit(Flags, A, _, _).
+
+unit(_, A, Sep, M) :-
+    unit(A, Sep, M).
+
+unit('%', '', "%").
+unit('kg', punct('_'), "kg").
+
+ml(Flags, A, mrow([X, Sp, Unit])) :-
+    compound(A),
+    compound_name_arguments(A, U, [Num]),
+    is_unit(Flags, U),
+    unit(Flags, U, Sep, Unit),
+    ml(Flags, Num, X),
+    ml(Flags, Sep, Sp).
+
+example :- example(10 '%').
+example :- example('100%'(0.1)).
+example :- example(kg(5)).
+
+%
 % Operators
 %
 ml(Flags, '100%'(A), X) :-
@@ -1385,30 +1409,6 @@ example :- example(1 + (-2 + 3)).
 example :- example(1 - (-2) - 3).
 example :- example(1 - ((-2) - 3)).
 example :- example((a + b) * (a - b) = a^2 - b^2).
-
-%
-% Units
-%
-is_unit(Flags, A) :-
-    unit(Flags, A, _, _).
-
-unit(_, A, Sep, M) :-
-    unit(A, Sep, M).
-
-unit('%', '', "%").
-unit('kg', punct('_'), "kg").
-
-ml(Flags, A, mrow([X, Sp, Unit])) :-
-    compound(A),
-    compound_name_arguments(A, U, [Num]),
-    is_unit(Flags, U),
-    unit(Flags, U, Sep, Unit),
-    ml(Flags, Num, X),
-    ml(Flags, Sep, Sp).
-
-example :- example(10 '%').
-example :- example('100%'(0.1)).
-example :- example(kg(5)).
 
 %
 % Fractions
