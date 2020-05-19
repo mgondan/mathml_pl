@@ -188,6 +188,7 @@ operator(>=, &(ge)).
 operator(\=, &(ne)).
 operator(!, !).
 operator('', '').
+operator('+-', &('PlusMinus')).
 operator('%', '%').
 operator(',', &(comma)).
 operator(';', &('#59')).
