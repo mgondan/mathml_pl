@@ -8,12 +8,14 @@
     op(180, xf, !),
     op(170, xf, '%'),
     op(200, xfy, '_'),
+    op(500, yfx, '+-'),
     op(1050, xfy, '~>'),
     op(600, xfy, '~')]).
 
 :- op(180, xf, !).
 :- op(170, xf, '%').
 :- op(200, xfy, '_').
+:- op(500, yfx, '+-').
 :- op(400, yfx, invisible_times).
 :- op(1050, xfy, '~>').
 :- op(600, xfy, ~).
