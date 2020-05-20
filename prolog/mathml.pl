@@ -1087,11 +1087,13 @@ math(Flags, A * B, Flags, M) :-
     dif(OpA, frac),
     dif(OpA, dfrac),
     dif(OpA, /),
+    dif(OpA, fun),
     PrecA =< Mult,
     precedence(Flags, B, OpB-PrecB),
     dif(OpB, frac),
     dif(OpB, dfrac),
     dif(OpB, /),
+    dif(OpB, fun),
     PrecB =< Mult,
     !, M = A invisible_times B.
 
