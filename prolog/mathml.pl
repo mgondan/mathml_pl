@@ -811,10 +811,9 @@ ml(Flags, left_landed(Err, Expr), M) :-
 
 ml(Flags, left_landed(Err, Expr), M) :-
     show(Flags, Err),
-    precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
-    compound_name_arguments(New, Op, [color(Err, L), R]),
-    ml(Flags, New, M).
+    compound_name_arguments(New, Op, [L, black(R)]),
+    ml(Flags, color(Err, New), M).
 
 ml(Flags, left_landed(Err, Expr), M) :-
     fix(Flags, Err),
