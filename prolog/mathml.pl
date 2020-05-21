@@ -921,7 +921,7 @@ math(Flags, ut(T, DF), Flags, fun(atom('P'), (atom('T') >= T ; [DF, punct('_'), 
 math(Flags, 2 * pt(T, DF, 'lower.tail'='FALSE'), Flags, tt(T, DF)).
 math(Flags, pt(T, DF), Flags, fun(atom('P'), (atom('T') =< T ; [DF, punct('_'), string("df")]))).
 math(Flags, pt(T, DF, 'lower.tail'='FALSE'), Flags, ut(T, DF)).
-math(Flags, qt(P, DF), Flags, fun(subsup('T', DF, -1), P)).
+math(Flags, qt(P, DF), Flags, fun(subsup('T', "df"=DF, -1), P)).
 
 %
 % Units
