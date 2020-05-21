@@ -796,11 +796,25 @@ ml(Flags, left_landed(Err, Expr), M) :-
     compound_name_arguments(Expr, Op, [L, R]),
     ml(Flags, (color(Err, roundedbox(black((L, Op)))), operator(Prec, fy, '', R)), M).
 
+%ml(Flags, left_landed(Err, Expr), M) :-
+%    show(Flags, Err),
+%    precedence(Flags, Expr, _-Prec),
+%    compound_name_arguments(Expr, Op, [L, R]),
+%    ml(Flags, (color_or_box(Err, (L, Op)), operator(Prec, fy, '', R)), M).
+
 ml(Flags, left_landed(Err, Expr), M) :-
     show(Flags, Err),
     precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, (color_or_box(Err, (L, Op)), operator(Prec, fy, '', R)), M).
+    erroneous((L, Op), [_ | _]), % expression has error -> box
+    !, ml(Flags, (color_or_box(Err, (L, Op)), operator(Prec, fy, '', R)), M).
+
+ml(Flags, left_landed(Err, Expr), M) :-
+    show(Flags, Err),
+    precedence(Flags, Expr, _-Prec),
+    compound_name_arguments(Expr, Op, [L, R]),
+    compound_name_arguments(New, Op, [color(Err, L), R]),
+    ml(Flags, New, M).
 
 ml(Flags, left_landed(Err, Expr), M) :-
     fix(Flags, Err),
