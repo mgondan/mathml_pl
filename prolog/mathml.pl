@@ -601,18 +601,6 @@ prec(Flags, error(Err, Mode, A), P) :-
     precedence([C | Flags], A, P).
 
 % A instead of B
-ml(Flags, instead_of(Err, Instead, Of), M) :-
-    highlight(Flags, Err),
-    !, ml([fix(all) | Flags], underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
-
-paren(Flags, instead_of(Err, Instead, _), P) :-
-    highlight(Flags, Err),
-    paren(Flags, Instead, P).
-
-prec(Flags, instead_of(Err, Instead, _), P) :-
-    highlight(Flags, Err),
-    precedence(Flags, Instead, P).
-
 ml(Flags, instead_of(Err, Instead, _), M) :-
     show(Flags, Err),
     ml(Flags, color_or_box(Err, Instead), M).
@@ -649,23 +637,19 @@ prec(Flags, instead_of(Err, _, Of), P) :-
     correct(Flags, Err),
     precedence(Flags, Of, P).
 
-% A instead of B
-ml(Flags, instead_of(Err, Instead, Instead, _Of, Of), M) :-
+ml(Flags, instead_of(Err, Instead, Of), M) :-
     highlight(Flags, Err),
     !, ml([fix(all) | Flags], underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
 
-ml(Flags, instead_of(Err, I, Instead, _Of, Of), M) :-
-    highlight(Flags, Err),
-    ml([fix(all) | Flags], underbrace(I, (Instead, punct(' '), string("instead of"), punct(' '), Of)), M).
-
-paren(Flags, instead_of(Err, Instead, _, _, _), P) :-
+paren(Flags, instead_of(Err, Instead, _), P) :-
     highlight(Flags, Err),
     paren(Flags, Instead, P).
 
-prec(Flags, instead_of(Err, Instead, _, _, _), P) :-
+prec(Flags, instead_of(Err, Instead, _), P) :-
     highlight(Flags, Err),
     precedence(Flags, Instead, P).
 
+% A instead of B
 ml(Flags, instead_of(Err, Instead, _, _, _), M) :-
     show(Flags, Err),
     ml(Flags, color_or_box(Err, Instead), M).
@@ -701,6 +685,22 @@ paren(Flags, instead_of(Err, _, _, Of, _), P) :-
 prec(Flags, instead_of(Err, _, _, Of, _), P) :-
     correct(Flags, Err),
     precedence(Flags, Of, P).
+
+ml(Flags, instead_of(Err, Instead, Instead, _Of, Of), M) :-
+    highlight(Flags, Err),
+    !, ml([fix(all) | Flags], underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
+
+ml(Flags, instead_of(Err, I, Instead, _Of, Of), M) :-
+    highlight(Flags, Err),
+    ml([fix(all) | Flags], underbrace(I, (Instead, punct(' '), string("instead of"), punct(' '), Of)), M).
+
+paren(Flags, instead_of(Err, Instead, _, _, _), P) :-
+    highlight(Flags, Err),
+    paren(Flags, Instead, P).
+
+prec(Flags, instead_of(Err, Instead, _, _, _), P) :-
+    highlight(Flags, Err),
+    precedence(Flags, Instead, P).
 
 % Omit element in list
 ml(Flags, omit(Err, Elem), M) :-
