@@ -696,7 +696,7 @@ ml(Flags, instead_of(Err, Instead, Instead, _Of, Of), M) :-
     !, ml(Flags, Instead, MInstead),
     % Fix errors in Of
     ml([fix(all) | Flags], (string("instead of"), punct(' '), Of), MOf),
-    M = munder([munder(accentunder(true), [MInstead, mo(stretchy(true), &('UnderBrace'))]), MOf])).
+    M = munder([munder(accentunder(true), [MInstead, mo(stretchy(true), &('UnderBrace'))]), MOf]).
 
 ml(Flags, instead_of(Err, I, Instead, _Of, Of), M) :-
     highlight(Flags, Err),
