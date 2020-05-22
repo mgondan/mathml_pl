@@ -600,6 +600,16 @@ prec(Flags, error(Err, Mode, A), P) :-
     C =.. [Err, Mode],
     precedence([C | Flags], A, P).
 
+% No more errors within protect
+ml(Flags, protect(X), M) :-
+    !, ml(Flags, X, M).
+
+paren(Flags, protect(X), P) :-
+    paren(Flags, X, P).
+
+prec(Flags, protect(X), P) :-
+    precedence(Flags, X, P).
+
 % A instead of B
 ml(Flags, instead_of(Err, Instead, _), M) :-
     show(Flags, Err),
