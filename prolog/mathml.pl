@@ -707,7 +707,11 @@ ml(Flags, instead_of(Err, Instead, Instead, _Of, Of), M) :-
 
 ml(Flags, instead_of(Err, I, Instead, _Of, Of), M) :-
     highlight(Flags, Err),
-    ml(Flags, underbrace(I, (Instead, punct(' '), string("instead of"), punct(' '), Of)), M).
+    !, ml(Flags, I, MI),
+    % Fix errors in Of
+    ml([fix(all) | Flags], (Instead, punct(' '), string("instead of"), punct(' '), Of), MOf),
+    M = munder([munder(accentunder(true), [MI, mo(stretchy(true), &('UnderBrace'))]), MOf]).
+
 
 paren(Flags, instead_of(Err, Instead, _, _, _), P) :-
     highlight(Flags, Err),
