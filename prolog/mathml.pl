@@ -603,7 +603,7 @@ prec(Flags, error(Err, Mode, A), P) :-
 % A instead of B
 ml(Flags, instead_of(Err, Instead, _), M) :-
     show(Flags, Err),
-    ml(Flags, color_or_box(Err, Instead), M).
+    !, ml(Flags, color_or_box(Err, Instead), M).
 
 paren(Flags, instead_of(Err, Instead, _), P) :-
     show(Flags, Err),
@@ -615,7 +615,7 @@ prec(Flags, instead_of(Err, Instead, _), P) :-
 
 ml(Flags, instead_of(Err, _, Of), M) :-
     fix(Flags, Err),
-    ml(Flags, color(Err, Of), M).
+    !, ml(Flags, color(Err, Of), M).
 
 paren(Flags, instead_of(Err, _, Of), P) :-
     fix(Flags, Err),
@@ -627,7 +627,7 @@ prec(Flags, instead_of(Err, _, Of), P) :-
 
 ml(Flags, instead_of(Err, _, Of), M) :-
     correct(Flags, Err),
-    ml(Flags, Of, M).
+    !, ml(Flags, Of, M).
 
 paren(Flags, instead_of(Err, _, Of), P) :-
     correct(Flags, Err),
@@ -639,7 +639,7 @@ prec(Flags, instead_of(Err, _, Of), P) :-
 
 ml(Flags, instead_of(Err, Instead, Of), M) :-
     highlight(Flags, Err),
-    !, ml([fix(all) | Flags], underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
+    ml([fix(all) | Flags], underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
 
 paren(Flags, instead_of(Err, Instead, _), P) :-
     highlight(Flags, Err),
@@ -652,7 +652,7 @@ prec(Flags, instead_of(Err, Instead, _), P) :-
 % A instead of B
 ml(Flags, instead_of(Err, Instead, _, _, _), M) :-
     show(Flags, Err),
-    ml(Flags, color_or_box(Err, Instead), M).
+    !, ml(Flags, color_or_box(Err, Instead), M).
 
 paren(Flags, instead_of(Err, Instead, _, _, _), P) :-
     show(Flags, Err),
@@ -664,7 +664,7 @@ prec(Flags, instead_of(Err, Instead, _, _, _), P) :-
 
 ml(Flags, instead_of(Err, _, _, Of, _), M) :-
     fix(Flags, Err),
-    ml(Flags, color(Err, Of), M).
+    !, ml(Flags, color(Err, Of), M).
 
 paren(Flags, instead_of(Err, _, _, Of, _), P) :-
     fix(Flags, Err),
@@ -676,7 +676,7 @@ prec(Flags, instead_of(Err, _, _, Of, _), P) :-
 
 ml(Flags, instead_of(Err, _, _, Of, _), M) :-
     correct(Flags, Err),
-    ml(Flags, Of, M).
+    !, ml(Flags, Of, M).
 
 paren(Flags, instead_of(Err, _, _, Of, _), P) :-
     correct(Flags, Err),
