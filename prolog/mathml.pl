@@ -603,7 +603,7 @@ prec(Flags, error(Err, Mode, A), P) :-
 % A instead of B
 ml(Flags, instead_of(Err, Instead, Of), M) :-
     highlight(Flags, Err),
-    !, ml(Flags, underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
+    !, ml([fix(all) | Flags], underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
 
 paren(Flags, instead_of(Err, Instead, _), P) :-
     highlight(Flags, Err),
@@ -652,11 +652,11 @@ prec(Flags, instead_of(Err, _, Of), P) :-
 % A instead of B
 ml(Flags, instead_of(Err, Instead, Instead, _Of, Of), M) :-
     highlight(Flags, Err),
-    !, ml(Flags, underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
+    !, ml([fix(all) | Flags], underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
 
 ml(Flags, instead_of(Err, I, Instead, _Of, Of), M) :-
     highlight(Flags, Err),
-    ml(Flags, underbrace(I, (Instead, punct(' '), string("instead of"), punct(' '), Of)), M).
+    ml([fix(all) | Flags], underbrace(I, (Instead, punct(' '), string("instead of"), punct(' '), Of)), M).
 
 paren(Flags, instead_of(Err, Instead, _, _, _), P) :-
     highlight(Flags, Err),
