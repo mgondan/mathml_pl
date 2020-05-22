@@ -639,7 +639,7 @@ prec(Flags, instead_of(Err, _, Of), P) :-
 
 ml(Flags, instead_of(Err, Instead, Of), M) :-
     highlight(Flags, Err),
-    ml([fix(all) | Flags], underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
+    ml(Flags, underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
 
 paren(Flags, instead_of(Err, Instead, _), P) :-
     highlight(Flags, Err),
