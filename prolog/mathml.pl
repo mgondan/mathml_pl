@@ -860,7 +860,7 @@ ml(Flags, right_landed(Err, Expr), M) :-
     show(Flags, Err),
     precedence(Flags, Expr, _-Prec),
     compound_name_arguments(Expr, Op, [L, R]),
-    ml(Flags, (operator(Prec, yf, '', L), color_or_box(Err, operator(Prec, fy, Op, R))), M).
+    ml(Flags, (operator(Prec, yf, '', L), color_or_box(Err, operator(Prec, yfx, Op, '', R))), M).
 
 ml(Flags, right_landed(Err, Expr), M) :-
     fix(Flags, Err),
