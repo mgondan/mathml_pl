@@ -637,9 +637,16 @@ prec(Flags, instead_of(Err, _, Of), P) :-
     correct(Flags, Err),
     precedence(Flags, Of, P).
 
+% ml(Flags, instead_of(Err, Instead, Of), M) :-
+%     highlight(Flags, Err),
+%     ml(Flags, underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
+
 ml(Flags, instead_of(Err, Instead, Of), M) :-
     highlight(Flags, Err),
-    ml(Flags, underbrace(Instead, (string("instead of"), punct(' '), Of)), M).
+    !, ml(Flags, Instead, MInstead),
+    % Fix errors in Of
+    ml([fix(all) | Flags], (string("instead of"), punct(' '), Of), MOf),
+    M = munder([munder(accentunder(true), [MInstead, mo(stretchy(true), &('UnderBrace'))]), MOf]).
 
 paren(Flags, instead_of(Err, Instead, _), P) :-
     highlight(Flags, Err),
