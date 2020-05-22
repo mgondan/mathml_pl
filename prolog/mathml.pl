@@ -553,6 +553,12 @@ erroneous(A, Errors) :-
 
 erroneous(_, []).
 
+fix(Flags, Err) :-
+    member(fix(Err), Flags).
+
+fix(Flags, _) :-
+    member(fix(all), Flags).
+
 highlight(Flags, Err) :-
     member(highlight(Err), Flags).
 
@@ -564,12 +570,6 @@ show(Flags, Err) :-
 
 show(Flags, _) :-
     member(show(all), Flags).
-
-fix(Flags, Err) :-
-    member(fix(Err), Flags).
-
-fix(Flags, _) :-
-    member(fix(all), Flags).
 
 correct(Flags, Err) :-
     member(correct(Err), Flags).
