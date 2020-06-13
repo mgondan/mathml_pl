@@ -1131,6 +1131,7 @@ math(Flags, A * B, Flags, M) :-
     dif(OpA, /),
     dif(OpA, fun),
     PrecA =< Mult,
+    paren(Flags, A, 0),
     precedence(Flags, B, OpB-PrecB),
     dif(OpB, frac),
     dif(OpB, dfrac),
