@@ -1208,6 +1208,9 @@ prec(_, operator(P, _, Op, _), Op-P).
 math(Flags, A + B, Flags, operator(P, yfy, +, A, B)) :-
     current_op(P, yfx, +).
 
+math(Flags, A * B, Flags, operator(P, yfy, *, A, B)) :-
+    current_op(P, yfx, *).
+
 math(Flags, A : B, Flags, operator(P, yfy, :, A, B)) :-
     current_op(P, xfy, :).
 
