@@ -1211,6 +1211,9 @@ math(Flags, A + B, Flags, operator(P, yfy, +, A, B)) :-
 math(Flags, A * B, Flags, operator(P, yfy, *, A, B)) :-
     current_op(P, yfx, *).
 
+math(Flags, A invisible_times B, Flags, operator(P, yfy, invisible_times, A, B)) :-
+    current_op(P, yfx, *).
+
 math(Flags, A : B, Flags, operator(P, yfy, :, A, B)) :-
     current_op(P, xfy, :).
 
