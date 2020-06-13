@@ -1138,6 +1138,7 @@ math(Flags, A * B, Flags, M) :-
     dif(OpB, /),
     dif(OpB, fun),
     PrecB =< Mult,
+    paren(Flags, B, 0),
     !, M = A invisible_times B.
 
 % Use plus as default separator for lists right to ~
