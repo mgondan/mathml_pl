@@ -1115,8 +1115,18 @@ ml(Flags, sup(A, B), msup([X, Y])) :-
       ; ml(Flags, A, X)
     ), ml(Flags, B, Y).
 
-paren(Flags, sup(A, _), P) :-
-    paren(Flags, A, P).
+paren(Flags, sup(A, _), Paren) :-
+    current_op(Prec, xfy, ^),
+    precedence(Flags, A, _-P),
+    Prec > P,
+    paren(Flags, A, Paren).
+
+paren(Flags, sup(A, _), Paren) :-
+    current_op(Prec, xfy, ^),
+    precedence(Flags, A, _-P),
+    Prec =< P,
+    paren(Flags, A, Inner),
+    Paren is Inner + 1.
 
 prec(_, sup(_, _), sup-P) :-
     current_op(Prec, xfy, ^),
