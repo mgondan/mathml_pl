@@ -478,7 +478,7 @@ paren(Flags, phantom(A), P) :-
 
 % formatting numbers
 math(Flags, tratio(A, _Df), Flags, A).
-
+math(Flags, prob(A), Flags, A).
 math(Flags, pm(A, B), Flags, '+-'(A, B)).
 math(Flags, paired_ci(D, S, N, Alpha), Flags, '+-'(D, fun(sub('T', 1-Alpha/2), (N-1, '_', "df")) * dfrac(S, sqrt(N)))).
 
