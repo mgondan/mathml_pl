@@ -1671,7 +1671,7 @@ math(Flags, dbinom(K, N, P), Flags, fun(atom('P') '_' string("Bi"), [atom('X') =
 math(Flags, pbinom(K, N, P), Flags, fun(atom('P') '_' string("Bi"), [atom('X') =< K ; (N, P)])).
 math(Flags, ubinom(K, N, P), Flags, fun(atom('P') '_' string("Bi"), [atom('X') >= K ; (N, P)])).
 math(Flags, qbinom(Alpha, N, P), Flags, fun(atom('Q') '_' string("Bi"), [Alpha ; (N, P)])).
-math(Flags, uqbinom(Alpha, N, P), Flags, fun(atom('Q') '_' string("Bi"), [1 - Alpha ; (N, P)])).
+math(Flags, uqbinom(Alpha, N, P), Flags, fun(atom('Q') '_' string("Bi"), [1 - Alpha ; [N, P]])).
 
 % Bit unusual terminology
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
