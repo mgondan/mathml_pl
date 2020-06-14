@@ -1671,16 +1671,21 @@ math(Flags, dbinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X')
 math(Flags, pbinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X') =< K ; [N, P]])).
 math(Flags, ubinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X') >= K ; [N, P]])).
 
+math(Flags, instead_of(Code, pbinom(K, N, P), ubinom(K, N, P)),
+     Flags, fun(sub(atom('P'), string("Bi")), [instead_of(Code, atom('X') =< K, atom('X') >= K) ; [N, P]])).
+
 % Lower and upper critical value
 math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
 math(Flags, uqbinom("upper", "dist", Alpha, N, P), Flags, argmin(c, ubinom(c, N, P) =< Alpha)).
 math(Flags, uqbinom("lower", "dist", Alpha, N, P), Flags, argmax(c, pbinom(c, N, P) =< Alpha)).
+
 math(Flags, instead_of(Code, uqbinom("lower", "dist", Alpha, N, P), _, uqbinom("upper", "dist", Alpha, N, P), _), 
         Flags, fun(instead_of(Code, under("argmax", c), under("argmin", c)), 
                    instead_of(Code, pbinom(c, N, P), ubinom(c, N, P))) =< Alpha).
-        
+
+
 math(Flags, uqbinom("upper", "density", Alpha, N, P), Flags, argmin(c, dbinom(c, N, P) =< Alpha)).
 math(Flags, uqbinom("lower", "density", Alpha, N, P), Flags, argmax(c, dbinom(c, N, P) =< Alpha)).
 
