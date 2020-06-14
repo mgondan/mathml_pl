@@ -1675,8 +1675,10 @@ math(Flags, ubinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X')
 math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
-math(Flags, ucbinom(Alpha, N, P), Flags, argmin(c, ubinom(c, N, P) =< Alpha)).
-math(Flags, lcbinom(Alpha, N, P), Flags, argmax(c, pbinom(c, N, P) =< Alpha)).
+math(Flags, cbinom("upper", "dist", Alpha, N, P), Flags, argmin(c, ubinom(c, N, P) =< Alpha)).
+math(Flags, cbinom("lower", "dist", Alpha, N, P), Flags, argmax(c, pbinom(c, N, P) =< Alpha)).
+math(Flags, cbinom("upper", "density", Alpha, N, P), Flags, argmin(c, dbinom(c, N, P) =< Alpha)).
+math(Flags, cbinom("lower", "density", Alpha, N, P), Flags, argmax(c, dbinom(c, N, P) =< Alpha)).
 
 % Bit unusual terminology
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
