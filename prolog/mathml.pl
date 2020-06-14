@@ -1675,10 +1675,12 @@ math(Flags, ubinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X')
 math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
-math(Flags, uqbinom(_, "upper", "dist", Alpha, N, P), Flags, argmin(c, ubinom(c, N, P) =< Alpha)).
-math(Flags, uqbinom(Code, "lower", "dist", Alpha, N, P), Flags, instead_of(Code, argmax(c, pbinom(c, N, P) =< Alpha), argmin(c, ubinom(c, N, P) =< Alpha))).
-math(Flags, uqbinom(_, "upper", "density", Alpha, N, P), Flags, argmin(c, dbinom(c, N, P) =< Alpha)).
-math(Flags, uqbinom(_, "lower", "density", Alpha, N, P), Flags, argmax(c, dbinom(c, N, P) =< Alpha)).
+math(Flags, uqbinom(_, "upper", _, "dist", Alpha, N, P), Flags, argmin(c, ubinom(c, N, P) =< Alpha)).
+math(Flags, uqbinom(TailS, "lower", _, "dist", Alpha, N, P), Flags, instead_of(TailA, argmax(c, pbinom(c, N, P) =< Alpha), argmin(c, ubinom(c, N, P) =< Alpha))) :-
+    atom_string(TailA, TailS).
+math(Flags, uqbinom(_, "upper", _, "density", Alpha, N, P), Flags, argmin(c, dbinom(c, N, P) =< Alpha)).
+math(Flags, uqbinom(TailS, "lower", _, "density", Alpha, N, P), Flags, instead_of(TailA, argmax(c, dbinom(c, N, P) =< Alpha), argmin(c, ubinom(c, N, P) =< Alpha))) :-
+    atom_string(TailA, TailS).
 
 % Bit unusual terminology
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
