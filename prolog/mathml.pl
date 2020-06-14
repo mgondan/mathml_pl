@@ -1631,14 +1631,14 @@ paren(Flags, sum(_, _, _, A), P) :-
 prec(Flags, sum(_, _, _, _), P) :-
     precedence(Flags, x + y, P).
 
-ml(Flags, argmin(I, _, _, A), M) :-
+ml(Flags, argmin(I, A), M) :-
     ml(Flags, fun(under(string("argmin"), I), A), M).
 
-paren(Flags, argmin(_, _, _, A), P) :-
+paren(Flags, argmin(_, A), P) :-
     paren(Flags, A, P).
 
-prec(Flags, argmin(_, _, _, _), P) :-
-    precedence(Flags, x + y, P).
+prec(Flags, argmin(_, A), P) :-
+    precedence(Flags, x + A, P).
 
 ml(Flags, argmax(I, _, _, A), M) :-
     ml(Flags, fun(under(string("argmax"), I), A), M).
@@ -1675,6 +1675,7 @@ math(Flags, ubinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X')
 math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
+math(Flags, cbinom(Alpha, N, P), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
 math(Flags, cbinom(Alpha, N, P), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
 
 % Bit unusual terminology
