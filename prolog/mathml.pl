@@ -1575,9 +1575,6 @@ example :- example(sin(a!)^2).
 %
 % Special functions
 %
-math(Flags, lower(Alpha), Flags, Alpha).
-math(Flags, upper(Alpha), Flags, 1 - Alpha).
-
 math(Flags, baseline_fratio(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 
 math(Flags, ancova_f(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
@@ -1673,12 +1670,12 @@ prec(Flags, sqrt(_), P) :-
 math(Flags, dbinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X') = K ; [N, P]])).
 math(Flags, pbinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X') =< K ; [N, P]])).
 math(Flags, ubinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X') >= K ; [N, P]])).
-math(Flags, qbinom(Alpha, N, P), Flags, fun(sub(atom('Q'), string("Bi")), [Alpha ; [N, P]])).
-math(Flags, uqbinom(Alpha, N, P), Flags, fun(sub(atom('Q'), string("Bi")), [1 - Alpha ; [N, P]])).
 
 % Lower and upper critical value
-math(Flags, lcbinom(Alpha, N, P, _), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
-math(Flags, ucbinom(Alpha, N, P, _), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
+math(Flags, lower(Alpha), Flags, Alpha).
+math(Flags, upper(Alpha), Flags, 1 - Alpha).
+
+math(Flags, cbinom(Alpha, N, P), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
 
 % Bit unusual terminology
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
