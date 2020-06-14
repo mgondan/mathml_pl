@@ -1640,14 +1640,14 @@ paren(Flags, argmin(_, A), P) :-
 prec(Flags, argmin(_, A), P) :-
     precedence(Flags, x + A, P).
 
-ml(Flags, argmax(I, _, _, A), M) :-
+ml(Flags, argmax(I, A), M) :-
     ml(Flags, fun(under(string("argmax"), I), A), M).
 
-paren(Flags, argmax(_, _, _, A), P) :-
+paren(Flags, argmax(_, A), P) :-
     paren(Flags, A, P).
 
-prec(Flags, argmax(_, _, _, _), P) :-
-    precedence(Flags, x + y, P).
+prec(Flags, argmax(_, A), P) :-
+    precedence(Flags, x + A, P).
 
 ml(Flags, under(A, B), munder([X, Y])) :-
     ml(Flags, A, X),
@@ -1675,8 +1675,8 @@ math(Flags, ubinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X')
 math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
-math(Flags, cbinom(Alpha, N, P), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
-math(Flags, cbinom(Alpha, N, P), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
+math(Flags, ucbinom(Alpha, N, P), Flags, argmin(c, ubinom(c, N, P) =< Alpha)).
+math(Flags, lcbinom(Alpha, N, P), Flags, argmax(c, pbinom(c, N, P) =< Alpha)).
 
 % Bit unusual terminology
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
