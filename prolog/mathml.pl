@@ -1677,8 +1677,8 @@ math(Flags, qbinom(Alpha, N, P), Flags, fun(sub(atom('Q'), string("Bi")), [Alpha
 math(Flags, uqbinom(Alpha, N, P), Flags, fun(sub(atom('Q'), string("Bi")), [1 - Alpha ; [N, P]])).
 
 % Lower and upper critical value
-math(Flags, lcbinom(Alpha, N, P), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
-math(Flags, ucbinom(Alpha, N, P), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
+math(Flags, lcbinom(Alpha, N, P, _), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
+math(Flags, ucbinom(Alpha, N, P, _), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
 
 % Bit unusual terminology
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
