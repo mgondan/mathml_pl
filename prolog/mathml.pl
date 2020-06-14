@@ -1673,6 +1673,10 @@ math(Flags, ubinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X')
 math(Flags, qbinom(Alpha, N, P), Flags, fun(sub(atom('Q'), string("Bi")), [Alpha ; [N, P]])).
 math(Flags, uqbinom(Alpha, N, P), Flags, fun(sub(atom('Q'), string("Bi")), [1 - Alpha ; [N, P]])).
 
+% Lower and upper critical value
+math(Flags, lcbinom(Alpha, N, P), Flags, fun(subsup(atom('F'), string("Bi"), -1), [Alpha ; [N, P]])).
+math(Flags, ucbinom(Alpha, N, P), Flags, fun(subsup(atom('F'), string("Bi"), -1), [1 - Alpha ; [N, P]])).
+
 % Bit unusual terminology
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
 math(Flags, successes(Succ, Pi), Flags, Pi^Succ).
