@@ -1575,6 +1575,9 @@ example :- example(sin(a!)^2).
 %
 % Special functions
 %
+math(Flags, lower(Alpha), Flags, Alpha).
+math(Flags, upper(Alpha), Flags, 1 - Alpha).
+
 math(Flags, baseline_fratio(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
 
 math(Flags, ancova_f(_, _Primary, _Covariates, _Strata, _Other, _Interactions, _Exclude, Therapy), Flags, sub(atom('F'), Therapy)).
