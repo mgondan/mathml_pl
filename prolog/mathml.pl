@@ -1676,9 +1676,15 @@ math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
 math(Flags, uqbinom(_, "upper", _, "dist", Alpha, N, P), Flags, argmin(c, ubinom(c, N, P) =< Alpha)).
-math(Flags, uqbinom(TailS, "lower", _, "dist", Alpha, N, P), Flags, instead_of(TailA, argmax(c, pbinom(c, N, P) =< Alpha), argmin(c, ubinom(c, N, P) =< Alpha))) :-
+
+math(Flags, uqbinom(TailS, "lower", _, "dist", Alpha, N, P), 
+        Flags, instead_of(TailA, argmax(c, pbinom(c, N, P) =< Alpha), argmin(c, ubinom(c, N, P) =< Alpha))) :-
     atom_string(TailA, TailS).
-math(Flags, uqbinom(_, "upper", _, "density", Alpha, N, P), Flags, argmin(c, dbinom(c, N, P) =< Alpha)).
+    
+math(Flags, uqbinom(_, "upper", DensS, "density", Alpha, N, P), 
+        Flags, argmin(c, instead_of(DensA, dbinom(c, N, P), pbinom(c, N, P)) =< Alpha)) :-
+    atom_string(DensA, DensS).
+        
 math(Flags, uqbinom(TailS, "lower", _, "density", Alpha, N, P), Flags, instead_of(TailA, argmax(c, dbinom(c, N, P) =< Alpha), argmin(c, ubinom(c, N, P) =< Alpha))) :-
     atom_string(TailA, TailS).
 
