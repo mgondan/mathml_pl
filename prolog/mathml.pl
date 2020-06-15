@@ -1694,14 +1694,14 @@ math(Flags, instead_of(Code, dbinom(K, N, P), ubinom(K, N, P)),
 math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
-math(Flags, uqbinom(Dist, Tail1, Tail2, Alpha, N, P), Flags, fun(Tail1, fun(sub('P', "Bi"), [Tail2 ; [N, P]]) =< Alpha)).
+math(Flags, uqbinom(Tail, Dist, Alpha, N, P), Flags, fun(Tail, fun(sub('P', "Bi"), [Dist ; [N, P]]) =< Alpha)).
 
-math(_, tail1("upper"), _, under("argmin", c)).
-math(_, tail1("lower"), _, under("argmax", c)).
+math(_, tail("upper"), _, under("argmin", c)).
+math(_, tail("lower"), _, under("argmax", c)).
 
-math(_, tail2("upper"), _, 'X' >= c).
-math(_, tail2("lower"), _, 'X' =< c).
-math(_, tail2("density"), _, 'X' = c).
+math(_, dist("upper"), _, 'X' >= c).
+math(_, dist("lower"), _, 'X' =< c).
+math(_, dist("density"), _, 'X' = c).
 
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
 math(Flags, successes(Succ, Pi), Flags, Pi^Succ).
