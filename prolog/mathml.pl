@@ -1694,7 +1694,7 @@ math(Flags, instead_of(Code, dbinom(K, N, P), ubinom(K, N, P)),
 math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
-math(Flags, uqbinom(Dist, Tail, Alpha, N, P), Flags, fun(under(tail(Tail), c), x)).
+math(Flags, uqbinom(Dist, Tail, Alpha, N, P), Flags, fun(under(Tail, c), x)).
 
 math(_, tail("upper"), _, "argmin").
 math(_, tail("lower"), _, "argmax").
