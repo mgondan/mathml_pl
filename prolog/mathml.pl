@@ -1701,7 +1701,7 @@ math(_, tail1("lower"), _, under("argmax", c)).
 
 math(_, tail2("upper"), _, 'X' >= c).
 math(_, tail2("lower"), _, 'X' =< c).
-math(_, tail2("dist"), _, 'X' = c).
+math(_, tail2("density"), _, 'X' = c).
 
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
 math(Flags, successes(Succ, Pi), Flags, Pi^Succ).
