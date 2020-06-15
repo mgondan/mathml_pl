@@ -1703,6 +1703,8 @@ math(_, dist("upper"), _, 'X' >= c).
 math(_, dist("lower"), _, 'X' =< c).
 math(_, dist("density"), _, 'X' = c).
 
+math(Flags, dist1(Dist), Flags, dist(Dist)).
+
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
 math(Flags, successes(Succ, Pi), Flags, Pi^Succ).
 math(Flags, failures(Fail, Pi), Flags, (1-Pi)^Fail).
