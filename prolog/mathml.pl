@@ -1687,6 +1687,9 @@ math(Flags, ubinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X')
 math(Flags, instead_of(Code, pbinom(K, N, P), ubinom(K, N, P)),
      Flags, fun(sub(atom('P'), string("Bi")), [instead_of(Code, atom('X') =< K, atom('X') >= K) ; [N, P]])).
 
+math(Flags, instead_of(Code, dbinom(K, N, P), ubinom(K, N, P)),
+     Flags, fun(sub(atom('P'), string("Bi")), [instead_of(Code, atom('X') = K, atom('X') >= K) ; [N, P]])).
+
 % Lower and upper critical value
 math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
