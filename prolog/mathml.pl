@@ -1694,10 +1694,13 @@ math(Flags, instead_of(Code, dbinom(K, N, P), ubinom(K, N, P)),
 math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
-math(Flags, uqbinom(Dist, Tail, Alpha, N, P), Flags, fun(Tail, fun(sub('P', "Bi"), ['X' =< c ; [N, P]]) =< Alpha)).
+math(Flags, uqbinom(Dist, Tail1, Tail2, Alpha, N, P), Flags, fun(Tail1, fun(sub('P', "Bi"), [Tail2 ; [N, P]]) =< Alpha)).
 
-math(_, tail("upper"), _, under("argmin", c)).
-math(_, tail("lower"), _, under("argmax", c)).
+math(_, tail1("upper"), _, under("argmin", c)).
+math(_, tail1("lower"), _, under("argmax", c)).
+
+math(_, tail2("upper"), _, 'X' >= c).
+math(_, tail2("lower"), _, 'X' =< c).
 
 math(Flags, uqbinom("upper", "dist", Alpha, N, P), Flags, argmin(c, ubinom(c, N, P) =< Alpha)).
 math(Flags, uqbinom("lower", "dist", Alpha, N, P), Flags, argmax(c, pbinom(c, N, P) =< Alpha)).
