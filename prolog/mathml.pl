@@ -1701,25 +1701,8 @@ math(_, tail1("lower"), _, under("argmax", c)).
 
 math(_, tail2("upper"), _, 'X' >= c).
 math(_, tail2("lower"), _, 'X' =< c).
+math(_, tail2("dist"), _, 'X' = c).
 
-math(Flags, uqbinom("upper", "dist", Alpha, N, P), Flags, argmin(c, ubinom(c, N, P) =< Alpha)).
-math(Flags, uqbinom("lower", "dist", Alpha, N, P), Flags, argmax(c, pbinom(c, N, P) =< Alpha)).
-
-math(Flags, instead_of(Code, uqbinom("lower", "dist", Alpha, N, P), _, uqbinom("upper", "dist", Alpha, N, P), _), 
-        Flags, fun(instead_of(Code, under("argmax", c), under("argmin", c)), 
-                   instead_of(Code, pbinom(c, N, P), ubinom(c, N, P))) =< Alpha).
-
-math(Flags, instead_of(Code, uqbinom("upper", "density", Alpha, N, P), uqbinom("upper", "dist", Alpha, N, P)), 
-        Flags, fun(under("argmin", c), instead_of(Code, dbinom(c, N, P), ubinom(c, N, P))) =< Alpha).
-
-math(Flags, instead_of(Code, uqbinom("lower", "density", Alpha, N, P), _, uqbinom("upper", "dist", Alpha, N, P), _), 
-        Flags, fun(instead_of(Code, under("argmax", c), under("argmin", c)), 
-                   instead_of(Code, pbinom(c, N, P), ubinom(c, N, P))) =< Alpha).
-
-math(Flags, uqbinom("upper", "density", Alpha, N, P), Flags, argmin(c, dbinom(c, N, P) =< Alpha)).
-math(Flags, uqbinom("lower", "density", Alpha, N, P), Flags, argmax(c, dbinom(c, N, P) =< Alpha)).
-
-% Bit unusual terminology
 math(Flags, bernoulli(Succ, N, Pi), Flags, successes(Succ, Pi) * failures(N-Succ, Pi)).
 math(Flags, successes(Succ, Pi), Flags, Pi^Succ).
 math(Flags, failures(Fail, Pi), Flags, (1-Pi)^Fail).
