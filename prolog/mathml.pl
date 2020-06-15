@@ -1324,6 +1324,19 @@ paren(Flags, operator(Prec, xfy, _, A, B), P) :-
       ; ParenB = PB
     ), P is max(ParenA, ParenB).
 
+paren(Flags, operator(Prec, yfy, _, A, B), P) :-
+    paren(Flags, A, PA),
+    precedence(Flags, A, _-PrecA),
+    ( Prec =< PrecA
+      -> ParenA is PA + 1
+      ; ParenA = PA
+    ), paren(Flags, B, PB),
+    precedence(Flags, B, _-PrecB),
+    ( Prec =< PrecB
+      -> ParenB is PB + 1
+      ; ParenB = PB
+    ), P is max(ParenA, ParenB).
+
 prec(_, operator(P, _, Op, _, _), Op-P).
 
 example :- example(a^3 + 3*a^2*b + 3*a*b^2 + b^3).
