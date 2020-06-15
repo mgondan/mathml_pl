@@ -1698,7 +1698,7 @@ math(Flags, instead_of(Code, uqbinom("lower", "dist", Alpha, N, P), _, uqbinom("
         Flags, fun(instead_of(Code, under("argmax", c), under("argmin", c)), 
                    instead_of(Code, pbinom(c, N, P), ubinom(c, N, P))) =< Alpha).
 
-math(Flags, instead_of(Code, uqbinom("upper", "density", Alpha, N, P), _, uqbinom("upper", "dist", Alpha, N, P), _), 
+math(Flags, instead_of(Code, uqbinom("upper", "density", Alpha, N, P), uqbinom("upper", "dist", Alpha, N, P)), 
         Flags, fun(under("argmin", c), instead_of(Code, dbinom(c, N, P), ubinom(c, N, P))) =< Alpha).
 
 math(Flags, uqbinom("upper", "density", Alpha, N, P), Flags, argmin(c, dbinom(c, N, P) =< Alpha)).
