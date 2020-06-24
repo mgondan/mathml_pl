@@ -1745,6 +1745,8 @@ math(Flags, denoting(A, _, _), Flags, A).
 
 math(Flags, denoting(_, _), Flags, '').
 
+math(Flags, abbrev(A, _), Flags, A).
+
 % Collect abbreviations
 abbreviations(Flags, A, W) :-
     denot(Flags, A, X),
