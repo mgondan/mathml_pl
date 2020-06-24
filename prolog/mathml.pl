@@ -10,7 +10,8 @@
     op(200, xfy, '_'),
     op(500, yfx, '+-'),
     op(1050, xfy, '~>'),
-    op(600, xfy, '~')]).
+    op(600, xfy, '~'),
+    op(150, xfx, ...)]).
 
 :- op(180, xf, !).
 :- op(170, xf, '%').
@@ -198,6 +199,7 @@ operator(->, &(rArr)).
 operator(~>, &(zigrarr)).
 operator(~, ~).
 operator(:, :).
+operator(..., &(hellip)).
 
 example :- 
     example(/).
