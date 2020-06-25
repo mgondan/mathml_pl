@@ -1701,12 +1701,12 @@ math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
 math(Flags, uqbinom(Tail, Dist, Alpha, N, P), Flags, fun(Tail, fun(sub('P', "Bi"), [Dist ; [N, P]]) =< Alpha)).
 
-math(_, tail("upper"), _, under("argmin", c)).
-math(_, tail("lower"), _, under("argmax", c)).
+math(_, tail("upper"), _, under("argmin", k)).
+math(_, tail("lower"), _, under("argmax", k)).
 
-math(_, dist("upper"), _, 'X' >= c).
-math(_, dist("lower"), _, 'X' =< c).
-math(_, dist("density"), _, 'X' = c).
+math(_, dist("upper"), _, 'X' >= k).
+math(_, dist("lower"), _, 'X' =< k).
+math(_, dist("density"), _, 'X' = k).
 
 math(Flags, dist1(Dist), Flags, dist(Dist)).
 
