@@ -955,6 +955,9 @@ prec(Flags, right_elsewhere(Err, Expr), Prec) :-
     compound_name_arguments(Expr, _Op, [L, _R]),
     precedence(Flags, L, Prec).
 
+% Rounding errors
+math(Flags, dec2(X), Flags, X).
+
 example :- example([highlight(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([fix(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([show(err1)], instead_of(err1, sigma, sigma, s)).
