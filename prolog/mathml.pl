@@ -1701,6 +1701,7 @@ math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
 math(Flags, uqbinom(Tail, Dist, Alpha, N, P), Flags, fun(Tail, fun(sub('P', "Bi"), [Dist ; [N, P]]) =< Alpha)).
+math(Flags, pwbinom(Dist, K, N, P), Flags, fun(sub('P', "Bi"), [dist(Dist) ; [N, P]]) =< c).
 
 math(_, tail("upper"), _, under("argmin", k)).
 math(_, tail("lower"), _, under("argmax", k)).
