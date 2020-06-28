@@ -1701,7 +1701,7 @@ math(Flags, lower(Alpha), Flags, Alpha).
 math(Flags, upper(Alpha), Flags, 1 - Alpha).
 
 math(Flags, uqbinom(Tail, Dist, Alpha, N, P), Flags, fun(Tail, fun(sub('P', "Bi"), [Dist ; [N, P]]) =< Alpha)).
-math(Flags, pwbinom(Dist, K, N, P), Flags, fun(sub('P', "Bi"), [dist(Dist) ; [N, P]]) =< c).
+math(Flags, pwbinom(Dist, K, N, P), Flags, fun(sub('P', "Bi"), [dist(Dist, K) ; [N, P]]).
 
 math(_, tail("upper"), _, under("argmin", k)).
 math(_, tail("lower"), _, under("argmax", k)).
@@ -1709,6 +1709,10 @@ math(_, tail("lower"), _, under("argmax", k)).
 math(_, dist("upper"), _, 'X' >= k).
 math(_, dist("lower"), _, 'X' =< k).
 math(_, dist("density"), _, 'X' = k).
+
+math(_, dist("upper", K), _, 'X' >= K).
+math(_, dist("lower", K), _, 'X' =< K).
+math(_, dist("density", K), _, 'X' = K).
 
 math(Flags, dist1(Dist), Flags, dist(Dist)).
 
