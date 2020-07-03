@@ -486,6 +486,17 @@ math(Flags, natural(A), Flags, A).
 math(Flags, pm(A, B), Flags, '+-'(A, B)).
 math(Flags, paired_ci(D, S, N, Alpha), Flags, '+-'(D, fun(sub('T', 1-Alpha/2), (N-1, '_', "df")) * dfrac(S, sqrt(N)))).
 
+math(Flags, pvalue(A), Flags, p < 0.001) :-
+    number(A),
+    A < 0.001.
+
+math(Flags, pvalue(A), Flags, p = round3(A)) :-
+    number(A),
+    A < 0.10.
+
+math(Flags, pvalue(A), Flags, p = round2(A)) :-
+    number(A).
+
 math(Flags, pvalue(A), Flags, A).
 
 math(Flags, fratio(A), Flags, A).
