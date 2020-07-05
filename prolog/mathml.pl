@@ -968,7 +968,7 @@ prec(Flags, right_elsewhere(Err, Expr), Prec) :-
     precedence(Flags, L, Prec).
 
 % Rounding errors
-math(Flags, dec2(X), Flags, X).
+math(Flags, dec(X, _D), Flags, X).
 
 example :- example([highlight(err1)], instead_of(err1, sigma, sigma, s)).
 example :- example([fix(err1)], instead_of(err1, sigma, sigma, s)).
