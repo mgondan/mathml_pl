@@ -1735,6 +1735,8 @@ paren(_, sqrt(_), 0).
 prec(Flags, sqrt(_), P) :-
     precedence(Flags, x^y, P).
 
+math(Flags, square(X), Flags, X^2).
+
 math(Flags, dbinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X') = K ; [N, P]])).
 math(Flags, pbinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X') =< K ; [N, P]])).
 math(Flags, ubinom(K, N, P), Flags, fun(sub(atom('P'), string("Bi")), [atom('X') >= K ; [N, P]])).
