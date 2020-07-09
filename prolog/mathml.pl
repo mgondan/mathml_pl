@@ -694,6 +694,10 @@ prec(Flags, instead_of(Err, Instead, _, _, _), P) :-
     show(Flags, Err),
     precedence(Flags, Instead, P).
 
+ml(Flags, instead_of(Err, _, _, _, Of), M) :-
+    fix(Flags, Err),
+    !, ml(Flags, color_or_box(Err, Of), M).
+
 ml(Flags, instead_of(Err, _, _, Of, _), M) :-
     fix(Flags, Err),
     !, ml(Flags, color_or_box(Err, Of), M).
