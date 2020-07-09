@@ -782,12 +782,12 @@ ml(Flags, skip(Err, Fn, Elem), M) :-
 
 ml(Flags, skip(Err, _Fn, Elem), M) :-
     show(Flags, Err),
-    ml(Flags, Elem, M).
+    ml(Flags, color_or_box(Err, Elem), M).
 
 ml(Flags, skip(Err, Fn, Elem), M) :-
     fix(Flags, Err),
     Expr =.. [Fn, black(Elem)],
-    ml(Flags, color(Err, Expr), M).
+    ml(Flags, color_or_box(Err, Expr), M).
 
 ml(Flags, skip(Err, Fn, Elem), M) :-
     correct(Flags, Err),
