@@ -1772,7 +1772,7 @@ math(Flags, abbrev(A, _), Flags, A).
 % Collect abbreviations
 abbreviations(Flags, A, W) :-
     denot(Flags, A, X),
-    list_to_set(X, W).
+    sort(1, @<, X, W).
 
 denot(_, A, []) :-
     atomic(A).
