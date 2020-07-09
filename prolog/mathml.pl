@@ -532,6 +532,10 @@ erroneous(omit_right(Err, A), Errors) :-
     !, erroneous(A, T),
     Errors = [Err | T].
 
+erroneous(skip(Err, _Fn, A), Errors) :-
+    !, erroneous(A, T),
+    Errors = [Err | T].
+
 erroneous(buggy(Fb, A), Errors) :-
     !, compound_name_arguments(Fb, Err, _),
     erroneous(A, T),
@@ -769,6 +773,34 @@ ml(Flags, omit(Err, Elem), M) :-
 
 paren(Flags, omit(_Err, Elem), P) :-
     paren(Flags, Elem, P).
+
+% Skip function
+ml(Flags, skip(Err, Fn, Elem), M) :-
+    highlight(Flags, Err),
+    Expr =.. [Fn, phantom(x)],
+    ml(Flags, underbrace(Elem, (Expr, string("omitted"))), M).
+
+ml(Flags, skip(Err, _Fn, Elem), M) :-
+    show(Flags, Err),
+    ml(Flags, Elem, M).
+
+ml(Flags, skip(Err, Fn, Elem), M) :-
+    fix(Flags, Err),
+    Expr =.. [Fn, black(Elem)],
+    ml(Flags, color(Err, Expr), M).
+
+ml(Flags, skip(Err, Fn, Elem), M) :-
+    correct(Flags, Err),
+    Expr =.. [Fn, Elem],
+    ml(Flags, Expr, M).
+
+paren(Flags, skip(_Err, Fn, Elem), P) :-
+    Expr =.. [Fn, Elem],
+    paren(Flags, Expr, P).
+
+prec(Flags, skip(_Err, Fn, Elem), P) :-
+    Expr =.. [Fn, Elem],
+    precedence(Flags, Expr, P).
 
 % Add element to list
 ml(Flags, add(Err, Elem), M) :-
