@@ -786,7 +786,7 @@ ml(Flags, skip(Err, _Fn, Elem), M) :-
 
 ml(Flags, skip(Err, Fn, Elem), M) :-
     fix(Flags, Err),
-    Expr =.. [Fn, Elem],
+    Expr =.. [Fn, black(Elem)],
     ml(Flags, color_or_box(Err, Expr), M).
 
 ml(Flags, skip(Err, Fn, Elem), M) :-
