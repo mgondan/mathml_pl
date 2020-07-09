@@ -640,7 +640,7 @@ prec(Flags, instead_of(Err, Instead, _), P) :-
 
 ml(Flags, instead_of(Err, _, Of), M) :-
     fix(Flags, Err),
-    !, ml(Flags, color(Err, Of), M).
+    !, ml(Flags, color_or_box(Err, Of), M).
 
 paren(Flags, instead_of(Err, _, Of), P) :-
     fix(Flags, Err),
@@ -696,7 +696,7 @@ prec(Flags, instead_of(Err, Instead, _, _, _), P) :-
 
 ml(Flags, instead_of(Err, _, _, Of, _), M) :-
     fix(Flags, Err),
-    !, ml(Flags, color(Err, Of), M).
+    !, ml(Flags, color_or_box(Err, Of), M).
 
 paren(Flags, instead_of(Err, _, _, Of, _), P) :-
     fix(Flags, Err),
