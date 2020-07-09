@@ -1683,10 +1683,9 @@ math(Flags, groups_t(M_A, S_A, N_A, M_B, S_B, N_B),
      Flags, fun((string("independent"), punct('_'), atom(t), string("-test")), [M_A, S_A, M_B, S_B; N_A, N_B])).
 
 math(Flags, var_pool(V_A, N_A, V_B, N_B), Flags, var_pool1(V_A, N_A, V_B, N_B)).
-
-math(Flags, var_pool1(V_A, N, V_B, N), Flags, dfrac(V_A + V_B, 2)).
-
-math(Flags, var_pool1(V_A, N_A, V_B, N_B), Flags, dfrac((N_A-1)*V_A + (N_B-1)*V_B, N_A + N_B - 2)).
+math(Flags, var_pool1(V_A, N_A, V_B, N_B), Flags, var_pool2(V_A, N_A, V_B, N_B)).
+math(Flags, var_pool2(V_A, N, V_B, N), Flags, dfrac(V_A + V_B, 2)).
+math(Flags, var_pool2(V_A, N_A, V_B, N_B), Flags, dfrac((N_A-1)*V_A + (N_B-1)*V_B, N_A + N_B - 2)).
 
 ml(Flags, sum(I, From, To, A), mrow([munderover([\['&sum;'], XFrom, XTo]), X])) :-
     ml(Flags, I = From, XFrom),
