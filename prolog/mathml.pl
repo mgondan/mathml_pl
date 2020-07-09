@@ -395,7 +395,7 @@ math(Flags, lightred(A), Flags, color("#FFA0A0", A)).
 
 ml(Flags, color(String, A), mstyle(mathcolor(String), X)) :-
     string(String),
-    ml(Flags, A, X).
+    ml([color(String) | Flags], A, X).
 
 ml(Flags, color(Num, A), X) :-
     number(Num),
@@ -1058,20 +1058,6 @@ paren(Flags, '100%'(A), P) :-
 
 prec(Flags, '100%'(A), atomic-P) :-
     precedence(Flags, a*A, _-P).
-
-%math(_, sup(sub(A, B), C), Subsup) :-
-%    !, Subsup = subsup(A, B, C).
-%
-% Unclear if math works both ways
-% math(Flags, sup(Sub, C), subsup(A, B, C)) :-
-%     math(Flags, Sub, sub(A, B)).
-%
-%math(_, sub(sup(A, B), C), Subsup) :-
-%    !, Subsup = subsup(A, C, B).
-%
-% Unclear if math works both ways
-%math(Flags, sub(Sup, C), subsup(A, C, B)) :-
-%    math(Flags, Sup, sup(A, B)).
 
 ml(Flags, sup(Sub, C), M) :-
     precedence(Flags, Sub, sub-_),
