@@ -757,7 +757,7 @@ prec(Flags, instead_of(Err, Instead, _, _, _), P) :-
 % Omit element in list
 ml(Flags, omit(Err, Elem), M) :-
     highlight(Flags, Err),
-    ml(Flags, underbrace(Elem, string("omitted")), M).
+    ml(Flags, underbrace(Elem, '_', string("omitted")), M).
 
 ml(Flags, omit(Err, Elem), M) :-
     show(Flags, Err),
@@ -778,7 +778,7 @@ paren(Flags, omit(_Err, Elem), P) :-
 ml(Flags, skip(Err, Fn, Elem), M) :-
     highlight(Flags, Err),
     Expr =.. [Fn, phantom(x)],
-    ml(Flags, underbrace(Elem, (Expr, string("omitted"))), M).
+    ml(Flags, underbrace(Elem, (Expr, '_', string("omitted"))), M).
 
 ml(Flags, skip(Err, _Fn, Elem), M) :-
     show(Flags, Err),
