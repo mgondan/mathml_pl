@@ -1061,6 +1061,11 @@ prec(Flags, '100%'(A), atomic-P) :-
 
 ml(Flags, sup(Sub, C), M) :-
     precedence(Flags, Sub, sub-_),
+    member(color(Col), Flags),
+    !, ml([replace(sub(A, B), subsup(A, B, color(Col, C))) | Flags], Sub, M).
+
+ml(Flags, sup(Sub, C), M) :-
+    precedence(Flags, Sub, sub-_),
     !, ml([replace(sub(A, B), subsup(A, B, C)) | Flags], Sub, M).
 
 paren(Flags, sup(Sub, C), P) :-
