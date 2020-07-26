@@ -239,7 +239,7 @@ greek(normal, 'Omega').
 
 % Translate to mathml
 ml(_, greek(A), mi(&(A))).
-ml(_, greek(normal, A), mi(mathvariant(normal), &(A))).
+ml(_, greek(normal, A), mi([mathvariant(normal)], &(A))).
 
 % Level of parentheses
 paren(_, greek(_), 0).
