@@ -215,34 +215,26 @@ math(Flags, A, Flags, greek(normal, A)) :-
     greek(normal, A).
 
 greek(alpha).
-greek(normal, 'Alpha').
-
 greek(beta).
-greek(normal, 'Beta').
-
 greek(gamma).
-greek(normal, 'Gamma').
-
 greek(delta).
-greek(normal, 'Delta').
-
 greek(epsilon).
 greek(varepsilon).
-greek(normal, 'Epsilon').
-
 greek(mu).
-greek(normal, 'Mu').
-
 greek(pi).
-greek(normal, 'Pi').
-
 greek(sigma).
-greek(normal, 'Sigma').
-
 greek(phi).
-greek(normal, 'Phi').
-
 greek(omega).
+
+greek(normal, 'Alpha').
+greek(normal, 'Beta').
+greek(normal, 'Gamma').
+greek(normal, 'Delta').
+greek(normal, 'Epsilon').
+greek(normal, 'Mu').
+greek(normal, 'Pi').
+greek(normal, 'Sigma').
+greek(normal, 'Phi').
 greek(normal, 'Omega').
 
 % Translate to mathml
