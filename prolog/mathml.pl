@@ -212,9 +212,32 @@ math(Flags, A, Flags, greek(A)) :-
     greek(A).
 
 greek(alpha).
+greek('Alpha').
+
+greek(beta).
+greek('Beta').
+
+greek(gamma).
+greek('Gamma').
+
+greek(delta).
+greek('Delta').
+
+greek(epsilon).
+greek(varepsilon).
+greek('Epsilon').
+
 greek(mu).
+greek('Mu').
+
 greek(pi).
+greek('Pi').
+
 greek(sigma).
+greek('Sigma').
+
+greek(phi).
+greek('Phi').
 
 % Translate to mathml
 ml(_, greek(A), mi(&(A))).
@@ -1784,6 +1807,11 @@ example :- example(dbinom(k, n, pi) =
 example :- example(pbinom(k, 'N', pi) =
                    sum(i, k, 'N', choose('N', k) * dbinom(i, 'N', k))).
 example :- example(sum(i, k, 'N', i) + sum(i, k, 'N', i)).
+
+%
+% Normal distribution
+%
+math(Flags, pnorm(Z), Flags, fun(greek('Phi'), Z)).
 
 %
 % Abbreviations
