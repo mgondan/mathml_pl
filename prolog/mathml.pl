@@ -1811,6 +1811,7 @@ example :- example(sum(i, k, 'N', i) + sum(i, k, 'N', i)).
 % Normal distribution
 %
 math(Flags, pnorm(Z), Flags, fun(greek('Phi'), Z)).
+math(Flags, unorm(Z), Flags, 1 - fun(greek('Phi'), Z)).
 
 %
 % Abbreviations
