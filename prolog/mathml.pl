@@ -211,36 +211,43 @@ example :-
 math(Flags, A, Flags, greek(A)) :-
     greek(A).
 
+math(Flags, A, Flags, greek(normal, A)) :-
+    greek(normal, A).
+
 greek(alpha).
-greek('Alpha').
+greek(normal, 'Alpha').
 
 greek(beta).
-greek('Beta').
+greek(normal, 'Beta').
 
 greek(gamma).
-greek('Gamma').
+greek(normal, 'Gamma').
 
 greek(delta).
-greek('Delta').
+greek(normal, 'Delta').
 
 greek(epsilon).
 greek(varepsilon).
-greek('Epsilon').
+greek(normal, 'Epsilon').
 
 greek(mu).
-greek('Mu').
+greek(normal, 'Mu').
 
 greek(pi).
-greek('Pi').
+greek(normal, 'Pi').
 
 greek(sigma).
-greek('Sigma').
+greek(normal, 'Sigma').
 
 greek(phi).
-greek('Phi').
+greek(normal, 'Phi').
+
+greek(omega).
+greek(normal, 'Omega').
 
 % Translate to mathml
-ml(_, greek(A), mi(mathvariant(normal), &(A))).
+ml(_, greek(A), mi(&(A))).
+ml(_, greek(normal, A), mi(mathvariant(normal), &(A))).
 
 % Level of parentheses
 paren(_, greek(_), 0).
