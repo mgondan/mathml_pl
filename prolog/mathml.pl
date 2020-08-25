@@ -1707,7 +1707,7 @@ math(Flags, var_pool2(V_A, N_A, V_B, N_B), Flags, dfrac((N_A-1)*V_A + (N_B-1)*V_
 
 math(Flags, p_pool(S_A, N_A, S_B, N_B), Flags, p_pool1(S_A, N_A, S_B, N_B)).
 math(Flags, p_pool1(S_A, N, S_B, N), Flags, dfrac(S_A + S_B, 2)).
-math(Flags, p_pool1(S_A, N_A, S_B, N_B), Flags, dfrac(N_A*S_A + N_B*S_B, N_A + N_B)).
+math(Flags, p_pool1(S_A, N_A, S_B, N_B), Flags, dfrac(S_A + S_B, N_A + N_B)).
 
 ml(Flags, sum(I, From, To, A), mrow([munderover([\['&sum;'], XFrom, XTo]), X])) :-
     ml(Flags, I = From, XFrom),
