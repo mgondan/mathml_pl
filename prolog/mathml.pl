@@ -505,6 +505,7 @@ paren(Flags, phantom(A), P) :-
 
 % formatting numbers
 math(Flags, tratio(A, _Df), Flags, A).
+math(Flags, chi2ratio(A, _Df), Flags, A).
 math(Flags, zratio(A), Flags, A).
 math(Flags, prob(A), Flags, A).
 math(Flags, perc(A), Flags, A).
