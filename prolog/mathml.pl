@@ -211,6 +211,7 @@ example :-
 math(Flags, A, Flags, greek(A)) :-
     greek(A).
 
+% Non-italicized uppercase letters
 math(Flags, A, Flags, greek(normal, A)) :-
     greek(normal, A).
 
@@ -222,6 +223,7 @@ greek(epsilon).
 greek(varepsilon).
 greek(mu).
 greek(pi).
+greek(chi).
 greek(sigma).
 greek(phi).
 greek(omega).
@@ -234,6 +236,7 @@ greek(normal, 'Epsilon').
 greek(normal, 'Mu').
 greek(normal, 'Pi').
 greek(normal, 'Sigma').
+greek(normal, 'Chi').
 greek(normal, 'Phi').
 greek(normal, 'Omega').
 
