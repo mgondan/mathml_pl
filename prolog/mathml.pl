@@ -1077,7 +1077,7 @@ example :- example(kg(5)).
 ml(Flags, '100%'(A), X) :-
     select_option(mult(M), Flags, New, 1),
     _100M is 100 * M,
-    ml([mult(_100M) | New], round(A) '%', X).
+    ml([mult(_100M) | New], round0(A) '%', X).
 
 paren(Flags, '100%'(A), P) :-
     paren(Flags, A, P).
