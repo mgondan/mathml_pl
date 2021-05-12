@@ -456,7 +456,7 @@ math(Flags, mean(A), Flags, overline(A)).
 
 % Underbrace with text
 ml(Flags, underbrace(A, Under),
-    munder([accentunder(true)], [munder([accentunder(true)], [X, mo([stretchy(true)], &('UnderBrace'))]), Y])) :-
+    munder([accentunder(false)], [munder([accentunder(false)], [X, mo([stretchy(true)], &('#x23DF'))]), Y])) :-
     ml(Flags, A, X),
     ml(Flags, Under, Y).
 
