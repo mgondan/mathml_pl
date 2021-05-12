@@ -456,7 +456,7 @@ math(Flags, mean(A), Flags, overline(A)).
 
 % Underbrace with text
 ml(Flags, underbrace(A, Under),
-    munder([accentunder(false)], [munder([accentunder(true)], [X, mo([stretchy(true)], &('UnderBrace'))]), Y])) :-
+    munder([accentunder(false)], [munder([accentunder(true)], [X, mo([stretchy(true), overflow(scale)], &('UnderBrace'))]), Y])) :-
     ml(Flags, A, X),
     ml(Flags, Under, Y).
 
@@ -702,7 +702,7 @@ ml(Flags, instead_of(Err, Instead, Of), M) :-
     !, ml(Flags, Instead, MInstead),
     % Fix errors in Of
     ml([fix(all) | Flags], (string("instead of"), punct(' '), Of), MOf),
-    M = munder([accentunder(false)], [munder([accentunder(true)], [MInstead, mo([stretchy(true)], &('UnderBrace'))]), MOf]).
+    M = munder([accentunder(false)], [munder([accentunder(true)], [MInstead, mo([stretchy(true), overflow(scale)], &('UnderBrace'))]), MOf]).
 
 paren(Flags, instead_of(Err, Instead, _), P) :-
     highlight(Flags, Err),
@@ -754,7 +754,7 @@ prec(Flags, instead_of(Err, _, _, Of, _), P) :-
     precedence(Flags, Of, P).
 
 ml(Flags, underbrace(A, Under),
-    munder([accentunder(false)], [munder([accentunder(true)], [X, mo([stretchy(true)], &('UnderBrace'))]), Y])) :-
+    munder([accentunder(false)], [munder([accentunder(true)], [X, mo([stretchy(true), overflow(scale)], &('UnderBrace'))]), Y])) :-
     ml(Flags, A, X),
     ml(Flags, Under, Y).
 
@@ -763,14 +763,14 @@ ml(Flags, instead_of(Err, Instead, Instead, _Of, Of), M) :-
     !, ml(Flags, Instead, MInstead),
     % Fix errors in Of
     ml([fix(all) | Flags], (string("instead of"), punct(' '), Of), MOf),
-    M = munder([accentunder(false)], [munder(accentunder(true), [MInstead, mo([stretchy(true)], &('UnderBrace'))]), MOf]).
+    M = munder([accentunder(false)], [munder(accentunder(true), [MInstead, mo([stretchy(true), overflow(scale)], &('UnderBrace'))]), MOf]).
 
 ml(Flags, instead_of(Err, I, Instead, _Of, Of), M) :-
     highlight(Flags, Err),
     !, ml(Flags, I, MI),
     % Fix errors in Of
     ml([fix(all) | Flags], (Instead, punct(' '), string("instead of"), punct(' '), Of), MOf),
-    M = munder([accentunder(false)], [munder([accentunder(true)], [MI, mo([stretchy(true)], &('UnderBrace'))]), MOf]).
+    M = munder([accentunder(false)], [munder([accentunder(true)], [MI, mo([stretchy(true), overflow(scale)], &('UnderBrace'))]), MOf]).
 
 
 paren(Flags, instead_of(Err, Instead, _, _, _), P) :-
